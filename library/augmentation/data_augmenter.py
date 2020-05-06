@@ -1,7 +1,7 @@
-import albumentation as A 
+import albumentations as A 
 import torchvision.transforms as T
 from torchvision.transforms import *
-from albumentation import *
+from albumentations import *
 
 
 class TransfomedDataSet():
