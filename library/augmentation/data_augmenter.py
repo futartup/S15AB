@@ -2,6 +2,7 @@ import albumentations as A
 import torchvision.transforms as T
 from torchvision.transforms import *
 from albumentations import *
+import numpy as np
 
 mapping = {
     'albumentation': A,
