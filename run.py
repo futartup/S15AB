@@ -1,7 +1,7 @@
 import json
 import argparse
 from library.model.get_model import GetModel
-from .loader.data_loader import DataLoader
+from library.loader.data_loader import DataLoader
 from tqdm import tqdm
 import torch
 import torch.nn as nn

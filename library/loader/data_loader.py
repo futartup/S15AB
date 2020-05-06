@@ -1,5 +1,4 @@
-import pytorch
-from .augmentation.data_augmenter import TransfomedDataSet
+from library.augmentation.data_augmenter import TransfomedDataSet
 
 
 data_dict = {
