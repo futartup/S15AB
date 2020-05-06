@@ -37,7 +37,7 @@ class Main:
         self.get_optimizer()
         self.get_scheduler()
         self.lr_finder()
-        for e in range(1, self.conf['epochs']:
+        for e in range(1, self.conf['epochs']):
             self.train()
             self.test()
 
