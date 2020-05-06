@@ -25,9 +25,9 @@ class Main:
         assert "model" in conf, "Please define the model name"
 
         self.conf = conf 
-        self.channels = channels
-        self.height = height
-        self.width = width
+        self.channels = int(channels)
+        self.height = int(height)
+        self.width = int(width)
         self.data_dir = data_dir
         self.model = self.get_model()
         assert self.conf['loss'] in globals(), "The loss function name doesn't match with names available"
