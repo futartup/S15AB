@@ -12,6 +12,8 @@ from torch.optim.lr_scheduler import OneCycleLR, ReduceLROnPlateau
 from library.lr_finder import LRFinder
 from torch.nn import *
 import torch.nn.functional as F
+from mpl_toolkits.axes_grid1 import ImageGrid
+
 
 
 class Main:
@@ -36,10 +38,11 @@ class Main:
         self.execution_flow()
 
     def execution_flow(self):
-        self.get_loaders()
-        self.lr_finder()
-        self.get_optimizer()
-        self.get_scheduler()
+        self.get_loaders() # get the test and train loaders
+        self.visualize_tranformed_data() # visualize the images for training
+        self.lr_finder() # find the best LR
+        self.get_optimizer() # get the optimizer
+        self.get_scheduler() # get the scheduler
         
         for e in range(1, self.conf['epochs']):
             self.train()
@@ -49,6 +52,20 @@ class Main:
         state = {'epoch': epoch + 1, 'state_dict': model.state_dict(),
              'optimizer': optimizer.state_dict(), 'losslogger': losslogger, }
         torch.save(state, 'saved_models/{}_{}'.format(datetime.now(), uuid.uuid4()))
+
+    def visualize_tranformed_data(self):
+        images, labels = next(iter(self.train_loader))
+        images = images.numpy()  # convert images to numpy for display
+        # plot the images in the batch, along with the corresponding labels
+        fig = plt.figure(figsize=(10, 10))
+        grid = ImageGrid(fig, 111,  # similar to subplot(111)
+                        nrows_ncols=(10, 10),  # creates 2x2 grid of axes
+                        axes_pad=0.1,  # pad between axes in inch.
+                        )
+        for ax, im in zip(grid, images):
+            # Iterating over the grid returns the Axes.
+            ax.imshow(im.transpose((1, 2, 0)))
+        plt.show()
 
     def get_model(self):
         model_obj = GetModel(self.conf, self.channels, self.height, self.width )
