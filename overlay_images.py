@@ -7,6 +7,10 @@ import os
 import numpy as np
 from tqdm import tqdm
 import gc
+if sys.version_info >= (3, 6):
+    import zipfile
+else:
+    import zipfile36 as zipfile
 
 
 CHANNEL_NUM = 3
@@ -30,12 +34,13 @@ print("[INFO] processing the images...")
 image_paths_background = list(paths.list_images(args["dataset1"]))
 image_paths_flipped_foreground = list(paths.list_images(args["dataset2"]))
 image_paths_foreground = list(paths.list_images(args["dataset2"]))
-
 total_flipped_foreground = image_paths_flipped_foreground + image_paths_foreground
-mean = [0,0,0]
-std = [0,0,0]
-count = 0
-for x in tqdm(total_flipped_foreground):
+
+
+for x, image in enumerate(tqdm(total_flipped_foreground)):
+    # labels for the created image
+    label_info = open(f't_label.txt', 'w+')
+
     # open the image which we will overlay
     image_foreground = Image.open(x)
     image_foreground_copy = image_foreground.copy()
@@ -58,14 +63,12 @@ for x in tqdm(total_flipped_foreground):
             img.paste(all_white_image_foreground_copy, (x, y), all_white_image_foreground_copy)
             img.save(os.getcwd() + '/raw_images/masked_images_blackwhite/bw_{}.png'.format(count))
 
-            # Calculate the mean and std
+            # Calculate the mean and std for each image
             im = np.asarray(image_background_copy)
             im = im / 255.0
             pixel_num += (im.size / CHANNEL_NUM)
             channel_sum += np.sum(im, axis=(0, 1))
-            #channel_sum.round(decimals=5)
             channel_sum_squared += np.sum(np.square(im), axis=(0, 1))
-            #channel_sum_squared.round(decimals=5)
 
             image_background_copy.close()
             img.close()
@@ -80,13 +83,3 @@ rgb_mean = list(bgr_mean)[::-1]
 rgb_std = list(bgr_std)[::-1]
 
 print(rgb_mean, rgb_std)
-
-
-
-
-# img = Image.open("data_mask_1354_2030.png")
-#
-# background = Image.open("background_1354_2030.png")
-#
-# background.paste(img, (0, 0), img)
-# background.save('how_to_superimpose_two_images_01.png',"PNG")
