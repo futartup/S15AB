@@ -170,6 +170,7 @@ class Main:
 
 
 if __name__ == '__main__':
+    # Main file
     ap = argparse.ArgumentParser()
     ap.add_argument("--conf_dir", required=True,
                     help="path to the configuration file")
