@@ -142,12 +142,11 @@ class Main:
             #return accuracy 
     
     def get_optimizer(self):
-        if self.conf['optimizer']['type'] in optimizer_mapping:
-            optimizer = globals()[self.conf['optimizer']['type']]
-            self.conf['optimizer'].pop('type')
-            self.optimizer = optimizer(self.model.parameters(),
-                                       lr=self.max_lr/10,
-                                       **self.conf['optimizer'])
+        optimizer = globals()[self.conf['optimizer']['type']]
+        self.conf['optimizer'].pop('type')
+        self.optimizer = optimizer(self.model.parameters(),
+                                    lr=self.max_lr/10,
+                                    **self.conf['optimizer'])
 
     def get_scheduler(self):
         if self.conf['scheduler']['type'] in scheduler_mapping:
