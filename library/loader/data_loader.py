@@ -1,4 +1,5 @@
 from library.augmentation.data_augmenter import TransfomedDataSet
+import torchvision
 
 
 data_dict = {
