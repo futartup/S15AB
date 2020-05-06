@@ -41,7 +41,7 @@ class DataLoader():
                                        download=True,
                                        transform=self.train_loader)
     else:
-      return torchvision.datasets.ImageFolder(root=self.data_dir+ '/train/', 
+      return torchvision.datasets.ImageFolder(root=self.data_dir+ '/train', 
                                               transform=self.train_loader)
   
   def get_test_set(self): 
@@ -50,7 +50,7 @@ class DataLoader():
                                        train=False,
                                        transform=self.test_loader)
     else:
-      return torchvision.datasets.ImageFolder(root=self.data_dir + '/test/', 
+      return torchvision.datasets.ImageFolder(root=self.data_dir + '/test', 
                                               transform=self.train_loader)
     
   def get_train_loader(self):
