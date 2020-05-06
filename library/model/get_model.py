@@ -4,6 +4,7 @@ from library.model.resnet18 import ResNet18
 
 model_mapping = {
     "resnet18": ResNet18,
+    "depth_prediction": DepthPrediction,
 }
 
 class GetModel:
@@ -18,7 +19,7 @@ class GetModel:
         if self.conf.get('model') in model_mapping:
             model_name = self.conf.get('model').lower()
         else:
-            print("The model names that you can define are resnet18, resnet50")
+            print("The model names that you can define are resnet18, depth_prediction")
         model = model_mapping[model_name]()
         self.get_summary(model)
         return model, self.device
