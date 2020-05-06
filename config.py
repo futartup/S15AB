@@ -1,6 +1,8 @@
 {
     "seed": 1,
     "data": "custom",
+    "mean": [0.43050, 0.44021, 0.43348],
+    "std": [0.28751, 0.26746, 0.26826],
     "num_workers": 2,
     "shuffle": true,
     "epochs": 50,
@@ -9,7 +11,6 @@
     "num_workers": 2,
     "lr_step_size": 25,
     "lr_gamma": 0.001,
-    "data_set": "cifar10",
     "loss": "CrossEntropyLoss",
     "lr_finder": {
         "optimizer": {"lr": 1e-5},
@@ -52,11 +53,26 @@
                 "num_holes":1,
                 "max_h_size": 8, 
                 "max_w_size": 8
+            },
+            {
+                "name": "Normalize",
+                "mean": [0.43050, 0.44021, 0.43348],
+                "std": [0.28751, 0.26746, 0.26826],
+                "always_apply": True
             }
+
         ]
         },
         "test": {
-            "which": "albumentation"
+            "which": "albumentation",
+            "what": [
+                {
+                 "name": "Normalize",
+                 "mean": [0.43050, 0.44021, 0.43348],
+                 "std": [0.28751, 0.26746, 0.26826],
+                 "always_apply": True
+                }
+            ]
         }
     },
     "model": "resnet18"
