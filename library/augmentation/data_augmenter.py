@@ -3,6 +3,10 @@ import torchvision.transforms as T
 from torchvision.transforms import *
 from albumentations import *
 
+mapping = {
+    'albumentation': A,
+    'pytorch': T,
+}
 
 class TransfomedDataSet():
   def __init__(self, transform_dict={}):
@@ -11,23 +15,24 @@ class TransfomedDataSet():
     else:
         self.aug = self.get_augmented_images(transform_dict)
 
-  def get_augmented_images(transform_list):
+  def get_augmented_images(self, transform_dict):
     augment_list = []
-    if transform_list['which'] in mapping:
-        obj = transform_list['which']
+    if transform_dict['which'] in mapping:
+        obj = transform_dict['which']
         if obj == 'albumentation':
             O = A 
             from albumentations.pytorch import ToTensor
         else:
             O = T
         methods = dir(obj)
-        for x in transform_list['what']:
-            if x['name'] in methods:
-                name = x['name']
-                x.pop('name')
-                augment_list.append(globals()[name](**x))
+        if 'what' in transform_dict:
+            for x in transform_dict['what']:
+                if x['name'] in methods:
+                    name = x['name']
+                    x.pop('name')
+                    augment_list.append(globals()[name](**x))
         augment_list.append(ToTensor())
-    return O.compose(augment_list) 
+    return O.Compose(augment_list) 
 
   def __call__(self, image):
     # image = plt.imread(numpy.asarray(self.image_list[i][0]))

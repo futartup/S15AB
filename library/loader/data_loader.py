@@ -1,6 +1,6 @@
 from library.augmentation.data_augmenter import TransfomedDataSet
 import torchvision
-
+import torch
 
 data_dict = {
     'cifar10': torchvision.datasets.CIFAR10,
@@ -35,8 +35,8 @@ class DataLoader():
     return
 
   def get_train_set(self): 
-    if self.conf.data.lower() in data_dict:
-      return data_dict[self.conf.data.lower()](root=self.path_to_save_data,
+    if self.conf['data'].lower() in data_dict:
+      return data_dict[self.conf['data'].lower()](root=self.path_to_save_data,
                                        train=True,
                                        download=True,
                                        transform=self.train_loader)
@@ -45,8 +45,8 @@ class DataLoader():
                                               transform=self.train_loader)
   
   def get_test_set(self): 
-    if self.conf.data.lower() in data_dict:
-      return data_dict[self.conf.data.lower()](root=self.path_to_save_data,
+    if self.conf['data'].lower() in data_dict:
+      return data_dict[self.conf['data'].lower()](root=self.path_to_save_data,
                                        train=False,
                                        transform=self.test_loader)
     else:

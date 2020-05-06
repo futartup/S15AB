@@ -12,9 +12,8 @@ class GetModel:
         self.channels = channels
         self.input_height = input_height
         self.input_width = input_width
-        self.model = self.return_model(self.conf)
+        self.model = self.return_model()
 
-    @classmethod
     def return_model(self):
         if self.conf.get('model') in model_mapping:
             model_name = self.conf.get('model').lower()
@@ -30,3 +29,5 @@ class GetModel:
             self.device = torch.device("cuda" if use_cuda else "cpu")
             model = net.to(self.device)
             summary(model, input_size=(self.channels, self.input_height, self.input_width))
+        else:
+            self.device = None

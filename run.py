@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 from torch.optim import *
 from torch.optim.lr_scheduler import OneCycleLR, ReduceLROnPlateau
-from nn import *
+from torch.nn import *
 import torch.nn.functional as F
 
 
@@ -42,7 +42,8 @@ class Main:
             self.test()
 
     def get_model(self):
-        self.model, self.device = GetModel(self.conf, self.channels, self.height, self.width ).return_model()
+        model_obj = GetModel(self.conf, self.channels, self.height, self.width )
+        self.model, self.device = model_obj.return_model()
 
     def get_loaders(self):
         obj = DataLoader(self.conf, self.data_dir)

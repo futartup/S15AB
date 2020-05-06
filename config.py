@@ -14,7 +14,7 @@
     "lr_finder": {
         "optimizer": {"lr": 1e-5},
         "range_test": {"end_lr":100, "step_mode": "exp"}
-    }
+    },
     "optimizer": {
         "type": "SGD",
         "weight_decay": 1e-4,
@@ -59,5 +59,5 @@
             "which": "albumentation"
         }
     },
-    "model": {}
+    "model": "resnet18"
 }
