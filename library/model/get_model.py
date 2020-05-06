@@ -20,12 +20,12 @@ class GetModel:
         else:
             print("The model names that you can define are resnet18, resnet50")
         model = model_mapping[model_name]()
-        print(model)
         self.get_summary(model)
         return model, self.device
 
     def get_summary(self, net):
         use_cuda = torch.cuda.is_available()
+        print(use_cuda)
         if use_cuda:
             torch.cuda.manual_seed(self.conf.get('seed'))
             self.device = torch.device("cuda" if use_cuda else "cpu")
