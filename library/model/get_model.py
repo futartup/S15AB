@@ -1,6 +1,6 @@
 import torch 
 from torchsummary import summary
-from .model.resnet18 import ResNet18
+from library.model.resnet18 import ResNet18
 
 model_mapping = {
     "resnet18": ResNet18,

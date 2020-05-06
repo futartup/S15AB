@@ -1,6 +1,6 @@
 import json
 import argparse
-from .model.get_model import GetModel
+from library.model.get_model import GetModel
 from .loader.data_loader import DataLoader
 from tqdm import tqdm
 import torch
