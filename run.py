@@ -1,5 +1,7 @@
 import json
 import argparse
+import uuid
+from datetime import datetime
 from library.model.get_model import GetModel
 from library.loader.data_loader import DataLoader
 from tqdm import tqdm
@@ -42,6 +44,11 @@ class Main:
         for e in range(1, self.conf['epochs']):
             self.train()
             self.test()
+
+        # Save the model, optimizer, 
+        state = {'epoch': epoch + 1, 'state_dict': model.state_dict(),
+             'optimizer': optimizer.state_dict(), 'losslogger': losslogger, }
+        torch.save(state, 'saved_models/{}_{}'.format(datetime.now(), uuid.uuid4()))
 
     def get_model(self):
         model_obj = GetModel(self.conf, self.channels, self.height, self.width )
@@ -186,6 +193,8 @@ if __name__ == '__main__':
                     help="The width of an image")
     ap.add_argument("--data_dir", required=True,
                     help="The Directory to the data")
+    ap.add_argument("--load_model", required=False,
+                    help="Load the saved model")
     args = vars(ap.parse_args())
     conf = args.get('conf_dir')
     with open(conf, 'r') as fp:
