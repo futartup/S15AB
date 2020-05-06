@@ -68,19 +68,19 @@ class Main:
                     for i,val in enumerate(result):
                         status = val.item()
                         if status:
-                        if len(correct_predicted) < sample_count:
-                            correct_predicted.append({
-                                'prediction': pred[i],
-                                'label': list(target.view_as(pred))[i],
-                                'image': data[i]
-                            })
-                        else:
-                        if len(false_predicted) < sample_count:
-                            false_predicted.append({
-                                'prediction': pred[i],
-                                'label': list(target.view_as(pred))[i],
-                                'image': data[i]
-                            })
+                            if len(correct_predicted) < sample_count:
+                                correct_predicted.append({
+                                    'prediction': pred[i],
+                                    'label': list(target.view_as(pred))[i],
+                                    'image': data[i]
+                                })
+                            else:
+                                if len(false_predicted) < sample_count:
+                                    false_predicted.append({
+                                        'prediction': pred[i],
+                                        'label': list(target.view_as(pred))[i],
+                                        'image': data[i]
+                                    })
                 correct += result.sum().item()
         test_loss /= len(test_loader.dataset)
         test_losses.append(test_loss)
