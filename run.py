@@ -7,6 +7,7 @@ import torch
 import torch.nn as nn
 from torch.optim import *
 from torch.optim.lr_scheduler import OneCycleLR, ReduceLROnPlateau
+from library.lr_finder import LRFinder
 from torch.nn import *
 import torch.nn.functional as F
 
@@ -34,9 +35,10 @@ class Main:
 
     def execution_flow(self):
         self.get_loaders()
+        self.lr_finder()
         self.get_optimizer()
         self.get_scheduler()
-        self.lr_finder()
+        
         for e in range(1, self.conf['epochs']):
             self.train()
             self.test()
@@ -44,6 +46,7 @@ class Main:
     def get_model(self):
         model_obj = GetModel(self.conf, self.channels, self.height, self.width )
         self.model, self.device = model_obj.return_model()
+        return self.model 
 
     def get_loaders(self):
         obj = DataLoader(self.conf, self.data_dir)
@@ -158,8 +161,9 @@ class Main:
                                        **self.conf['scheduler'])
 
     def lr_finder(self):
-        optimizer = optim.SGD(self.model.parameters(), **self.conf['lr_finder']['optimizer'])
-        lr_finder = LRFinder(self.model, self.optimizer, self.criterion, self.device) #implemented LRFinder for SGD
+        criterion = globals()[self.conf['loss']]
+        optimizer = globals()[self.conf['optimizer']['type']](self.model.parameters(), **self.conf['lr_finder']['optimizer'])
+        lr_finder = LRFinder(self.model, optimizer, criterion, self.device) #implemented LRFinder for SGD
         lr_finder.range_test(self.train_loader, num_iter=len(self.train_loader)*10, **self.conf['lr_finder']['range_test'])
         lr_finder.plot() # to inspect the loss-learning rate graph
         lr_finder.reset()
