@@ -58,7 +58,7 @@
                 "name": "Normalize",
                 "mean": [0.43050, 0.44021, 0.43348],
                 "std": [0.28751, 0.26746, 0.26826],
-                "always_apply": True
+                "always_apply": true
             }
 
         ]
@@ -70,7 +70,7 @@
                  "name": "Normalize",
                  "mean": [0.43050, 0.44021, 0.43348],
                  "std": [0.28751, 0.26746, 0.26826],
-                 "always_apply": True
+                 "always_apply": true
                 }
             ]
         }
