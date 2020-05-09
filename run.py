@@ -22,13 +22,12 @@ class Main:
     main class where the program diverge to various modules
     It is as an entry point
     """
-    def __init__(self, conf, channels=3, height=32, width=32, data_dir='./data'):   
+    def __init__(self, conf, height=32, width=32, data_dir='./data'):   
         # Sanity check 
         assert bool(conf) == True, "Please set configurations for your journey"
         assert "model" in conf, "Please define the model name"
 
         self.conf = conf 
-        self.channels = int(channels)
         self.height = int(height)
         self.width = int(width)
         self.data_dir = data_dir
@@ -221,4 +220,4 @@ if __name__ == '__main__':
     conf = args.get('conf_dir')
     with open(conf, 'r') as fp:
         conf = json.load(fp)
-    Main(conf, args.get('channels'), args.get('height'), args.get('width'), args.get('data_dir'))
+    Main(conf, args.get('height'), args.get('width'), args.get('data_dir'))
