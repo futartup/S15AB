@@ -141,7 +141,7 @@ class Main:
             # Because of this, when you start your training loop, ideally you should zero out the gradients so that you do the parameter update correctly.
 
             # Predict
-            y_pred = model(data)
+            y_pred = self.model(data)
 
             # Calculate loss
             loss = self.criterion(y_pred, target)
