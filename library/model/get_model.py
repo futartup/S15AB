@@ -9,9 +9,8 @@ model_mapping = {
 }
 
 class GetModel:
-    def __init__(self, conf, channels=3, input_height=32, input_width=32):
+    def __init__(self, conf, input_height=32, input_width=32):
         self.conf = conf 
-        self.channels = channels
         self.input_height = input_height
         self.input_width = input_width
         self.model = self.return_model()

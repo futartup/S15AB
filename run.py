@@ -68,7 +68,7 @@ class Main:
         plt.show()
 
     def get_model(self):
-        model_obj = GetModel(self.conf, self.channels, self.height, self.width )
+        model_obj = GetModel(self.conf, self.height, self.width )
         self.model, self.device = model_obj.return_model()
         return self.model 
 
