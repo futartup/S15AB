@@ -75,5 +75,10 @@
             ]
         }
     },
-    "model": "UNet"
+    "model": "UNet",
+    "model_initializer": {
+        "n_channels": 1,
+        "n_classes": 2,
+        "bilinear": false
+    }
 }

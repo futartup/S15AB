@@ -20,7 +20,7 @@ class GetModel:
             model_name = self.conf.get('model').lower()
         else:
             print("The model names that you can define are resnet18, depth_prediction")
-        model = model_mapping[model_name]()
+        model = model_mapping[model_name](**self.conf['model_initializer'])
         self.get_summary(model)
         return model, self.device
 
