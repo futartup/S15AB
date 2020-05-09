@@ -1,10 +1,11 @@
 import torch 
 from torchsummary import summary
 from library.model.resnet18 import ResNet18
+from library.model.u_net import UNet
 
 model_mapping = {
     "resnet18": ResNet18,
-    "depth_prediction": DepthPrediction,
+    "unet": UNet,
 }
 
 class GetModel:
