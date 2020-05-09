@@ -105,12 +105,3 @@ class UNet(nn.Module):
         x = self.up4(x, x1)
         logits = self.outc(x)
         return logits
-
-net = UNet(1, 2, False)
-use_cuda = torch.cuda.is_available()
-print(use_cuda)
-if use_cuda:
-    torch.cuda.manual_seed(1)
-device = torch.device("cuda" if use_cuda else "cpu")
-model = net.to(device)
-summary(model, input_size=(1, 224, 224))
