@@ -185,6 +185,7 @@ class Main:
         self.conf['scheduler'].pop('type')
         self.scheduler = scheduler(self.optimizer,
                                     max_lr=self.max_lr,
+                                    epochs=self.conf['epochs'],
                                     steps_per_epoch=int(len(self.train_loader))+1,
                                     **self.conf['scheduler'])
 
