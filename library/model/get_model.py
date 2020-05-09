@@ -32,4 +32,5 @@ class GetModel:
             torch.cuda.manual_seed(self.conf.get('seed'))
         self.device = torch.device("cuda" if use_cuda else "cpu")
         model = net.to(self.device)
-        summary(model, input_size=(self.channels, self.input_height, self.input_width))
+        summary(model, input_size=(self.conf['model_initializer']['n_channels'], 
+                                   self.input_height, self.input_width))
