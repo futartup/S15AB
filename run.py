@@ -172,18 +172,21 @@ class Main:
     def get_optimizer(self):
         optimizer = globals()[self.conf['optimizer']['type']]
         self.conf['optimizer'].pop('type')
+        try:
+          self.max_lr = self.max_lr/10
+        except:
+          self.max_lr = 0.01
         self.optimizer = optimizer(self.model.parameters(),
                                     lr=self.max_lr/10,
                                     **self.conf['optimizer'])
 
     def get_scheduler(self):
-        if self.conf['scheduler']['type'] in scheduler_mapping:
-            scheduler = globals()[self.conf['scheduler']['type']]
-            self.conf['scheduler'].pop('type')
-            self.scheduler = scheduler(self.optimizer,
-                                       max_lr=self.max_lr,
-                                       steps_per_epoch=int(len(self.train_loader))+1
-                                       **self.conf['scheduler'])
+        scheduler = globals()[self.conf['scheduler']['type']]
+        self.conf['scheduler'].pop('type')
+        self.scheduler = scheduler(self.optimizer,
+                                    max_lr=self.max_lr,
+                                    steps_per_epoch=int(len(self.train_loader))+1,
+                                    **self.conf['scheduler'])
 
     def lr_finder(self):
         criterion = globals()[self.conf['loss']]
