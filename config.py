@@ -75,5 +75,5 @@
             ]
         }
     },
-    "model": "resnet18"
+    "model": "UNet"
 }
