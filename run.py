@@ -189,7 +189,7 @@ class Main:
                                     **self.conf['scheduler'])
 
     def lr_finder(self):
-        criterion = globals()[self.conf['loss']]
+        criterion = globals()[self.conf['loss']]()
         optimizer = globals()[self.conf['optimizer']['type']](self.model.parameters(), **self.conf['lr_finder']['optimizer'])
         lr_finder = LRFinder(self.model, optimizer, criterion, self.device) #implemented LRFinder for SGD
         lr_finder.range_test(self.train_loader, num_iter=len(self.train_loader)*10, **self.conf['lr_finder']['range_test'])
