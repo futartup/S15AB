@@ -33,7 +33,7 @@ class Main:
         self.data_dir = data_dir
         self.model = self.get_model()
         assert self.conf['loss'] in globals(), "The loss function name doesn't match with names available"
-        self.criterion = globals()[self.conf['loss']]
+        self.criterion = globals()[self.conf['loss']]()
 
         self.execution_flow()
 
