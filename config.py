@@ -77,7 +77,7 @@
     },
     "model": "unet",
     "model_initializer": {
-        "n_channels": 1,
+        "n_channels": 3,
         "n_classes": 2,
         "bilinear": false
     }
