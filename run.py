@@ -3,7 +3,7 @@ import argparse
 import uuid
 from datetime import datetime
 from library.model.get_model import GetModel
-from library.loader.data_loader import DataLoader
+from library.loader.data_loader import DataLoader, DepthDataLoader
 from tqdm import tqdm
 import torch
 import torch.nn as nn
@@ -73,7 +73,7 @@ class Main:
         return self.model 
 
     def get_loaders(self):
-        obj = DataLoader(self.conf, self.data_dir)
+        obj = DepthDataLoader(self.conf, self.data_dir + '/images', self.data_dir + '/mask', .30)
         self.train_loader = obj.get_train_loader()
         self.test_loader = obj.get_test_loader()
 

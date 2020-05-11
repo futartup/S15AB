@@ -1,6 +1,12 @@
 from library.augmentation.data_augmenter import TransfomedDataSet
 import torchvision
 import torch
+from torch.utils.data import Dataset, DataLoader, random_split
+from os.path import splitext
+from os import listdir
+from glob import glob
+import numpy as np 
+
 
 data_dict = {
     'cifar10': torchvision.datasets.CIFAR10,
@@ -71,3 +77,64 @@ class DataLoader():
                                               transform=self.train_loader)
     
   
+
+class DepthDataLoader:
+  def __init__(self, conf, image_dir, mask_dir, test_data_percentage):
+    # self.image_dir = image_dir
+    # self.mask_dir = mask_dir
+    # self.conf = conf
+    # self.test_data_percentage = test_data_percentage
+    dataset = DepthDataSet(conf, image_dir, mask_dir)
+    test_p = int(len(dataset)) * test_data_percentage
+    train_p = len(dataset) - test_p
+    self.train, self.test = random_split(dataset, [train_p, test_p])
+
+  def get_train_loader(self):
+    return torch.utils.data.DataLoader(self.train, 
+                                       batch_size=self.conf.get('batch_size', 64),
+                                       shuffle=self.conf.get('shuffle', True), 
+                                       num_workers=self.conf.get('num_workers', 2)
+                                       pin_memory=self.conf.get('pin_memory', True))
+    
+  def get_test_loader(self):
+    return torch.utils.data.DataLoader(self.test, 
+                                       batch_size=self.conf.get('batch_size', 64),
+                                       shuffle=self.conf.get('shuffle', True), 
+                                       num_workers=self.conf.get('num_workers', 2),
+                                       pin_memory=self.conf.get('pin_memory', True))
+
+
+
+class DepthDataSet(Dataset):
+  """ Dataset for Depth and mask prediction """
+
+  def __init__(self, conf, image_dir, mask_dir, transform=None):
+    """
+    Args:
+        conf = configuration file
+        image_dir: Directory to images of depth
+        mask_dir: Directory to mask images of depth
+        transformation: transformations applied on that image
+    """
+    self.conf = conf
+    self.image_dir = image_dir
+    self.mask_dir = mask_dir 
+    self.ids = [splitext(file)[0] for file in listdir(image_dir) if not file.startswith('.')]
+
+  def __len__(self):
+    return len(self.ids)
+
+  def __getitem__(self, i):
+    idx = self.ids[i]
+    image_file = glob(self.image_dir + idx + '*')
+    mask_file = glob(self.mask_dir + idx + '*')
+
+    assert len(mask_file) > 1, "No mask found"
+    assert len(image_file) > 1, "No image found"
+
+    mask = Image.open(mask_file[0])
+    image = Image.open(image_file[0])
+
+    assert image.size == mask.size, "Image and mask size is not same, but are {image.size} and {mask.size}"
+
+    return {'image': torch.from_numpy(image), 'mask': torch.from_numpy(mask)}
