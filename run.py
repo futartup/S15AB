@@ -146,23 +146,8 @@ class Main:
 
             mask_pred = self.model(images)
             loss = self.criterion(mask_pred, true_masks)
-
-            # Init
+            
             self.optimizer.zero_grad()
-            # In PyTorch, we need to set the gradients to zero before starting to do backpropragation because PyTorch accumulates the gradients on subsequent backward passes. 
-            # Because of this, when you start your training loop, ideally you should zero out the gradients so that you do the parameter update correctly.
-
-            # Predict
-            y_pred = self.model(data)
-
-            # Calculate loss
-            loss = self.criterion(y_pred, target)
-            # criteria = L1Loss(size_average=False)
-            # regularizer_loss = 0
-            # for param in model.parameters():
-            #     regularizer_loss += criteria(param, torch.zeros_like(param))
-            # loss += 0.0005 * regularizer_loss
-            train_losses.append(loss)
 
             # Backpropagation
             loss.backward()
@@ -170,9 +155,7 @@ class Main:
             scheduler.step()
         
             train_loss += loss.item()
-            predicted = y_pred.argmax(dim=1, keepdim=True)
             total += len(data)
-            correct += predicted.eq(target.view_as(predicted)).sum().item()
 
             processed += len(data)
 
