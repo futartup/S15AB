@@ -14,6 +14,7 @@ from torch.nn import *
 import torch.nn.functional as F
 from mpl_toolkits.axes_grid1 import ImageGrid
 from matplotlib import pyplot as plt
+from torch.utils.tensorboard import SummaryWriter
 
 
 
@@ -33,7 +34,7 @@ class Main:
         self.data_dir = data_dir
         self.get_model()
         assert self.conf['loss'] in globals(), "The loss function name doesn't match with names available"
-        self.criterion = globals()[self.conf['loss']]
+        self.criterion = globals()[self.conf['loss']]()
 
         self.execution_flow()
 
@@ -128,9 +129,12 @@ class Main:
         correct = 0
         processed = 0
         train_loss = 0
+        train_acc = []
         total = 0
+        global_step = 0
         device = self.device
         self.model.to(self.device)
+        writer = SummaryWriter(comment=f'Summary')
         for batch in enumerate(pbar):
             # get samples
             images = batch[1]['image'].transpose(1, 3)
@@ -141,8 +145,7 @@ class Main:
             #     f'Network has been defined with {self.model.n_channels} input channels' \
             #     f'but loaded with images having {images.shape[1]} channels. '\
             #     f'Please check the configuration file or images channels.'
-            print(images.shape)
-            print(mask.shape)
+            
             #images = images.transpose(1, 3)
             images = images.to(device=self.device, dtype=torch.float)
             mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
@@ -150,22 +153,24 @@ class Main:
 
             mask_pred = self.model(images)
             loss = self.criterion(mask_pred, mask)
-            
+            train_loss += loss.item()
+            writer.add_scalar('Loss/train', loss.item(), global_step)
+
+            pbar.set_postfix(**{'loss (batch)': loss.item()})
             self.optimizer.zero_grad()
 
             # Backpropagation
             loss.backward()
-            optimizer.step()
-            scheduler.step()
+            self.optimizer.step()
+            self.scheduler.step()
         
-            train_loss += loss.item()
-            total += len(data)
+            
+            total += len(images)
 
-            processed += len(data)
-
-            accuracy = 100*correct/total
-            pbar.set_description(desc= f'Loss={loss.item()} Batch_id={batchidx} Accuracy={accuracy:0.2f}')
-            train_acc.append(100*correct/processed)
+            accuracy = 100*train_loss/total
+            global_step += 1
+            #pbar.set_description(desc= f'Loss={loss.item()} Accuracy={accuracy:0.2f}')
+            train_acc.append(accuracy)
             #return accuracy 
     
     def get_optimizer(self):
