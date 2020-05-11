@@ -109,7 +109,7 @@ class DepthDataLoader:
 class DepthDataSet(Dataset):
   """ Dataset for Depth and mask prediction """
 
-  def __init__(self, conf, image_dir, mask_dir, transform=None):
+  def __init__(self, conf, image_dir, mask_dir, transform=None, scale=1):
     """
     Args:
         conf = configuration file
@@ -120,10 +120,30 @@ class DepthDataSet(Dataset):
     self.conf = conf
     self.image_dir = image_dir
     self.mask_dir = mask_dir 
+    self.scale = scale
     self.ids = [file for file in listdir(image_dir) if not file.startswith('.')]
 
   def __len__(self):
     return len(self.ids)
+
+  @classmethod
+  def preprocess(cls, pil_img, scale):
+      w, h = pil_img.size
+      newW, newH = int(scale * w), int(scale * h)
+      assert newW > 0 and newH > 0, 'Scale is too small'
+      pil_img = pil_img.resize((newW, newH))
+
+      img_nd = np.array(pil_img)
+
+      if len(img_nd.shape) == 2:
+          img_nd = np.expand_dims(img_nd, axis=2)
+
+      # HWC to CHW
+      img_trans = img_nd.transpose((2, 0, 1))
+      if img_trans.max() > 1:
+          img_trans = img_trans / 255
+
+      return img_trans
 
   def __getitem__(self, i):
     idx = self.ids[i]
@@ -139,7 +159,10 @@ class DepthDataSet(Dataset):
     mask = Image.open(self.mask_dir + '/'+ idx)
     image = Image.open(self.image_dir + '/'+ idx)
 
-    if image.size != mask.size:
-      mask.resize(image.size)
+    #if image.size != mask.size:
+    mask.resize((112,112))
+    #assert image.size == mask.size
+    #img = self.preprocess(image, self.scale)
+    #mask = self.preprocess(mask, self.scale)
 
     return {'image': torch.from_numpy(np.array(image)), 'mask': torch.from_numpy(np.array(mask))}

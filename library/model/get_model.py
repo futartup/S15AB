@@ -14,22 +14,25 @@ class GetModel:
         self.input_height = input_height
         self.input_width = input_width
         self.model = self.return_model()
+        self.get_summary()
 
     def return_model(self):
         if self.conf.get('model') in model_mapping:
             model_name = self.conf.get('model').lower()
         else:
             print("The model names that you can define are resnet18, depth_prediction")
-        model = model_mapping[model_name](**self.conf['model_initializer'])
-        self.get_summary(model)
-        return model, self.device
+        model = model_mapping[model_name](**self.conf['model_initializer']).cuda()
+        return model
 
-    def get_summary(self, net):
+    def get_device(self):
+        return self.device
+
+    def get_summary(self):
         use_cuda = torch.cuda.is_available()
         print(use_cuda)
         if use_cuda:
             torch.cuda.manual_seed(self.conf.get('seed'))
         self.device = torch.device("cuda" if use_cuda else "cpu")
-        model = net.to(self.device)
+        model = self.model.to(self.device)
         summary(model, input_size=(self.conf['model_initializer']['n_channels'], 
                                    self.input_height, self.input_width))

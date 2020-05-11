@@ -31,7 +31,7 @@ class Main:
         self.height = int(height)
         self.width = int(width)
         self.data_dir = data_dir
-        self.model = self.get_model()
+        self.get_model()
         assert self.conf['loss'] in globals(), "The loss function name doesn't match with names available"
         self.criterion = globals()[self.conf['loss']]
 
@@ -40,7 +40,7 @@ class Main:
     def execution_flow(self):
         self.get_loaders() # get the test and train loaders
         self.visualize_tranformed_data() # visualize the images for training
-        self.lr_finder() # find the best LR
+        #self.lr_finder() # find the best LR
         self.get_optimizer() # get the optimizer
         self.get_scheduler() # get the scheduler
         
@@ -69,8 +69,9 @@ class Main:
 
     def get_model(self):
         model_obj = GetModel(self.conf, self.height, self.width )
-        self.model, self.device = model_obj.return_model()
-        return self.model 
+        self.model = model_obj.return_model()
+        self.device = model_obj.get_device()
+        #return self.model 
 
     def get_loaders(self):
         obj = DepthDataLoader(self.conf, self.data_dir + '/images', self.data_dir + '/mask', .30)
@@ -129,23 +130,26 @@ class Main:
         train_loss = 0
         total = 0
         device = self.device
-
+        self.model.to(self.device)
         for batch in enumerate(pbar):
             # get samples
-            images = batch['image']
-            mask = batch['mask']
+            images = batch[1]['image'].transpose(1, 3)
+            mask = batch[1]['mask']
 
-            assert images.shape[1] == self.model.n_channels, \
-                f'Network has been defined with {self.model.n_channels} input channels' \
-                f'but loaded with images having {images.shape[1]} channels. '\
-                f'Please check the configuration file or images channels.'
-            
-            images = images.to(device=self.device, dtype=torch.float32)
+            #assert len(images) == len(mask)
+            # assert images.shape[1] == self.model.n_channels, \
+            #     f'Network has been defined with {self.model.n_channels} input channels' \
+            #     f'but loaded with images having {images.shape[1]} channels. '\
+            #     f'Please check the configuration file or images channels.'
+            print(images.shape)
+            print(mask.shape)
+            #images = images.transpose(1, 3)
+            images = images.to(device=self.device, dtype=torch.float)
             mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
-            true_masks = true_masks.to(device=self.device, dtype=mask_type)
+            mask = mask.to(device=device, dtype=mask_type)
 
             mask_pred = self.model(images)
-            loss = self.criterion(mask_pred, true_masks)
+            loss = self.criterion(mask_pred, mask)
             
             self.optimizer.zero_grad()
 
