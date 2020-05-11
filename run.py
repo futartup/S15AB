@@ -33,7 +33,7 @@ class Main:
         self.data_dir = data_dir
         self.model = self.get_model()
         assert self.conf['loss'] in globals(), "The loss function name doesn't match with names available"
-        self.criterion = globals()[self.conf['loss']]()
+        self.criterion = globals()[self.conf['loss']]
 
         self.execution_flow()
 
@@ -54,8 +54,8 @@ class Main:
         torch.save(state, 'saved_models/{}_{}'.format(datetime.now(), uuid.uuid4()))
 
     def visualize_tranformed_data(self):
-        images, labels = next(iter(self.train_loader))
-        images = images.numpy()  # convert images to numpy for display
+        images = next(iter(self.train_loader))
+        images = images['image'].numpy()  # convert images to numpy for display
         # plot the images in the batch, along with the corresponding labels
         fig = plt.figure(figsize=(10, 10))
         grid = ImageGrid(fig, 111,  # similar to subplot(111)
@@ -64,7 +64,7 @@ class Main:
                         )
         for ax, im in zip(grid, images):
             # Iterating over the grid returns the Axes.
-            ax.imshow(im.transpose((1, 2, 0)))
+            ax.imshow(im)
         plt.show()
 
     def get_model(self):
@@ -130,9 +130,22 @@ class Main:
         total = 0
         device = self.device
 
-        for batchidx, (data, target) in enumerate(pbar):
+        for batch in enumerate(pbar):
             # get samples
-            data, target = data.to(device), target.to(device)
+            images = batch['image']
+            mask = batch['mask']
+
+            assert images.shape[1] == self.model.n_channels, \
+                f'Network has been defined with {self.model.n_channels} input channels' \
+                f'but loaded with images having {images.shape[1]} channels. '\
+                f'Please check the configuration file or images channels.'
+            
+            images = images.to(device=self.device, dtype=torch.float32)
+            mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
+            true_masks = true_masks.to(device=self.device, dtype=mask_type)
+
+            mask_pred = self.model(images)
+            loss = self.criterion(mask_pred, true_masks)
 
             # Init
             self.optimizer.zero_grad()
