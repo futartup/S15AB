@@ -79,7 +79,7 @@ class Main:
                               self.data_dir + '/fg_bg/temp', 
                               self.data_dir + '/masked_images_blackwhite/temp',  
                               self.data_dir + '/depth/color/temp',
-                              30)
+                              .30)
         self.train_loader = obj.get_train_loader()
         self.test_loader = obj.get_test_loader()
 
