@@ -80,12 +80,12 @@ class DataLoader():
   
 
 class DepthDataLoader:
-  def __init__(self, conf, image_dir, mask_dir, test_data_percentage):
+  def __init__(self, conf, fg_bg_dir, mask_dir, depth_dir, test_data_percentage):
     # self.image_dir = image_dir
     # self.mask_dir = mask_dir
     self.conf = conf
     # self.test_data_percentage = test_data_percentage
-    dataset = DepthDataSet(conf, image_dir, mask_dir)
+    dataset = DepthDataSet(conf, fg_bg_dir, mask_dir, depth_dir)
     test_p = int(len(dataset) * test_data_percentage)
     train_p = len(dataset) - test_p
     self.train, self.test = random_split(dataset, [train_p, test_p])
@@ -109,7 +109,7 @@ class DepthDataLoader:
 class DepthDataSet(Dataset):
   """ Dataset for Depth and mask prediction """
 
-  def __init__(self, conf, image_dir, mask_dir, transform=None, scale=1):
+  def __init__(self, conf, fg_bg_dir, mask_dir, depth_dir, transform=None, scale=1):
     """
     Args:
         conf = configuration file
@@ -118,10 +118,11 @@ class DepthDataSet(Dataset):
         transformation: transformations applied on that image
     """
     self.conf = conf
-    self.image_dir = image_dir
+    self.fg_bg_dir = fg_bg_dir
     self.mask_dir = mask_dir 
+    self.depth_dir = depth_dir 
     self.scale = scale
-    self.ids = [file for file in listdir(image_dir) if not file.startswith('.')]
+    self.ids = [file for file in listdir(fg_bg_dir) if not file.startswith('.')]
 
   def __len__(self):
     return len(self.ids)
@@ -157,12 +158,15 @@ class DepthDataSet(Dataset):
     # assert len(image_file) > 1, "No image found"
 
     mask = Image.open(self.mask_dir + '/'+ idx)
-    image = Image.open(self.image_dir + '/'+ idx)
-
+    fg_bg = Image.open(self.fg_bg_dir + '/'+ idx)
+    depth = Image.open(self.depth_dir + '/'+ idx)
     #if image.size != mask.size:
-    mask.resize((112,112))
     #assert image.size == mask.size
     #img = self.preprocess(image, self.scale)
     #mask = self.preprocess(mask, self.scale)
 
-    return {'image': torch.from_numpy(np.array(image)), 'mask': torch.from_numpy(np.array(mask))}
+    return {
+            'image': torch.from_numpy(np.array(fg_bg)), 
+            'mask': torch.from_numpy(np.array(mask)), 
+            'depth': torch.from_numpy(np.array(depth))
+           }

@@ -40,7 +40,7 @@ class Main:
 
     def execution_flow(self):
         self.get_loaders() # get the test and train loaders
-        self.visualize_tranformed_data() # visualize the images for training
+        #self.visualize_tranformed_data() # visualize the images for training
         #self.lr_finder() # find the best LR
         self.get_optimizer() # get the optimizer
         self.get_scheduler() # get the scheduler
@@ -50,8 +50,8 @@ class Main:
             self.test()
 
         # Save the model, optimizer, 
-        state = {'epoch': epoch + 1, 'state_dict': model.state_dict(),
-             'optimizer': optimizer.state_dict(), 'losslogger': losslogger, }
+        state = {'epoch': epoch + 1, 'state_dict': self.model.state_dict(),
+             'optimizer': self.optimizer.state_dict(), 'losslogger': losslogger, }
         torch.save(state, 'saved_models/{}_{}'.format(datetime.now(), uuid.uuid4()))
 
     def visualize_tranformed_data(self):
@@ -75,7 +75,11 @@ class Main:
         #return self.model 
 
     def get_loaders(self):
-        obj = DepthDataLoader(self.conf, self.data_dir + '/images', self.data_dir + '/mask', .30)
+        obj = DepthDataLoader(self.conf, 
+                              self.data_dir + '/fg_bg', 
+                              self.data_dir + '/masked_images_blackwhite',  
+                              self.data_dir + '/depth/color',
+                              30)
         self.train_loader = obj.get_train_loader()
         self.test_loader = obj.get_test_loader()
 

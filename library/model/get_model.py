@@ -21,7 +21,7 @@ class GetModel:
             model_name = self.conf.get('model').lower()
         else:
             print("The model names that you can define are resnet18, depth_prediction")
-        model = model_mapping[model_name](**self.conf['model_initializer']).cuda()
+        model = model_mapping[model_name](**self.conf['model_initializer'])
         return model
 
     def get_device(self):
