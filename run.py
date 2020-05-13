@@ -13,9 +13,9 @@ from library.lr_finder import LRFinder
 from torch.nn import *
 import torch.nn.functional as F
 from mpl_toolkits.axes_grid1 import ImageGrid
+import matplotlib
 from matplotlib import pyplot as plt
 from torch.utils.tensorboard import SummaryWriter
-
 
 
 class Main:
@@ -49,25 +49,28 @@ class Main:
         test_acc = []
 
         for e in range(1, self.conf['epochs']):
+            print("================================")
+            print("Epoch number : {}".format(e))
             self.train(train_acc)
             self.test(test_acc)
+            print("================================")
 
-        self.plot_graphs({"train_acc": train_acc, "test_acc": test_acc})
+        self.plot_graphs(train_acc, test_acc)
         # plot the train and test accuracy graph
 
         # Save the model, optimizer, 
-        state = {'state_dict': self.model.state_dict(),
-                 'optimizer': self.optimizer.state_dict()}
-        torch.save(state, 'saved_models/{}_{}'.format(datetime.now(), uuid.uuid4()))
+        # state = {'state_dict': self.model.state_dict(),
+        #          'optimizer': self.optimizer.state_dict()}
+        torch.save(self.model.state_dict(), 'saved_models/{}_{}.pth'.format(datetime.now(), uuid.uuid4()))
 
-    def plot_graphs(self, *args, **kwargs):
-        plt.figure(figsize=(20,20))
-        plt.plot(kwargs['train_acc'])
-        plt.plot(kwargs['test_acc'])
+    def plot_graphs(self, train_acc, test_acc):
+        plt.figure(figsize=(8,8))
+        plt.plot(train_acc)
+        plt.plot(test_acc)
         plt.legend(['Train Loss', 'Test Loss'],
                     loc='upper left',
                     bbox_to_anchor=(1.05, 1), borderaxespad=0.)
-        plt.show()
+        plt.savefig("loss.png")
 
     def visualize_tranformed_data(self):
         images = next(iter(self.train_loader))
@@ -81,7 +84,7 @@ class Main:
         for ax, im in zip(grid, images):
             # Iterating over the grid returns the Axes.
             ax.imshow(im)
-        plt.show()
+        plt.savefig("transformed_images.png")
 
     def get_model(self):
         model_obj = GetModel(self.conf, self.height, self.width )
