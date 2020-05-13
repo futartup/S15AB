@@ -112,7 +112,7 @@ class Main:
                 images, mask, depth = batch['image'].transpose(1,3), batch['mask'], batch['depth']
 
                 images = images.to(device=self.device, dtype=torch.float32)
-                mask_type = torch.float32 if net.n_classes == 1 else torch.long
+                mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
                 true_masks = masks.to(device=self.device, dtype=mask_type)
                 depth = depth.to(device=self.device, dtype=mask_type)
 
