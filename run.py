@@ -104,9 +104,11 @@ class Main:
         self.model.eval()
         test_loss = 0
         #correct = 0
+        pbar = tqdm(self.test_loader)
+        length = len(self.test_loader)
         test_accuracy = []
         with torch.no_grad():
-            for batch in self.test_loader:
+            for batch in pbar:
                 images, mask, depth = batch['image'].transpose(1,3), batch['mask'], batch['depth']
 
                 images = images.to(device=self.device, dtype=torch.float32)
@@ -120,7 +122,10 @@ class Main:
                 loss = loss_mask + loss_depth
 
                 test_loss += loss_mask.item() + loss_depth.item()
-                pbar.set_postfix(**{'loss (batch)': test_loss})
+
+                accuracy = 100 * (test_loss/length)
+
+                pbar.set_description(desc= f'Loss={test_loss} Accuracy={accuracy:0.2f}')
                 test_acc.append(test_loss)
                 #loss = criterion(output, target)
                 #loss = F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
@@ -160,15 +165,11 @@ class Main:
     def train(self, train_acc):
         self.model.train()
         pbar = tqdm(self.train_loader)
-        correct = 0
-        processed = 0
         train_loss = 0
         #train_acc = []
-        total = 0
-        global_step = 0
+        length = len(self.train_loader)
         device = self.device
         self.model.to(self.device)
-        writer = SummaryWriter(comment=f'Summary')
         for batch in enumerate(pbar):
             # get samples
             images = batch[1]['image'].transpose(1, 3)
@@ -193,7 +194,7 @@ class Main:
             loss = loss_mask + loss_depth
 
             train_loss += loss_mask.item() + loss_depth.item()
-            writer.add_scalar('Loss/train', train_loss, global_step)
+            #writer.add_scalar('Loss/train', train_loss, global_step)
 
             pbar.set_postfix(**{'loss (batch)': train_loss})
             self.optimizer.zero_grad()
@@ -203,12 +204,8 @@ class Main:
             self.optimizer.step()
             self.scheduler.step()
         
-            
-            total += len(images)
-
-            accuracy = 100*train_loss/total
-            global_step += 1
-            #pbar.set_description(desc= f'Loss={loss.item()} Accuracy={accuracy:0.2f}')
+            accuracy = 100*(train_loss/length)
+            pbar.set_description(desc= f'Loss={train_loss} Accuracy={accuracy:0.2f}')
             train_acc.append(accuracy)
             #return accuracy 
     
