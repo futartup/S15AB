@@ -108,7 +108,6 @@ class Main:
         with torch.no_grad():
             for batch in self.test_loader:
                 images, mask, depth = batch['image'].transpose(1,3), batch['mask'], batch['depth']
-                output = self.model(data)
 
                 images = images.to(device=self.device, dtype=torch.float32)
                 mask_type = torch.float32 if net.n_classes == 1 else torch.long
