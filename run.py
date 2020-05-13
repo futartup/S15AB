@@ -56,16 +56,14 @@ class Main:
         # plot the train and test accuracy graph
 
         # Save the model, optimizer, 
-        state = {'epoch': epoch + 1, 'state_dict': self.model.state_dict(),
-             'optimizer': self.optimizer.state_dict(), 'losslogger': losslogger, }
+        state = {'state_dict': self.model.state_dict(),
+                 'optimizer': self.optimizer.state_dict()}
         torch.save(state, 'saved_models/{}_{}'.format(datetime.now(), uuid.uuid4()))
 
     def plot_graphs(self, *args, **kwargs):
         plt.figure(figsize=(20,20))
         plt.plot(kwargs['train_acc'])
-        plt.plot(train_acc)
         plt.plot(kwargs['test_acc'])
-        plt.plot(test_acc)
         plt.legend(['Train Loss', 'Test Loss'],
                     loc='upper left',
                     bbox_to_anchor=(1.05, 1), borderaxespad=0.)
