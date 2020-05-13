@@ -113,7 +113,7 @@ class Main:
 
                 images = images.to(device=self.device, dtype=torch.float32)
                 mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
-                true_masks = masks.to(device=self.device, dtype=mask_type)
+                mask = mask.to(device=self.device, dtype=mask_type)
                 depth = depth.to(device=self.device, dtype=mask_type)
 
                 mask_pred = self.model(images)
