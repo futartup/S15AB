@@ -7,7 +7,7 @@
     "shuffle": true,
     "epochs": 50,
     "multiclass": true,
-    "batch_size": 512,
+    "batch_size": 10,
     "num_workers": 2,
     "lr_step_size": 25,
     "lr_gamma": 0.001,

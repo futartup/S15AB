@@ -45,14 +45,31 @@ class Main:
         self.get_optimizer() # get the optimizer
         self.get_scheduler() # get the scheduler
         
+        train_acc = []
+        test_acc = []
+
         for e in range(1, self.conf['epochs']):
-            self.train()
-            self.test()
+            self.train(train_acc)
+            self.test(test_acc)
+
+        self.plot_graphs({"train_acc": train_acc, "test_acc": test_acc})
+        # plot the train and test accuracy graph
 
         # Save the model, optimizer, 
         state = {'epoch': epoch + 1, 'state_dict': self.model.state_dict(),
              'optimizer': self.optimizer.state_dict(), 'losslogger': losslogger, }
         torch.save(state, 'saved_models/{}_{}'.format(datetime.now(), uuid.uuid4()))
+
+    def plot_graphs(self, *args, **kwargs):
+        plt.figure(figsize=(20,20))
+        plt.plot(kwargs['train_acc'])
+        plt.plot(train_acc)
+        plt.plot(kwargs['test_acc'])
+        plt.plot(test_acc)
+        plt.legend(['Train Loss', 'Test Loss'],
+                    loc='upper left',
+                    bbox_to_anchor=(1.05, 1), borderaxespad=0.)
+        plt.show()
 
     def visualize_tranformed_data(self):
         images = next(iter(self.train_loader))
@@ -78,62 +95,76 @@ class Main:
         obj = DepthDataLoader(self.conf, 
                               self.data_dir + '/fg_bg/temp', 
                               self.data_dir + '/masked_images_blackwhite/temp',  
-                              self.data_dir + '/depth/temp',
+                              self.data_dir + '/depth/temp1',
                               .30)
         self.train_loader = obj.get_train_loader()
         self.test_loader = obj.get_test_loader()
 
-    def test(self):
+    def test(self, test_acc):
         self.model.eval()
         test_loss = 0
-        correct = 0
+        #correct = 0
+        test_accuracy = []
         with torch.no_grad():
-            for data, target in self.test_loader:
-                data, target = data.to(self.device), target.to(self.device)
+            for batch in self.test_loader:
+                images, mask, depth = batch['image'].transpose(1,3), batch['mask'], batch['depth']
                 output = self.model(data)
 
+                images = images.to(device=self.device, dtype=torch.float32)
+                mask_type = torch.float32 if net.n_classes == 1 else torch.long
+                true_masks = masks.to(device=self.device, dtype=mask_type)
+                depth = depth.to(device=self.device, dtype=mask_type)
+
+                mask_pred = self.model(images)
+                loss_mask = self.criterion(mask_pred, mask)
+                loss_depth = self.criterion(mask_pred, depth)
+                loss = loss_mask + loss_depth
+
+                test_loss += loss_mask.item() + loss_depth.item()
+                pbar.set_postfix(**{'loss (batch)': test_loss})
+                test_acc.append(test_loss)
                 #loss = criterion(output, target)
                 #loss = F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
             
-                test_loss += self.criterion(output, target).item()  # sum up batch loss
-                pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
-                result = pred.eq(target.view_as(pred))
-                if e == 2:
-                    for i,val in enumerate(result):
-                        status = val.item()
-                        if status:
-                            if len(correct_predicted) < sample_count:
-                                correct_predicted.append({
-                                    'prediction': pred[i],
-                                    'label': list(target.view_as(pred))[i],
-                                    'image': data[i]
-                                })
-                            else:
-                                if len(false_predicted) < sample_count:
-                                    false_predicted.append({
-                                        'prediction': pred[i],
-                                        'label': list(target.view_as(pred))[i],
-                                        'image': data[i]
-                                    })
-                correct += result.sum().item()
-        test_loss /= len(test_loader.dataset)
-        test_losses.append(test_loss)
-        #pbar.set_description(desc= f'Loss={test_loss.item()} Batch_id={batch_idx} Accuracy={100*correct/processed:0.2f}')
-        a = 100. * correct / len(test_loader.dataset)
-        print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)\n'.format(
-            test_loss, correct, len(test_loader.dataset), a
-            ))
+                # test_loss += self.criterion(output, target).item()  # sum up batch loss
+                # pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
+                # result = pred.eq(target.view_as(pred))
+                # if e == 2:
+                #     for i,val in enumerate(result):
+                #         status = val.item()
+                #         if status:
+                #             if len(correct_predicted) < sample_count:
+                #                 correct_predicted.append({
+                #                     'prediction': pred[i],
+                #                     'label': list(target.view_as(pred))[i],
+                #                     'image': data[i]
+                #                 })
+                #             else:
+                #                 if len(false_predicted) < sample_count:
+                #                     false_predicted.append({
+                #                         'prediction': pred[i],
+                #                         'label': list(target.view_as(pred))[i],
+                #                         'image': data[i]
+                #                     })
+                # correct += result.sum().item()
+        # test_loss /= len(test_loader.dataset)
+        # test_losses.append(test_loss)
+        # #pbar.set_description(desc= f'Loss={test_loss.item()} Batch_id={batch_idx} Accuracy={100*correct/processed:0.2f}')
+        # a = 100. * correct / len(test_loader.dataset)
+        # print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)\n'.format(
+        #     test_loss, correct, len(test_loader.dataset), a
+        #     ))
         
-        test_acc.append(100. * correct / len(test_loader.dataset))
-        return test_loss
+        # test_acc.append(100. * correct / len(test_loader.dataset))
+        # return test_loss
 
-    def train(self):
+    def train(self, train_acc):
         self.model.train()
         pbar = tqdm(self.train_loader)
         correct = 0
         processed = 0
         train_loss = 0
-        train_acc = []
+        #train_acc = []
         total = 0
         global_step = 0
         device = self.device
@@ -143,6 +174,7 @@ class Main:
             # get samples
             images = batch[1]['image'].transpose(1, 3)
             mask = batch[1]['mask']
+            depth = batch[1]['depth']
 
             #assert len(images) == len(mask)
             # assert images.shape[1] == self.model.n_channels, \
@@ -154,13 +186,17 @@ class Main:
             images = images.to(device=self.device, dtype=torch.float)
             mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
             mask = mask.to(device=device, dtype=mask_type)
+            depth = depth.to(device=device, dtype=mask_type)
 
             mask_pred = self.model(images)
-            loss = self.criterion(mask_pred, mask)
-            train_loss += loss.item()
-            writer.add_scalar('Loss/train', loss.item(), global_step)
+            loss_mask = self.criterion(mask_pred, mask)
+            loss_depth = self.criterion(mask_pred, depth)
+            loss = loss_mask + loss_depth
 
-            pbar.set_postfix(**{'loss (batch)': loss.item()})
+            train_loss += loss_mask.item() + loss_depth.item()
+            writer.add_scalar('Loss/train', train_loss, global_step)
+
+            pbar.set_postfix(**{'loss (batch)': train_loss})
             self.optimizer.zero_grad()
 
             # Backpropagation
