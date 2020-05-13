@@ -8,6 +8,9 @@ from library.loader.data_loader import DepthDataSet
 from torchvision import transforms
 import torch.nn.functional as F
 import numpy as np
+import matplotlib.pyplot as plt
+import skimage
+from skimage.transform import resize
 
 
 def predict_img(net,
@@ -45,6 +48,61 @@ def predict_img(net,
 
     return full_mask
 
+
+def display_images(outputs, inputs=None, gt=None, is_colormap=True, is_rescale=True):
+    
+
+    plasma = plt.get_cmap('plasma')
+
+    #shape = (outputs[0].shape[0], outputs[0].shape[1], 3)
+    
+    all_images = []
+    count = 0
+    for pos, i in enumerate(outputs):
+        imgs = []
+        
+        if isinstance(inputs, (list, tuple, np.ndarray)):
+            x = to_multichannel(inputs[i])
+            x = resize(x, shape, preserve_range=True, mode='reflect', anti_aliasing=True )
+            imgs.append(x)
+
+        if isinstance(gt, (list, tuple, np.ndarray)):
+            x = to_multichannel(gt[i])
+            x = resize(x, shape, preserve_range=True, mode='reflect', anti_aliasing=True )
+            imgs.append(x)
+
+        if is_colormap:
+            rescaled = outputs[pos][:,:,0]
+            if is_rescale:
+                rescaled = rescaled - np.min(rescaled)
+                rescaled = rescaled / np.max(rescaled)
+            im = Image.fromarray(np.uint8(rescaled*255))
+            im.save('/content/drive/My Drive/Colab Notebooks/S15A-B/Data/final_data/output/{}.jpg'.format(count))
+            #imgs.append(plasma(rescaled)[:,:,:3])
+        else:
+            imgs.append(to_multichannel(outputs[i]))
+
+        #img_set = np.hstack(imgs)
+        #all_images.append(img_set)
+
+    #all_images = np.stack(all_images)
+    
+    #return skimage.util.montage(all_images, multichannel=True, fill=(0,0,0))
+
+def plot_img_and_mask(img, mask, filename):
+    classes = mask.shape[2] if len(mask.shape) > 2 else 1
+    fig, ax = plt.subplots(1, classes + 1)
+    ax[0].set_title('Input image')
+    ax[0].imshow(img)
+    if classes > 1:
+        for i in range(classes):
+            ax[i+1].set_title(f'Output mask (class {i+1})')
+            ax[i+1].imshow(mask[:, :, i])
+    else:
+        ax[1].set_title(f'Output mask')
+        ax[1].imshow(mask)
+    plt.xticks([]), plt.yticks([])
+    plt.savefig('/content/drive/My Drive/Colab Notebooks/S15A-B/Data/final_data/output/{}'.format(filename))
 
 def mask_to_image(mask):
     Image.fromarray(np.uint8(mask[0]*255))
@@ -96,6 +154,7 @@ if __name__ == '__main__':
     logging.info("Model loaded !")
     print(args)
     images = list(paths.list_images(args["input_dir"][0]))
+    outputs = []
     #images = ['/content/drive/My Drive/Colab Notebooks/S15A-B/Data/final_data/val/399708.jpg']
     for i, image in enumerate(images):
         filename = image.split('/')[-1]
@@ -106,6 +165,10 @@ if __name__ == '__main__':
         mask = predict_img(net=net,
                            full_img=img,
                            device=device)
-        result = mask_to_image(mask)
-        result.save(args['output'][0] + filename)
 
+        result = mask_to_image(mask)
+        plot_img_and_mask(img, mask, filename)
+        outputs.append(mask)
+        #result.save(args['output'][0] + filename)
+
+display_images(outputs, is_colormap=True)

@@ -61,16 +61,16 @@ class Main:
         # Save the model, optimizer, 
         # state = {'state_dict': self.model.state_dict(),
         #          'optimizer': self.optimizer.state_dict()}
-        torch.save(self.model.state_dict(), 'saved_models/{}_{}.pth'.format(datetime.now(), uuid.uuid4()))
+        torch.save(self.model.state_dict(), 'saved_models/no_depth_epoch_{}_{}_{}.pth'.format(self.conf['epochs'], datetime.now(), uuid.uuid4()))
 
     def plot_graphs(self, train_acc, test_acc):
         plt.figure(figsize=(8,8))
         plt.plot(train_acc)
+        plt.savefig("train_loss.jpg")
+
+        plt.figure(figsize=(8,8))
         plt.plot(test_acc)
-        plt.legend(['Train Loss', 'Test Loss'],
-                    loc='upper left',
-                    bbox_to_anchor=(1.05, 1), borderaxespad=0.)
-        plt.savefig("loss.png")
+        plt.savefig("test_loss.jpg")
 
     def visualize_tranformed_data(self):
         images = next(iter(self.train_loader))
@@ -100,6 +100,7 @@ class Main:
                               .30)
         self.train_loader = obj.get_train_loader()
         self.test_loader = obj.get_test_loader()
+        print("Total length of train and test is : {} and {}".format(len(self.train_loader), len(self.test_loader)))
 
     def test(self, test_acc):
         self.model.eval()
@@ -107,6 +108,7 @@ class Main:
         #correct = 0
         pbar = tqdm(self.test_loader)
         length = len(self.test_loader)
+        print("Length of test loader is {}".format(length))
         test_accuracy = []
         with torch.no_grad():
             for batch in pbar:
@@ -119,10 +121,10 @@ class Main:
 
                 mask_pred = self.model(images)
                 loss_mask = self.criterion(mask_pred, mask)
-                loss_depth = self.criterion(mask_pred, depth)
-                loss = loss_mask + loss_depth
+                #loss_depth = self.criterion(mask_pred, depth)
+                loss = loss_mask 
 
-                test_loss += loss_mask.item() + loss_depth.item()
+                test_loss += loss_mask.item() 
 
                 accuracy = 100 * (test_loss/length)
 
@@ -161,7 +163,6 @@ class Main:
         #     ))
         
         # test_acc.append(100. * correct / len(test_loader.dataset))
-        # return test_loss
 
     def train(self, train_acc):
         self.model.train()
@@ -169,6 +170,7 @@ class Main:
         train_loss = 0
         #train_acc = []
         length = len(self.train_loader)
+        print("Length of train loader is {}".format(length))
         device = self.device
         self.model.to(self.device)
         for batch in enumerate(pbar):
@@ -191,10 +193,10 @@ class Main:
 
             mask_pred = self.model(images)
             loss_mask = self.criterion(mask_pred, mask)
-            loss_depth = self.criterion(mask_pred, depth)
-            loss = loss_mask + loss_depth
+            #loss_depth = self.criterion(mask_pred, depth)
+            loss = loss_mask 
 
-            train_loss += loss_mask.item() + loss_depth.item()
+            train_loss += loss_mask.item() 
             #writer.add_scalar('Loss/train', train_loss, global_step)
 
             pbar.set_postfix(**{'loss (batch)': train_loss})
