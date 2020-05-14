@@ -94,7 +94,7 @@ class Main:
 
     def get_loaders(self):
         obj = DepthDataLoader(self.conf, 
-                              self.data_dir + '/fg_bg/temp', 
+                              self.data_dir + '/fg_bg/images/temp', 
                               self.data_dir + '/masked_images_blackwhite/temp',  
                               self.data_dir + '/depth/temp1',
                               .30)
