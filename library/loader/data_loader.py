@@ -85,12 +85,12 @@ class DepthDataLoader:
     # self.mask_dir = mask_dir
     self.conf = conf
     # self.test_data_percentage = test_data_percentage
-    dataset = DepthDataSet(conf, fg_bg_dir, mask_dir, depth_dir)
-    test_p = int(len(dataset) * test_data_percentage)
-    train_p = len(dataset) - test_p
-    self.train, self.test = random_split(dataset, [train_p, test_p])
-    self.train = list(map(TransfomedDataSet(self.conf['transformations']['train']), self.train))
-    self.test = list(map(TransfomedDataSet(self.conf['transformations']['test']), self.test))
+    #dataset = DepthDataSet(conf, fg_bg_dir, mask_dir, depth_dir)
+    #test_p = int(len(dataset) * test_data_percentage)
+    #train_p = len(dataset) - test_p
+    #self.train, self.test = random_split(dataset, [train_p, test_p])
+    self.train = DepthDataSet(conf, fg_bg_dir+ '/train', mask_dir+'/train', depth_dir+'/train', transform=TransfomedDataSet(self.conf['transformations']['train']))
+    self.test = DepthDataSet(conf, fg_bg_dir+ '/test', mask_dir+'/test', depth_dir+'/test', transform=TransfomedDataSet(self.conf['transformations']['test']))
 
   def get_train_loader(self):
     return torch.utils.data.DataLoader(self.train, 
@@ -124,6 +124,7 @@ class DepthDataSet(Dataset):
     self.mask_dir = mask_dir 
     self.depth_dir = depth_dir 
     self.scale = scale
+    self.transform = transform
     self.ids = [file for file in listdir(fg_bg_dir) if not file.startswith('.')]
 
   def __len__(self):
@@ -168,7 +169,7 @@ class DepthDataSet(Dataset):
     #mask = self.preprocess(mask, self.scale)
 
     return {
-            'image': torch.from_numpy(np.array(fg_bg)), 
+            'image': self.transform(image=fg_bg), 
             'mask': torch.from_numpy(np.array(mask)), 
             'depth': torch.from_numpy(np.array(depth))
            }

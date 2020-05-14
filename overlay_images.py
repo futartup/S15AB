@@ -37,7 +37,7 @@ image_paths_foreground = list(paths.list_images(args["dataset2"]))
 total_flipped_foreground = image_paths_flipped_foreground + image_paths_foreground
 
 
-for x, image in enumerate(tqdm(total_flipped_foreground))
+for x, image in enumerate(tqdm(total_flipped_foreground)):
     # open the image which we will overlay
     image_foreground = Image.open(x)
     image_foreground_copy = image_foreground.copy()
