@@ -89,8 +89,8 @@ class DepthDataLoader:
     test_p = int(len(dataset) * test_data_percentage)
     train_p = len(dataset) - test_p
     self.train, self.test = random_split(dataset, [train_p, test_p])
-    self.train = map(TransfomedDataSet(self.conf['transformations']['train']), self.train)
-    self.test = map(TransfomedDataSet(self.conf['transformations']['test']), self.test)
+    self.train = list(map(TransfomedDataSet(self.conf['transformations']['train']), self.train))
+    self.test = list(map(TransfomedDataSet(self.conf['transformations']['test']), self.test))
 
   def get_train_loader(self):
     return torch.utils.data.DataLoader(self.train, 
