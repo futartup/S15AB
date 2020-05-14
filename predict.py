@@ -46,7 +46,7 @@ def predict_img(net,
         probs = tf(probs.cpu())
         full_mask = probs.squeeze().cpu().numpy()
 
-    return full_mask
+    return full_mask > out_threshold
 
 
 def display_images(outputs, inputs=None, gt=None, is_colormap=True, is_rescale=True):
@@ -102,10 +102,10 @@ def plot_img_and_mask(img, mask, filename):
         ax[1].set_title(f'Output mask')
         ax[1].imshow(mask)
     plt.xticks([]), plt.yticks([])
-    plt.savefig('/content/drive/My Drive/Colab Notebooks/S15A-B/Data/final_data/output/{}'.format(filename))
+    plt.savefig('/content/drive/My Drive/Colab Notebooks/S15AB/data/output/{}'.format(filename))
 
 def mask_to_image(mask):
-    Image.fromarray(np.uint8(mask[0]*255))
+    img = Image.fromarray(np.uint8(mask[1]*255))
     #img = Image.fromarray((mask * 255))
     print(img)
     return img
@@ -165,10 +165,13 @@ if __name__ == '__main__':
         mask = predict_img(net=net,
                            full_img=img,
                            device=device)
-
+        mask = np.where(mask == True, 1, 0)
+        #print(mask)
+        #print(type(mask))
         result = mask_to_image(mask)
-        plot_img_and_mask(img, mask, filename)
+        result.save('/content/drive/My Drive/Colab Notebooks/S15AB/data/output/{}'.format(filename))
+        #plot_img_and_mask(img, mask, filename)
         outputs.append(mask)
         #result.save(args['output'][0] + filename)
 
-display_images(outputs, is_colormap=True)
+#display_images(outputs, is_colormap=True)

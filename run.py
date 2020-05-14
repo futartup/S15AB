@@ -179,14 +179,6 @@ class Main:
             mask = batch[1]['mask']
             depth = batch[1]['depth']
             print(len(images), len(mask), len(depth))
-
-            #assert len(images) == len(mask)
-            # assert images.shape[1] == self.model.n_channels, \
-            #     f'Network has been defined with {self.model.n_channels} input channels' \
-            #     f'but loaded with images having {images.shape[1]} channels. '\
-            #     f'Please check the configuration file or images channels.'
-            
-            #images = images.transpose(1, 3)
             images = images.to(device=self.device, dtype=torch.float)
             mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
             mask = mask.to(device=device, dtype=mask_type)
