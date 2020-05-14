@@ -41,6 +41,7 @@ class TransfomedDataSet():
     # image = self.albu_aug(image=np.array(image))['image']
     # #image = np.transpose(image, (2, 0, 1)).astype(np.float32)
     # return image
-    image = np.array(image*255)
-    image = self.aug(image=image)
+    np_image = np.asarray(image)
+    #image = np.array(np_image)
+    image = self.aug(image=np_image)
     return image

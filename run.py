@@ -94,7 +94,7 @@ class Main:
 
     def get_loaders(self):
         obj = DepthDataLoader(self.conf, 
-                              self.data_dir + '/fg_bg/images/temp', 
+                              self.data_dir + '/fg_bg/masked_images', 
                               self.data_dir + '/masked_images_blackwhite/temp',  
                               self.data_dir + '/depth/temp1',
                               .30)
@@ -175,9 +175,10 @@ class Main:
         self.model.to(self.device)
         for batch in enumerate(pbar):
             # get samples
-            images = batch[1]['image'].transpose(1, 3)
+            images = batch[1]['image']
             mask = batch[1]['mask']
             depth = batch[1]['depth']
+            print(len(images), len(mask), len(depth))
 
             #assert len(images) == len(mask)
             # assert images.shape[1] == self.model.n_channels, \
@@ -192,6 +193,7 @@ class Main:
             depth = depth.to(device=device, dtype=mask_type)
 
             mask_pred = self.model(images)
+           
             loss_mask = self.criterion(mask_pred, mask)
             #loss_depth = self.criterion(mask_pred, depth)
             loss = loss_mask 

@@ -84,6 +84,7 @@ class DepthDataLoader:
     # self.image_dir = image_dir
     # self.mask_dir = mask_dir
     self.conf = conf
+    print(fg_bg_dir)
     # self.test_data_percentage = test_data_percentage
     #dataset = DepthDataSet(conf, fg_bg_dir, mask_dir, depth_dir)
     #test_p = int(len(dataset) * test_data_percentage)
@@ -91,20 +92,23 @@ class DepthDataLoader:
     #self.train, self.test = random_split(dataset, [train_p, test_p])
     self.train = DepthDataSet(conf, fg_bg_dir+ '/train', mask_dir+'/train', depth_dir+'/train', transform=TransfomedDataSet(self.conf['transformations']['train']))
     self.test = DepthDataSet(conf, fg_bg_dir+ '/test', mask_dir+'/test', depth_dir+'/test', transform=TransfomedDataSet(self.conf['transformations']['test']))
-
+    print(len(self.train))
+    print(len(self.test))
   def get_train_loader(self):
     return torch.utils.data.DataLoader(self.train, 
                                        batch_size=self.conf.get('batch_size', 64),
                                        shuffle=self.conf.get('shuffle', True), 
                                        num_workers=self.conf.get('num_workers', 2),
-                                       pin_memory=self.conf.get('pin_memory', True))
+                                       pin_memory=self.conf.get('pin_memory', True)
+                                       )
     
   def get_test_loader(self):
     return torch.utils.data.DataLoader(self.test, 
                                        batch_size=self.conf.get('batch_size', 64),
                                        shuffle=self.conf.get('shuffle', True), 
                                        num_workers=self.conf.get('num_workers', 2),
-                                       pin_memory=self.conf.get('pin_memory', True))
+                                       pin_memory=self.conf.get('pin_memory', True)
+                                       )
 
 
 
@@ -166,10 +170,11 @@ class DepthDataSet(Dataset):
     #if image.size != mask.size:
     #assert image.size == mask.size
     #img = self.preprocess(image, self.scale)
-    #mask = self.preprocess(mask, self.scale)
-
+    # mask = self.preprocess(mask, self.scale)
+    # depth = self.preprocess(depth, self.scale)
+    fg_bg =  self.transform(image=fg_bg)
     return {
-            'image': self.transform(image=fg_bg), 
+            'image': fg_bg['image'], 
             'mask': torch.from_numpy(np.array(mask)), 
             'depth': torch.from_numpy(np.array(depth))
            }
