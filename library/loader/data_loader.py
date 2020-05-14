@@ -1,267 +1,174 @@
-import json
-import argparse
-import uuid
-from datetime import datetime
-from library.model.get_model import GetModel
-from library.loader.data_loader import DataLoader, DepthDataLoader
-from tqdm import tqdm
+from library.augmentation.data_augmenter import TransfomedDataSet
+import torchvision
 import torch
-import torch.nn as nn
-from torch.optim import *
-from torch.optim.lr_scheduler import OneCycleLR, ReduceLROnPlateau
-from library.lr_finder import LRFinder
-from torch.nn import *
-import torch.nn.functional as F
-from mpl_toolkits.axes_grid1 import ImageGrid
-import matplotlib
-from matplotlib import pyplot as plt
-from torch.utils.tensorboard import SummaryWriter
+from torch.utils.data import Dataset, DataLoader, random_split
+from os.path import splitext
+from os import listdir
+from glob import glob
+import numpy as np 
+from PIL import Image
 
 
-class Main:
-    """
-    main class where the program diverge to various modules
-    It is as an entry point
-    """
-    def __init__(self, conf, height=32, width=32, data_dir='./data'):   
-        # Sanity check 
-        assert bool(conf) == True, "Please set configurations for your journey"
-        assert "model" in conf, "Please define the model name"
+data_dict = {
+    'cifar10': torchvision.datasets.CIFAR10,
+    'cifar100': torchvision.datasets.CIFAR100,
+}
 
-        self.conf = conf 
-        self.height = int(height)
-        self.width = int(width)
-        self.data_dir = data_dir
-        self.get_model()
-        assert self.conf['loss'] in globals(), "The loss function name doesn't match with names available"
-        self.criterion = globals()[self.conf['loss']]()
 
-        self.execution_flow()
+class DataLoader():
+  def __init__(self, conf=None, data_dir='./data', path_to_save_data='./data'):
+    self.conf = conf
+    self.data_dir = data_dir
+    self.path_to_save_data = path_to_save_data
+    self.path = path_to_save_data + '/tiny-imagenet-200'
+    self.train_loader = self.get_transformed_data(True)
+    self.test_loader = self.get_transformed_data(False)
 
-    def execution_flow(self):
-        self.get_loaders() # get the test and train loaders
-        #self.visualize_tranformed_data() # visualize the images for training
-        #self.lr_finder() # find the best LR
-        self.get_optimizer() # get the optimizer
-        self.get_scheduler() # get the scheduler
-        
-        train_acc = []
-        test_acc = []
+  def get_transformed_data(self, train=True):
+    if train:
+        return TransfomedDataSet(self.conf['transformations']['train'])
+    else:
+        return TransfomedDataSet(self.conf['transformations']['test'])
 
-        for e in range(1, self.conf['epochs']):
-            print("================================")
-            print("Epoch number : {}".format(e))
-            self.train(train_acc)
-            self.test(test_acc)
-            print("================================")
+  def download_images(self, url):
+    if os.path.isdir("tiny-imagenet-200.zip"):
+      print("Images are already there")
+      return
+    r = requests.get(url, stream=True)
+    print("Downloading " + url)
+    zip_ref = zipfile.ZipFile(BytesIO(r.content))
+    zip_ref.extractall(self.path_to_save_data)
+    zip_ref.close()
+    return
 
-        self.plot_graphs(train_acc, test_acc)
-        # plot the train and test accuracy graph
-
-        # Save the model, optimizer, 
-        # state = {'state_dict': self.model.state_dict(),
-        #          'optimizer': self.optimizer.state_dict()}
-        torch.save(self.model.state_dict(), '/content/drive/My Drive/Colab Notebooks/S15A-B/Data/final_data/saved_models/epoch_{}_{}_{}.pth'.format(self.conf['epochs'], datetime.now(), uuid.uuid4()))
-
-    def plot_graphs(self, train_acc, test_acc):
-        plt.figure(figsize=(8,8))
-        plt.plot(train_acc)
-        plt.savefig("train_loss.jpg")
-
-        plt.figure(figsize=(8,8))
-        plt.plot(test_acc)
-        plt.savefig("test_loss.jpg")
-
-    def visualize_tranformed_data(self):
-        images = next(iter(self.train_loader))
-        images = images['image'].numpy()  # convert images to numpy for display
-        # plot the images in the batch, along with the corresponding labels
-        fig = plt.figure(figsize=(10, 10))
-        grid = ImageGrid(fig, 111,  # similar to subplot(111)
-                        nrows_ncols=(10, 10),  # creates 2x2 grid of axes
-                        axes_pad=0.1,  # pad between axes in inch.
-                        )
-        for ax, im in zip(grid, images):
-            # Iterating over the grid returns the Axes.
-            ax.imshow(im)
-        plt.savefig("transformed_images.png")
-
-    def get_model(self):
-        model_obj = GetModel(self.conf, self.height, self.width )
-        self.model = model_obj.return_model()
-        self.device = model_obj.get_device()
-        #return self.model 
-
-    def get_loaders(self):
-        obj = DepthDataLoader(self.conf, 
-                              self.data_dir + '/fg_bg/temp', 
-                              self.data_dir + '/masked_images_blackwhite/temp',  
-                              self.data_dir + '/depth/temp1',
-                              .30)
-        self.train_loader = obj.get_train_loader()
-        self.test_loader = obj.get_test_loader()
-        print("Total length of train and test is : {} and {}".format(len(self.train_loader), len(self.test_loader)))
-
-    def test(self, test_acc):
-        self.model.eval()
-        test_loss = 0
-        #correct = 0
-        pbar = tqdm(self.test_loader)
-        length = len(self.test_loader)
-        print("Length of test loader is {}".format(length))
-        test_accuracy = []
-        with torch.no_grad():
-            for batch in pbar:
-                images, mask, depth = batch['image'].transpose(1,3), batch['mask'], batch['depth']
-
-                images = images.to(device=self.device, dtype=torch.float32)
-                mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
-                mask = mask.to(device=self.device, dtype=mask_type)
-                depth = depth.to(device=self.device, dtype=mask_type)
-
-                mask_pred = self.model(images)
-                loss_mask = self.criterion(mask_pred, mask)
-                #loss_depth = self.criterion(mask_pred, depth)
-                loss = loss_mask 
-
-                test_loss += loss_mask.item() 
-
-                accuracy = 100 * (test_loss/length)
-
-                pbar.set_description(desc= f'Loss={test_loss} Accuracy={accuracy:0.2f}')
-                test_acc.append(test_loss)
-                #loss = criterion(output, target)
-                #loss = F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
-            
-                # test_loss += self.criterion(output, target).item()  # sum up batch loss
-                # pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
-                # result = pred.eq(target.view_as(pred))
-                # if e == 2:
-                #     for i,val in enumerate(result):
-                #         status = val.item()
-                #         if status:
-                #             if len(correct_predicted) < sample_count:
-                #                 correct_predicted.append({
-                #                     'prediction': pred[i],
-                #                     'label': list(target.view_as(pred))[i],
-                #                     'image': data[i]
-                #                 })
-                #             else:
-                #                 if len(false_predicted) < sample_count:
-                #                     false_predicted.append({
-                #                         'prediction': pred[i],
-                #                         'label': list(target.view_as(pred))[i],
-                #                         'image': data[i]
-                #                     })
-                # correct += result.sum().item()
-        # test_loss /= len(test_loader.dataset)
-        # test_losses.append(test_loss)
-        # #pbar.set_description(desc= f'Loss={test_loss.item()} Batch_id={batch_idx} Accuracy={100*correct/processed:0.2f}')
-        # a = 100. * correct / len(test_loader.dataset)
-        # print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)\n'.format(
-        #     test_loss, correct, len(test_loader.dataset), a
-        #     ))
-        
-        # test_acc.append(100. * correct / len(test_loader.dataset))
-
-    def train(self, train_acc):
-        self.model.train()
-        pbar = tqdm(self.train_loader)
-        train_loss = 0
-        #train_acc = []
-        length = len(self.train_loader)
-        print("Length of train loader is {}".format(length))
-        device = self.device
-        self.model.to(self.device)
-        for batch in enumerate(pbar):
-            # get samples
-            images = batch[1]['image'].transpose(1, 3)
-            mask = batch[1]['mask']
-            depth = batch[1]['depth']
-
-            #assert len(images) == len(mask)
-            # assert images.shape[1] == self.model.n_channels, \
-            #     f'Network has been defined with {self.model.n_channels} input channels' \
-            #     f'but loaded with images having {images.shape[1]} channels. '\
-            #     f'Please check the configuration file or images channels.'
-            
-            #images = images.transpose(1, 3)
-            images = images.to(device=self.device, dtype=torch.float)
-            mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
-            mask = mask.to(device=device, dtype=mask_type)
-            depth = depth.to(device=device, dtype=mask_type)
-
-            mask_pred = self.model(images)
-            loss_mask = self.criterion(mask_pred, mask)
-            #loss_depth = self.criterion(mask_pred, depth)
-            loss = loss_mask 
-
-            train_loss += loss_mask.item() 
-            #writer.add_scalar('Loss/train', train_loss, global_step)
-
-            pbar.set_postfix(**{'loss (batch)': train_loss})
-            self.optimizer.zero_grad()
-
-            # Backpropagation
-            loss.backward()
-            self.optimizer.step()
-            self.scheduler.step()
-        
-            accuracy = 100*(train_loss/length)
-            pbar.set_description(desc= f'Loss={train_loss} Accuracy={accuracy:0.2f}')
-            train_acc.append(accuracy)
-            #return accuracy 
+  def get_train_set(self): 
+    if self.conf['data'].lower() in data_dict:
+      return data_dict[self.conf['data'].lower()](root=self.path_to_save_data,
+                                       train=True,
+                                       download=True,
+                                       transform=self.train_loader)
+    else:
+      return torchvision.datasets.ImageFolder(root=self.data_dir+ '/train', 
+                                              transform=self.train_loader)
+  
+  def get_test_set(self): 
+    if self.conf['data'].lower() in data_dict:
+      return data_dict[self.conf['data'].lower()](root=self.path_to_save_data,
+                                       train=False,
+                                       transform=self.test_loader)
+    else:
+      return torchvision.datasets.ImageFolder(root=self.data_dir + '/test', 
+                                              transform=self.train_loader)
     
-    def get_optimizer(self):
-        optimizer = globals()[self.conf['optimizer']['type']]
-        self.conf['optimizer'].pop('type')
-        try:
-          self.max_lr = self.max_lr/10
-        except:
-          self.max_lr = 0.01
-        self.optimizer = optimizer(self.model.parameters(),
-                                    lr=self.max_lr/10,
-                                    **self.conf['optimizer'])
+  def get_train_loader(self):
+    return torch.utils.data.DataLoader(self.get_train_set(), 
+                                       batch_size=self.conf.get('batch_size', 64),
+                                       shuffle=self.conf.get('shuffle', True), 
+                                       num_workers=self.conf.get('num_workers', 2))
+    
+  def get_test_loader(self):
+    return torch.utils.data.DataLoader(self.get_test_set(), 
+                                       batch_size=self.conf.get('batch_size', 64),
+                                       shuffle=self.conf.get('shuffle', True), 
+                                       num_workers=self.conf.get('num_workers', 2))
+    
+  def get_test_train_loaders(self):
+     train_data, train_labels, test_data, test_labels = self.get_data(self.get_id_dictionary())
+     traindata = torchvision.datasets.ImageFolder(root=self.path_to_save_data + '/tiny-imagenet-200/train', 
+                                              transform=self.train_loader)
+    
+  
 
-    def get_scheduler(self):
-        scheduler = globals()[self.conf['scheduler']['type']]
-        self.conf['scheduler'].pop('type')
-        self.scheduler = scheduler(self.optimizer,
-                                    max_lr=self.max_lr,
-                                    epochs=self.conf['epochs'],
-                                    steps_per_epoch=int(len(self.train_loader))+1,
-                                    **self.conf['scheduler'])
+class DepthDataLoader:
+  def __init__(self, conf, fg_bg_dir, mask_dir, depth_dir, test_data_percentage):
+    # self.image_dir = image_dir
+    # self.mask_dir = mask_dir
+    self.conf = conf
+    # self.test_data_percentage = test_data_percentage
+    dataset = DepthDataSet(conf, fg_bg_dir, mask_dir, depth_dir)
+    test_p = int(len(dataset) * test_data_percentage)
+    train_p = len(dataset) - test_p
+    self.train, self.test = random_split(dataset, [train_p, test_p])
+    self.train = map(TransfomedDataSet(self.conf['transformations']['train']), self.train)
+    self.test = map(TransfomedDataSet(self.conf['transformations']['test']), self.test)
 
-    def lr_finder(self):
-        criterion = globals()[self.conf['loss']]()
-        optimizer = globals()[self.conf['optimizer']['type']](self.model.parameters(), **self.conf['lr_finder']['optimizer'])
-        lr_finder = LRFinder(self.model, optimizer, criterion, self.device) #implemented LRFinder for SGD
-        lr_finder.range_test(self.train_loader, num_iter=len(self.train_loader)*10, **self.conf['lr_finder']['range_test'])
-        lr_finder.plot() # to inspect the loss-learning rate graph
-        lr_finder.reset()
-        loss = lr_finder.history['loss']
-        lr = lr_finder.history['lr']
-        max_lr = lr[loss.index(min(loss))]
-        self.max_lr = max_lr 
+  def get_train_loader(self):
+    return torch.utils.data.DataLoader(self.train, 
+                                       batch_size=self.conf.get('batch_size', 64),
+                                       shuffle=self.conf.get('shuffle', True), 
+                                       num_workers=self.conf.get('num_workers', 2),
+                                       pin_memory=self.conf.get('pin_memory', True))
+    
+  def get_test_loader(self):
+    return torch.utils.data.DataLoader(self.test, 
+                                       batch_size=self.conf.get('batch_size', 64),
+                                       shuffle=self.conf.get('shuffle', True), 
+                                       num_workers=self.conf.get('num_workers', 2),
+                                       pin_memory=self.conf.get('pin_memory', True))
 
 
-if __name__ == '__main__':
-    # Main file
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--conf_dir", required=True,
-                    help="path to the configuration file")
-    ap.add_argument("--channels", required=False,
-                    help="The number of channels in an image")
-    ap.add_argument("--height", required=False,
-                    help="The height of an image")
-    ap.add_argument("--width", required=False,
-                    help="The width of an image")
-    ap.add_argument("--data_dir", required=True,
-                    help="The Directory to the data")
-    ap.add_argument("--load_model", required=False,
-                    help="Load the saved model")
-    args = vars(ap.parse_args())
-    conf = args.get('conf_dir')
-    with open(conf, 'r') as fp:
-        conf = json.load(fp)
-    Main(conf, args.get('height'), args.get('width'), args.get('data_dir'))
+
+class DepthDataSet(Dataset):
+  """ Dataset for Depth and mask prediction """
+
+  def __init__(self, conf, fg_bg_dir, mask_dir, depth_dir, transform=None, scale=1):
+    """
+    Args:
+        conf = configuration file
+        image_dir: Directory to images of depth
+        mask_dir: Directory to mask images of depth
+        transformation: transformations applied on that image
+    """
+    self.conf = conf
+    self.fg_bg_dir = fg_bg_dir
+    self.mask_dir = mask_dir 
+    self.depth_dir = depth_dir 
+    self.scale = scale
+    self.ids = [file for file in listdir(fg_bg_dir) if not file.startswith('.')]
+
+  def __len__(self):
+    return len(self.ids)
+
+  @classmethod
+  def preprocess(cls, pil_img, scale):
+      w, h = pil_img.size
+      newW, newH = int(scale * w), int(scale * h)
+      assert newW > 0 and newH > 0, 'Scale is too small'
+      pil_img = pil_img.resize((newW, newH))
+
+      img_nd = np.array(pil_img)
+
+      if len(img_nd.shape) == 2:
+          img_nd = np.expand_dims(img_nd, axis=2)
+
+      # HWC to CHW
+      img_trans = img_nd.transpose((2, 0, 1))
+      if img_trans.max() > 1:
+          img_trans = img_trans / 255
+
+      return img_trans
+
+  def __getitem__(self, i):
+    idx = self.ids[i]
+    # image_file = glob(self.image_dir + '/'+ idx )
+    # mask_file = glob(self.mask_dir + '/'+ idx )
+    # print(idx)
+    # print(self.image_dir)
+    # print(mask_file)
+
+    # assert len(mask_file) > 1, "No mask found"
+    # assert len(image_file) > 1, "No image found"
+
+    mask = Image.open(self.mask_dir + '/'+ idx)
+    fg_bg = Image.open(self.fg_bg_dir + '/'+ idx)
+    depth = Image.open(self.depth_dir + '/'+ idx)
+    #if image.size != mask.size:
+    #assert image.size == mask.size
+    #img = self.preprocess(image, self.scale)
+    #mask = self.preprocess(mask, self.scale)
+
+    return {
+            'image': torch.from_numpy(np.array(fg_bg)), 
+            'mask': torch.from_numpy(np.array(mask)), 
+            'depth': torch.from_numpy(np.array(depth))
+           }
