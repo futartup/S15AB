@@ -1,6 +1,7 @@
 import json
 import argparse
 import uuid
+import logging
 from datetime import datetime
 from library.model.get_model import GetModel
 from library.loader.data_loader import DataLoader, DepthDataLoader
@@ -48,10 +49,18 @@ class Main:
         train_acc = []
         test_acc = []
 
+        logging.info(f'''   Starting training:
+                            Epochs:          {self.conf['epochs']}
+                            Batch size:      {self.conf['batch_size']}
+                            Training size:   {len(self.train_loader)}
+                            Test size:       {len(self.test_loader)}
+                            Device:          {self.device.type}
+                            ''')
+        writer = SummaryWriter(comment=f'BS_{self.conf['batch_size']}')
         for e in range(1, self.conf['epochs']):
             print("================================")
             print("Epoch number : {}".format(e))
-            self.train(train_acc)
+            self.train(e, train_acc)
             self.test(test_acc)
             print("================================")
 
@@ -130,41 +139,8 @@ class Main:
 
                 pbar.set_description(desc= f'Loss={test_loss} Accuracy={accuracy:0.2f}')
                 test_acc.append(test_loss)
-                #loss = criterion(output, target)
-                #loss = F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
-            
-                # test_loss += self.criterion(output, target).item()  # sum up batch loss
-                # pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
-                # result = pred.eq(target.view_as(pred))
-                # if e == 2:
-                #     for i,val in enumerate(result):
-                #         status = val.item()
-                #         if status:
-                #             if len(correct_predicted) < sample_count:
-                #                 correct_predicted.append({
-                #                     'prediction': pred[i],
-                #                     'label': list(target.view_as(pred))[i],
-                #                     'image': data[i]
-                #                 })
-                #             else:
-                #                 if len(false_predicted) < sample_count:
-                #                     false_predicted.append({
-                #                         'prediction': pred[i],
-                #                         'label': list(target.view_as(pred))[i],
-                #                         'image': data[i]
-                #                     })
-                # correct += result.sum().item()
-        # test_loss /= len(test_loader.dataset)
-        # test_losses.append(test_loss)
-        # #pbar.set_description(desc= f'Loss={test_loss.item()} Batch_id={batch_idx} Accuracy={100*correct/processed:0.2f}')
-        # a = 100. * correct / len(test_loader.dataset)
-        # print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)\n'.format(
-        #     test_loss, correct, len(test_loader.dataset), a
-        #     ))
-        
-        # test_acc.append(100. * correct / len(test_loader.dataset))
 
-    def train(self, train_acc):
+    def train(self, epoch, train_acc):
         self.model.train()
         pbar = tqdm(self.train_loader)
         train_loss = 0
@@ -200,11 +176,10 @@ class Main:
             loss.backward()
             self.optimizer.step()
             self.scheduler.step()
-        
+
             accuracy = 100*(train_loss/length)
             pbar.set_description(desc= f'Loss={train_loss} Accuracy={accuracy:0.2f}')
-            train_acc.append(accuracy)
-            #return accuracy 
+            train_acc.append(accuracy)            
     
     def get_optimizer(self):
         optimizer = globals()[self.conf['optimizer']['type']]
