@@ -13,6 +13,7 @@ from torch.optim.lr_scheduler import OneCycleLR, ReduceLROnPlateau
 from library.lr_finder import LRFinder
 from torch.nn import *
 import torch.nn.functional as F
+import torchvision.transforms as T
 from mpl_toolkits.axes_grid1 import ImageGrid
 import matplotlib
 from matplotlib import pyplot as plt
@@ -41,7 +42,7 @@ class Main:
 
     def execution_flow(self):
         self.get_loaders() # get the test and train loaders
-        #self.visualize_tranformed_data() # visualize the images for training
+        self.visualize_tranformed_data() # visualize the images for training
         #self.lr_finder() # find the best LR
         self.get_optimizer() # get the optimizer
         self.get_scheduler() # get the scheduler
@@ -83,17 +84,13 @@ class Main:
 
     def visualize_tranformed_data(self):
         images = next(iter(self.train_loader))
-        images = images['image'].numpy()  # convert images to numpy for display
-        # plot the images in the batch, along with the corresponding labels
-        fig = plt.figure(figsize=(10, 10))
-        grid = ImageGrid(fig, 111,  # similar to subplot(111)
-                        nrows_ncols=(10, 10),  # creates 2x2 grid of axes
-                        axes_pad=0.1,  # pad between axes in inch.
-                        )
-        for ax, im in zip(grid, images):
-            # Iterating over the grid returns the Axes.
-            ax.imshow(im)
-        plt.savefig("transformed_images.png")
+        images = images['image'][:20].numpy()  # convert images to numpy for display
+        count = 0
+        for im in images:
+          im = T.ToPILImage(mode="RGB")(im)
+          im.save('/content/drive/My Drive/Colab Notebooks/S15A-B/transformed_images/{}.jpg'.format(count))
+          im.close()
+          count += 1
 
     def get_model(self):
         model_obj = GetModel(self.conf, self.height, self.width )
@@ -121,7 +118,7 @@ class Main:
         test_accuracy = []
         with torch.no_grad():
             for batch in pbar:
-                images, mask, depth = batch['image'].transpose(1,3), batch['mask'], batch['depth']
+                images, mask, depth = batch['image'], batch['mask'], batch['depth']
 
                 images = images.to(device=self.device, dtype=torch.float32)
                 mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
