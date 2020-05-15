@@ -98,11 +98,11 @@ class DepthDataSet(Dataset):
     #if image.size != mask.size:
     #assert image.size == mask.size
     #img = self.preprocess(image, self.scale)
-    # mask = self.preprocess(mask, self.scale)
-    # depth = self.preprocess(depth, self.scale)
+    #mask = self.preprocess(mask, self.scale)
+    #depth = self.preprocess(depth, self.scale)
     fg_bg =  self.transform(image=fg_bg)
     return {
             'image': fg_bg['image'], 
-            'mask': torch.from_numpy(np.array(mask)), 
-            'depth': torch.from_numpy(np.array(depth))
+            'mask': torch.from_numpy(np.array(mask)/255), 
+            'depth': torch.from_numpy(np.array(depth)/255)
            }

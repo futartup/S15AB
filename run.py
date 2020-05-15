@@ -56,7 +56,7 @@ class Main:
                             Test size:       {len(self.test_loader)}
                             Device:          {self.device.type}
                             ''')
-        writer = SummaryWriter(comment=f'BS_{self.conf['batch_size']}')
+        #writer = SummaryWriter(comment=f'BS_{self.conf['batch_size']}')
         for e in range(1, self.conf['epochs']):
             print("================================")
             print("Epoch number : {}".format(e))
@@ -129,11 +129,11 @@ class Main:
                 depth = depth.to(device=self.device, dtype=mask_type)
 
                 mask_pred = self.model(images)
-                loss_mask = self.criterion(mask_pred, mask)
+                loss = self.criterion(mask_pred, mask)
                 #loss_depth = self.criterion(mask_pred, depth)
-                loss = loss_mask 
+                #loss = loss_mask 
 
-                test_loss += loss_mask.item() 
+                test_loss += loss.item() 
 
                 accuracy = 100 * (test_loss/length)
 
@@ -161,12 +161,12 @@ class Main:
             depth = depth.to(device=device, dtype=mask_type)
 
             mask_pred = self.model(images)
-           
-            loss_mask = self.criterion(mask_pred, mask)
+            print(mask_pred.shape, mask.shape)
+            loss = self.criterion(mask_pred, mask)
             #loss_depth = self.criterion(mask_pred, depth)
-            loss = loss_mask 
+            #loss = loss_mask 
 
-            train_loss += loss_mask.item() 
+            train_loss += loss.item() 
             #writer.add_scalar('Loss/train', train_loss, global_step)
 
             pbar.set_postfix(**{'loss (batch)': train_loss})
@@ -176,9 +176,8 @@ class Main:
             loss.backward()
             self.optimizer.step()
             self.scheduler.step()
-
             accuracy = 100*(train_loss/length)
-            pbar.set_description(desc= f'Loss={train_loss} Accuracy={accuracy:0.2f}')
+            pbar.set_description(desc= f'Loss={train_loss} LR={self.scheduler.get_last_lr()} Accuracy={accuracy:0.2f}')
             train_acc.append(accuracy)            
     
     def get_optimizer(self):
