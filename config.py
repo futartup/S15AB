@@ -18,17 +18,13 @@
     },
     "optimizer": {
         "type": "SGD",
-        "weight_decay": 1e-4,
+        "weight_decay": 1e-8,
         "nesterov": true,
         "momentum": 0.9
     },
     "scheduler": {
-        "type": "OneCycleLR",
-        "pct_start": 0.2,
-        "anneal_strategy": "linear",
-        "cycle_momentum": true,
-        "base_momentum": 0.80,
-        "max_momentum": 0.85
+        "type": "ReduceLROnPlateau",
+        "patience": 2
     },
     "lr_finder_use": true,
     "transformations": {
@@ -36,29 +32,10 @@
             "which": "albumentation",
             "what": [
             {
-                "name": "PadIfNeeded",
-                "min_height": 40,
-                "border_mode": 4,
-                "p": 1.0
-            },
-            {
-                "name": "RandomCrop",
-                "height": 32
-            },
-            {
-                "name": "HorizontalFlip"
-            },
-            {
                 "name": "Cutout",
-                "num_holes":1,
-                "max_h_size": 8, 
-                "max_w_size": 8
-            },
-            {
-                "name": "Normalize",
-                "mean": [0.43050, 0.44021, 0.43348],
-                "std": [0.28751, 0.26746, 0.26826,
-                "always_apply": true
+                "num_holes":3,
+                "max_h_size": 20, 
+                "max_w_size": 20
             }
 
         ]
@@ -66,12 +43,7 @@
         "test": {
             "which": "albumentation",
             "what": [
-                {
-                 "name": "Normalize",
-                 "mean": [0.43050, 0.44021, 0.43348],
-                 "std": [0.28751, 0.26746, 0.26826,
-                 "always_apply": true
-                }
+                
             ]
         }
     },
