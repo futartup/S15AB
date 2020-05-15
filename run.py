@@ -49,6 +49,11 @@ class Main:
         
         train_acc = []
         test_acc = []
+        train_loss = []
+        tests_loss = []
+
+        train_loss_decrease = 0
+        test_loss_decrease = 0
 
         logging.info(f'''   Starting training:
                             Epochs:          {self.conf['epochs']}
@@ -61,25 +66,27 @@ class Main:
         for e in range(1, self.conf['epochs']):
             print("================================")
             print("Epoch number : {}".format(e))
-            self.train(e, train_acc)
-            self.test(test_acc)
+            self.train(e, train_acc, train_loss, train_loss_decrease)
+            
+            loss = self.test(test_acc, tests_loss, test_loss_decrease)
+            self.scheduler.step(loss)
             print("================================")
 
-        self.plot_graphs(train_acc, test_acc)
+        self.plot_graphs(train_loss, tests_loss)
         # plot the train and test accuracy graph
 
         # Save the model, optimizer, 
         # state = {'state_dict': self.model.state_dict(),
         #          'optimizer': self.optimizer.state_dict()}
         torch.save(self.model.state_dict(), '/content/drive/My Drive/Colab Notebooks/S15AB/saved_models/no_depth_epoch_{}_{}_{}.pth'.format(self.conf['epochs'], datetime.now(), uuid.uuid4()))
-
-    def plot_graphs(self, train_acc, test_acc):
+        
+    def plot_graphs(self, train_loss, tests_loss):
         plt.figure(figsize=(8,8))
-        plt.plot(train_acc)
+        plt.plot(train_loss)
         plt.savefig("train_loss.jpg")
 
         plt.figure(figsize=(8,8))
-        plt.plot(test_acc)
+        plt.plot(tests_loss)
         plt.savefig("test_loss.jpg")
 
     def visualize_tranformed_data(self):
@@ -108,7 +115,7 @@ class Main:
         self.test_loader = obj.get_test_loader()
         print("Total length of train and test is : {} and {}".format(len(self.train_loader), len(self.test_loader)))
 
-    def test(self, test_acc):
+    def test(self, test_acc, tests_loss, test_loss_decrease):
         self.model.eval()
         test_loss = 0
         #correct = 0
@@ -127,17 +134,19 @@ class Main:
 
                 mask_pred = self.model(images)
                 loss = self.criterion(mask_pred, mask)
+                tests_loss.append(loss)
                 #loss_depth = self.criterion(mask_pred, depth)
                 #loss = loss_mask 
 
-                test_loss += loss.item() 
+                test_loss_decrease += loss.item() 
 
-                accuracy = 100 * (test_loss/length)
+                accuracy = 100 * (test_loss_decrease/length)
 
                 pbar.set_description(desc= f'Loss={test_loss} Accuracy={accuracy:0.2f}')
                 test_acc.append(test_loss)
+        return test_loss
 
-    def train(self, epoch, train_acc):
+    def train(self, epoch, train_acc, train_los, train_loss_decrease):
         self.model.train()
         pbar = tqdm(self.train_loader)
         train_loss = 0
@@ -146,35 +155,36 @@ class Main:
         print("Length of train loader is {}".format(length))
         device = self.device
         self.model.to(self.device)
-        for batch in enumerate(pbar):
+        for batch in pbar:
             # get samples
-            images = batch[1]['image']
-            mask = batch[1]['mask']
-            depth = batch[1]['depth']
-            print(len(images), len(mask), len(depth))
+            images = batch['image'] # fg_bg images
+            mask = batch['mask'] # the mask images
+            depth = batch['depth'] # the depth images produced from densedepth
+
             images = images.to(device=self.device, dtype=torch.float)
             mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
             mask = mask.to(device=device, dtype=mask_type)
             depth = depth.to(device=device, dtype=mask_type)
 
             mask_pred = self.model(images)
-            print(mask_pred.shape, mask.shape)
             loss = self.criterion(mask_pred, mask)
+            train_los.append(loss)
             #loss_depth = self.criterion(mask_pred, depth)
             #loss = loss_mask 
 
-            train_loss += loss.item() 
+            train_loss_decrease += loss.item() 
+            
             #writer.add_scalar('Loss/train', train_loss, global_step)
 
-            pbar.set_postfix(**{'loss (batch)': train_loss})
+            #pbar.set_postfix(**{'loss (batch)': train_loss})
             self.optimizer.zero_grad()
 
             # Backpropagation
             loss.backward()
             self.optimizer.step()
-            self.scheduler.step()
-            accuracy = 100*(train_loss/length)
-            pbar.set_description(desc= f'Loss={train_loss} LR={self.scheduler.get_last_lr()} Accuracy={accuracy:0.2f}')
+            
+            accuracy = 100*(train_loss_decrease/length)
+            pbar.set_description(desc= f'Loss={train_loss} Loss ={accuracy:0.2f}')
             train_acc.append(accuracy)            
     
     def get_optimizer(self):
@@ -192,10 +202,8 @@ class Main:
         scheduler = globals()[self.conf['scheduler']['type']]
         self.conf['scheduler'].pop('type')
         self.scheduler = scheduler(self.optimizer,
-                                    max_lr=self.max_lr,
-                                    epochs=self.conf['epochs'],
-                                    steps_per_epoch=int(len(self.train_loader))+1,
-                                    **self.conf['scheduler'])
+                                   'min' if self.model.n_classes > 1 else 'max',
+                                   **self.conf['scheduler'])
 
     def lr_finder(self):
         criterion = globals()[self.conf['loss']]()
