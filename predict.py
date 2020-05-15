@@ -1,4 +1,5 @@
 import argparse
+import cv2
 from library.model.u_net import UNet
 from PIL import Image
 from imutils import paths
@@ -102,8 +103,8 @@ def plot_img_and_mask(img, mask, filename):
         ax[1].set_title(f'Output mask')
         ax[1].imshow(mask)
     plt.xticks([]), plt.yticks([])
-    plt.savefig('/content/drive/My Drive/Colab Notebooks/S15AB/data/output/{}'.format(filename))
-
+    #plt.savefig('/content/drive/My Drive/Colab Notebooks/S15AB/data/output/{}'.format(filename))
+    plt.savefig('/Users/anupgogoi/Desktop/{}'.format(filename))
 def mask_to_image(mask):
     img = Image.fromarray(np.uint8(mask[1]*255))
     #img = Image.fromarray((mask * 255))
@@ -169,9 +170,16 @@ if __name__ == '__main__':
         #print(mask)
         #print(type(mask))
         result = mask_to_image(mask)
-        result.save('/content/drive/My Drive/Colab Notebooks/S15AB/data/output/{}'.format(filename))
+        
+        alpha=0.9
+        # img = cv2.imread('/Users/anupgogoi/Desktop/count.jpg')
+        # mask = cv2.imread('/Users/anupgogoi/Desktop/392885.jpg')
+
+        mask = cv2.resize(mask, img.shape[1::-1])
+        dst = cv2.addWeighted(img, alpha, mask, alpha, 0)
+
+        cv2.imwrite(args['output'] + '/' + filename, dst)
         #plot_img_and_mask(img, mask, filename)
-        outputs.append(mask)
         #result.save(args['output'][0] + filename)
 
 #display_images(outputs, is_colormap=True)

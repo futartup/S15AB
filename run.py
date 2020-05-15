@@ -42,7 +42,7 @@ class Main:
 
     def execution_flow(self):
         self.get_loaders() # get the test and train loaders
-        self.visualize_tranformed_data() # visualize the images for training
+        #self.visualize_tranformed_data() # visualize the images for training
         #self.lr_finder() # find the best LR
         self.get_optimizer() # get the optimizer
         self.get_scheduler() # get the scheduler
@@ -71,7 +71,7 @@ class Main:
         # Save the model, optimizer, 
         # state = {'state_dict': self.model.state_dict(),
         #          'optimizer': self.optimizer.state_dict()}
-        torch.save(self.model.state_dict(), 'saved_models/no_depth_epoch_{}_{}_{}.pth'.format(self.conf['epochs'], datetime.now(), uuid.uuid4()))
+        torch.save(self.model.state_dict(), '/content/drive/My Drive/Colab Notebooks/S15AB/saved_models/no_depth_epoch_{}_{}_{}.pth'.format(self.conf['epochs'], datetime.now(), uuid.uuid4()))
 
     def plot_graphs(self, train_acc, test_acc):
         plt.figure(figsize=(8,8))
