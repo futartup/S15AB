@@ -72,7 +72,7 @@ class Main:
             self.scheduler.step(loss)
             print("================================")
 
-        self.plot_graphs(train_loss, tests_loss)
+        self.plot_graphs(train_loss, tests_loss, train_acc, test_acc)
         # plot the train and test accuracy graph
 
         # Save the model, optimizer, 
@@ -80,7 +80,7 @@ class Main:
         #          'optimizer': self.optimizer.state_dict()}
         torch.save(self.model.state_dict(), '/content/drive/My Drive/Colab Notebooks/S15AB/saved_models/no_depth_epoch_{}_{}_{}.pth'.format(self.conf['epochs'], datetime.now(), uuid.uuid4()))
         
-    def plot_graphs(self, train_loss, tests_loss):
+    def plot_graphs(self, train_loss, tests_loss, train_acc, test_acc):
         plt.figure(figsize=(8,8))
         plt.plot(train_loss)
         plt.savefig("train_loss.jpg")
@@ -88,6 +88,14 @@ class Main:
         plt.figure(figsize=(8,8))
         plt.plot(tests_loss)
         plt.savefig("test_loss.jpg")
+
+        plt.figure(figsize=(8,8))
+        plt.plot(train_acc)
+        plt.savefig("train_acc.jpg")
+
+        plt.figure(figsize=(8,8))
+        plt.plot(test_acc)
+        plt.savefig("test_acc.jpg")
 
     def visualize_tranformed_data(self):
         images = next(iter(self.train_loader))
@@ -140,9 +148,9 @@ class Main:
 
                 test_loss_decrease += loss.item() 
 
-                accuracy = 100 * (test_loss_decrease/length)
+                accuracy = 100.00 - (100 * (test_loss_decrease/length))
 
-                pbar.set_description(desc= f'Loss={test_loss} Accuracy={accuracy:0.2f}')
+                pbar.set_description(desc= f'Loss={loss.item()} Accuracy={accuracy:0.2f}')
                 test_acc.append(test_loss)
         return test_loss
 
@@ -183,8 +191,8 @@ class Main:
             loss.backward()
             self.optimizer.step()
             
-            accuracy = 100*(train_loss_decrease/length)
-            pbar.set_description(desc= f'Loss={train_loss} Loss ={accuracy:0.2f}')
+            accuracy = 100.00 - (100*(train_loss_decrease/length))
+            pbar.set_description(desc= f'Loss={loss.item()} Accuracy ={accuracy:0.2f}')
             train_acc.append(accuracy)            
     
     def get_optimizer(self):
