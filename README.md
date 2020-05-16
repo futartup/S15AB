@@ -67,7 +67,7 @@ To solve this problem i have implemented UNet with total trainable params of 31,
 The model code can be found [here](https://github.com/futartup/S15AB/blob/master/library/model/u_net.py)
 ![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/unet.png)
 
-The saved models are stored in [here](https://github.com/futartup/S15AB/tree/master/saved_models).
+The saved models are stored in [here](https://drive.google.com/drive/u/3/folders/1A8jBzOUM_WPFKIa-gjjYs3H9tTffAGyL).
 The code for storing the saved model can be found [here](https://github.com/futartup/S15AB/blob/master/train.py).
 
 ## Representation of task
