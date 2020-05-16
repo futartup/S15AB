@@ -43,7 +43,7 @@ class Main:
             self.get_optimizer() # get the optimizer
         if not self.get_scheduler:
             self.get_scheduler() # get the scheduler
-            
+
         self.execution_flow()
 
     def execution_flow(self):
@@ -118,7 +118,7 @@ class Main:
           count += 1
 
     def get_model(self):
-        model_obj = GetModel(self.conf, self.height, self.width )
+        model_obj = GetModel(self.conf)
         if self.load_model is None:
             self.model = model_obj.return_model()
             self.device = model_obj.get_device()

@@ -9,7 +9,7 @@ model_mapping = {
 }
 
 class GetModel:
-    def __init__(self, conf, input_height=32, input_width=32):
+    def __init__(self, conf):
         self.conf = conf 
         self.input_height = input_height
         self.input_width = input_width
