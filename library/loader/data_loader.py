@@ -16,10 +16,18 @@ data_dict = {
 
 
 class DepthDataLoader:
-  def __init__(self, conf, fg_bg_dir, mask_dir, depth_dir, test_data_percentage):
+  def __init__(self, conf, fg_bg_dir, mask_dir, depth_dir, bg_dir,  test_data_percentage):
     self.conf = conf  
-    self.train = DepthDataSet(conf, fg_bg_dir+ '/train', mask_dir+'/train', depth_dir+'/train', transform=TransfomedDataSet(self.conf['transformations']['train']))
-    self.test = DepthDataSet(conf, fg_bg_dir+ '/test', mask_dir+'/test', depth_dir+'/test', transform=TransfomedDataSet(self.conf['transformations']['test']))
+    self.train = DepthDataSet(conf, fg_bg_dir+ '/train', 
+                                    mask_dir+'/train', 
+                                    depth_dir+'/train', 
+                                    bg_dir,
+                                    transform=TransfomedDataSet(self.conf['transformations']['train']))
+    self.test = DepthDataSet(conf, fg_bg_dir+ '/test', 
+                                    mask_dir+'/test', 
+                                    depth_dir+'/test', 
+                                    bg_dir,
+                                    transform=TransfomedDataSet(self.conf['transformations']['test']))
     print(len(self.train))
     print(len(self.test))
   def get_train_loader(self):
