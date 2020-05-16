@@ -33,4 +33,4 @@ class GetModel:
         self.device = torch.device("cuda" if use_cuda else "cpu")
         model = self.model.to(self.device)
         summary(model, input_size=(self.conf['model_initializer']['n_channels'], 
-                                   self.input_height, self.input_width))
+                                   224, 224))
