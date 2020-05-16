@@ -165,11 +165,15 @@ Each fg_bg images are passed through [this model](https://github.com/ialhashim/D
 |       |   UNet   | 90%
 
 ## File Structure
-| Name   |   Age | University   |
-|--------|-------|--------------|
-| Hassan |    21 | LUMS         |
-| Ali    |    22 | FAST         |
-| Ahmed  |    23 | UET          |
+- [library](https://github.com/futartup/S15AB/tree/master/library) (The library code)
+  - [augmentation](https://github.com/futartup/S15AB/tree/master/library/augmentation) (The augmentation code)
+  - [loader](https://github.com/futartup/S15AB/tree/master/library/loader) (The dataloader code)
+  - [model](https://github.com/futartup/S15AB/tree/master/library/model) (The model code)
+- [saved_models](https://github.com/futartup/S15AB/tree/master/saved_models) (The models are saved here, though it is large its not stored in here and stored in google drive)
+- [data](https://github.com/futartup/S15AB/tree/master/data) (The data for test , train and validation)
+- [raw_images](https://github.com/futartup/S15AB/tree/master/raw_images) (All the raw images are stored in here)
+
+
 
 
 ## About me
