@@ -156,9 +156,9 @@ class Main:
                 images, mask, depth = batch['image'], batch['mask'], batch['depth']
 
                 images = images.to(device=self.device, dtype=torch.float32)
-                mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
-                mask = mask.to(device=self.device, dtype=mask_type)
-                depth = depth.to(device=self.device, dtype=mask_type)
+                #mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
+                mask = mask.to(device=self.device, dtype=torch.long)
+                depth = depth.to(device=self.device, dtype=torch.long)
 
                 mask_pred = self.model(images)
                 loss = self.criterion(mask_pred, mask)
@@ -189,9 +189,9 @@ class Main:
             depth = batch['depth'] # the depth images produced from densedepth
 
             images = images.to(device=self.device, dtype=torch.float)
-            mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
-            mask = mask.to(device=device, dtype=mask_type)
-            depth = depth.to(device=device, dtype=mask_type)
+            #mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
+            mask = mask.to(device=device, dtype=torch.long)
+            depth = depth.to(device=device, dtype=torch.long)
 
             mask_pred = self.model(images)
             loss = self.criterion(mask_pred, mask)
