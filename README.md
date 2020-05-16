@@ -21,6 +21,8 @@ The model code can be found [here](https://github.com/futartup/S15AB/blob/master
 The goal is to segment the cars(which is the case in my case) in an image and predict the depth in an image. Simply, my goal is to take either a RGB color image (height×width×3) or a grayscale image (height×width×1) and output a segmentation map where each pixel contains a class label represented as an integer (height×width×1).
 ![alt-text-1](https://github.com/futartup/S15AB/blob/master/data/images/lady.png) 
 
+## Loss functions
+I have used CrossEntropyLoss for mask prediction and MSELoss for depth estimation.
 
 ## Creation of dataset
 ### Choosing of background images
