@@ -39,9 +39,9 @@ class Main:
         
         self.get_model()
         
-        if not self.optimizer:
+        if not hasattr(Main, 'optimizer'):
             self.get_optimizer() # get the optimizer
-        if not self.get_scheduler:
+        if not hasattr(Main, 'scheduler'):
             self.get_scheduler() # get the scheduler
 
         self.execution_flow()
