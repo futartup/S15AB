@@ -124,9 +124,9 @@ class Main:
             self.device = model_obj.get_device()
         else:
             checkpoint = torch.load(self.load_model)
-            self.conf['epochs'] = checkpoint['epoch']
+            self.conf['epochs'] = checkpoint.get('epoch', self.conf['epochs'])
             self.model = self.model.load_state_dict(checkpoint['state_dict'])
-            self.optimizer = self.model.load_state_dict(checkpoint['optimizer'])
+            self.optimizer = self.model.load_state_dict(checkpoint.get('optimizer', self.get_optimizer()))
             self.device = model_obj.get_device()
 
     def get_loaders(self):
