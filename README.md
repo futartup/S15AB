@@ -51,10 +51,10 @@ These foreground images are flipped randomly.
 ### Masked images of foreground images
 Each foreground images are masked using GIMP software and it looks as follows-
 
-![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/masked_black_images/399244.jpg) 
-![alt-text-2](https://github.com/futartup/S15AB/blob/master/raw_images/masked_black_images/399250.jpg) 
-![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/masked_black_images/399278.jpg) 
-![alt-text-2](https://github.com/futartup/S15AB/blob/master/raw_images/masked_black_images/399536.jpg)
+![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/masked_black_images/20-209366_asia-hero-motorcycle-bikes-prices-in-pakistan-super.jpg) 
+![alt-text-2](https://github.com/futartup/S15AB/blob/master/raw_images/masked_black_images/2004-mitsubishi-montero-sport-mitsubishi-pajero-sport-car-mitsubishi-motors-mitsubishi-png-thumbnail.jpg) 
+![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/masked_black_images/2014-jaguar-f-type-coupe-2015-jaguar-f-type-r-jaguar-r-coupe-car-jaguar-f-type-white-car-thumbnail.jpg) 
+![alt-text-2](https://github.com/futartup/S15AB/blob/master/raw_images/masked_black_images/2015-ferrari-f12berlinetta-sports-car-luxury-vehicle-black-ferrari-f12-berlinetta-car-thumbnail.jpg)
 
 ### Overlayed images
 Each foreground and flipped foreground images are randomly placed over background images 20 times and it looks as follows-
@@ -66,10 +66,10 @@ Each foreground and flipped foreground images are randomly placed over backgroun
 
 The program which is used to overlay foreground images on background images is [here](https://github.com/futartup/S15A/blob/master/overlay_images.py). The same program is used to generate the mask images which looks as follows:
 
-![alt-text-1](https://github.com/futartup/S15A/blob/master/raw_images/mask/bw_0.png) 
-![alt-text-2](https://github.com/futartup/S15A/blob/master/raw_images/mask/bw_2.png) 
-![alt-text-1](https://github.com/futartup/S15A/blob/master/raw_images/mask/bw_95.png) 
-![alt-text-2](https://github.com/futartup/S15A/blob/master/raw_images/mask/bw_99.png).
+![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/masked_black_images/399244.jpg) 
+![alt-text-2](https://github.com/futartup/S15AB/blob/master/raw_images/masked_black_images/399250.jpg) 
+![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/masked_black_images/399278.jpg) 
+![alt-text-2](https://github.com/futartup/S15AB/blob/master/raw_images/masked_black_images/399536.jpg)
 
 ### Depth images
 Each fg_bg images are passed through [this model](https://github.com/ialhashim/DenseDepth/blob/master/DenseDepth.ipynb) and created 400K depth images which looks as follows:
