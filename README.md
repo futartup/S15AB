@@ -72,13 +72,25 @@ The code for storing the saved model can be found [here](https://github.com/futa
 
 ## Representation of task
 The goal is to segment the cars(which is the case in my case) in an image and predict the depth in an image. Simply, my goal is to take either a RGB color image (height×width×3) or a grayscale image (height×width×1) and output a segmentation map where each pixel contains a class label represented as an integer (height×width×1). 
+
 There are four kinds of inputs which are classified into bg, fg_bg, mask and depth. The explanation for these categories of images can be found below. The mask and depth are the ground truths for our images. The mask has only one class which is a vehicle class as of now only. The depth dataset has been created using this [repo](https://github.com/ialhashim/DenseDepth/blob/master/DenseDepth.ipynb)
+
+The fg_bg and bg images are feed into the model. The masks and depth are used as targets in our criterion. The loss is added up and then autograd will backprop in this total loss. But the gradients will be for these individual losses.
+
 ![alt-text-1](https://github.com/futartup/S15AB/blob/master/data/images/lady.png) 
 ![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/depth.png)
 
 ## Loss functions
-I have used CrossEntropyLoss for mask prediction and MSELoss for depth estimation.
-These loss functions can be defines in [here](https://github.com/futartup/S15AB/blob/master/config.py)
+I have used CrossEntropyLoss for mask prediction and MSELoss for depth estimation. 
+There is only one class which is vehicle in out dataset now. I have plans to add some more classes in the dataset. 
+
+For the depth prediction MSELoss function is used since i want to find the loss for the each pixels.
+
+These loss functions can be defined in [here](https://github.com/futartup/S15AB/blob/master/config.py)
+
+## Loss curves
+Train loss curve for CrossEntropyLoss, ReduceLROnPlateau, SGD
+![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/train_loss%20(1).jpg)
 
 ## Creation of dataset
 ### Choosing of background images
