@@ -1,6 +1,6 @@
 # EVA Assignment Submissions ( S15A and S15 )
 
-This is an original submission of assignments from S15A and S15. The goal is to segment and create a bounding box around the object detected as well as monocular depth estimation. I have created my own dataset.
+This is an original submission of assignments from S15A and S15. The goal is to segment vehicle in images as well as monocular depth estimation. I have created my own dataset.
 
 ## Acknowledgements
 
@@ -71,7 +71,8 @@ The saved models are stored in [here](https://drive.google.com/drive/u/3/folders
 The code for storing the saved model can be found [here](https://github.com/futartup/S15AB/blob/master/train.py).
 
 ## Representation of task
-The goal is to segment the cars(which is the case in my case) in an image and predict the depth in an image. Simply, my goal is to take either a RGB color image (height×width×3) or a grayscale image (height×width×1) and output a segmentation map where each pixel contains a class label represented as an integer (height×width×1).
+The goal is to segment the cars(which is the case in my case) in an image and predict the depth in an image. Simply, my goal is to take either a RGB color image (height×width×3) or a grayscale image (height×width×1) and output a segmentation map where each pixel contains a class label represented as an integer (height×width×1). 
+There are four kinds of inputs which are classified into bg, fg_bg, mask and depth. The explanation for these categories of images can be found below. The mask and depth are the ground truths for our images. The mask has only one class which is a vehicle class as of now only. The depth dataset has been created using this [repo](https://github.com/ialhashim/DenseDepth/blob/master/DenseDepth.ipynb)
 ![alt-text-1](https://github.com/futartup/S15AB/blob/master/data/images/lady.png) 
 ![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/depth.png)
 
