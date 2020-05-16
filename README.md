@@ -65,6 +65,7 @@ optional arguments:
 ## Constructing the model architecture
 To solve this problem i have implemented UNet with total trainable params of 31, 043, 521.
 The model code can be found [here](https://github.com/futartup/S15AB/blob/master/library/model/u_net.py)
+![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/unet.png)
 
 The saved models are stored in [here](https://github.com/futartup/S15AB/tree/master/saved_models).
 The code for storing the saved model can be found [here](https://github.com/futartup/S15AB/blob/master/train.py).
