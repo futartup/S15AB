@@ -51,10 +51,10 @@ These foreground images are flipped randomly.
 ### Masked images of foreground images
 Each foreground images are masked using GIMP software and it looks as follows-
 
-![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/masked_black_images/20-209366_asia-hero-motorcycle-bikes-prices-in-pakistan-super.jpg) 
-![alt-text-2](https://github.com/futartup/S15A/blob/master/raw_images/masked_images_100/2013-toyota-corolla-le-car-toyota-sienna-front-wheel-drive-toyota-thumbnail.jpg ) 
-![alt-text-1](https://github.com/futartup/S15A/blob/master/raw_images/masked_images_100/2016-land-rover-range-rover-sport-2017-land-rover-range-rover-sport-car-rover-company-rang-thumbnail.jpg) 
-![alt-text-2](https://github.com/futartup/S15A/blob/master/raw_images/masked_images_100/bmw-png-transparent-images-169843-174756.jpg)
+![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/masked_black_images/399244.jpg) 
+![alt-text-2](https://github.com/futartup/S15AB/blob/master/raw_images/masked_black_images/399250.jpg) 
+![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/masked_black_images/399278.jpg) 
+![alt-text-2](https://github.com/futartup/S15AB/blob/master/raw_images/masked_black_images/399536.jpg)
 
 ### Overlayed images
 Each foreground and flipped foreground images are randomly placed over background images 20 times and it looks as follows-
