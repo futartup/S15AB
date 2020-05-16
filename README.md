@@ -166,7 +166,7 @@ Each fg_bg images are passed through [this model](https://github.com/ialhashim/D
 
 ## File Structure
 | Name   |   Age | University   |
-|--------+-------+--------------|
+|--------|-------|--------------|
 | Hassan |    21 | LUMS         |
 | Ali    |    22 | FAST         |
 | Ahmed  |    23 | UET          |
