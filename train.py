@@ -33,13 +33,17 @@ class Main:
 
         self.conf = conf 
         self.data_dir = data_dir
-        self.get_optimizer() # get the optimizer
-        self.get_scheduler() # get the scheduler
-        self.get_model()
         self.load_model = load_model
         assert self.conf['loss'] in globals(), "The loss function name doesn't match with names available"
         self.criterion = globals()[self.conf['loss']]()
-
+        
+        self.get_model()
+        
+        if not self.optimizer:
+            self.get_optimizer() # get the optimizer
+        if not self.get_scheduler:
+            self.get_scheduler() # get the scheduler
+            
         self.execution_flow()
 
     def execution_flow(self):
