@@ -128,7 +128,8 @@ class Main:
             self.conf['epochs'] = checkpoint.get('epoch', self.conf['epochs'])
             if 'state_dict' in checkpoint:
                 self.model = self.model.load_state_dict(checkpoint.get('state_dict'))
-            self.optimizer = self.model.load_state_dict(checkpoint.get('optimizer', self.get_optimizer()))
+            if 'optimizer' in checkpoint:
+                self.optimizer = self.model.load_state_dict(checkpoint.get('optimizer'))
             self.device = model_obj.get_device()
 
     def get_loaders(self):
