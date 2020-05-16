@@ -14,9 +14,17 @@ I would also like to thank www.theschoolofai.in to give me this opporthunity to 
 - GIMP
 
 ## To train the model
+[train.py](https://github.com/futartup/S15AB/blob/master/train.py)
 ```
 !cd S15AB; CUDA_LAUNCH_BLOCKING=1 python3 train.py --h
 ```
+
+## To predict the output
+[predict1.py](https://github.com/futartup/S15AB/blob/master/predict1.py)
+```
+!cd S15AB; CUDA_LAUNCH_BLOCKING=1 python3 predict1.py --h
+```
+
 
 ## Constructing the model architecture
 To solve this problem i have implemented UNet with total trainable params of 31, 043, 521.
