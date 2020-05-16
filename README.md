@@ -62,10 +62,7 @@ optional arguments:
 ```
 
 ## Output images
-![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/depth_pred_output_color.jpeg)
-![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/depth_predict_output.jpeg)
 ![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/mask_and_depth_prediction.png)
-![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/mask_and_depth_prediction_1.jpeg)
 
 
 ## Constructing the model architecture
