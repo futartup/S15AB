@@ -32,9 +32,9 @@ class Main:
         assert "model" in conf, "Please define the model name"
 
         self.conf = conf 
-        self.height = int(height)
-        self.width = int(width)
         self.data_dir = data_dir
+        self.get_optimizer() # get the optimizer
+        self.get_scheduler() # get the scheduler
         self.get_model()
         self.load_model = load_model
         assert self.conf['loss'] in globals(), "The loss function name doesn't match with names available"
@@ -44,10 +44,6 @@ class Main:
 
     def execution_flow(self):
         self.get_loaders() # get the test and train loaders
-        #self.visualize_tranformed_data() # visualize the images for training
-        #self.lr_finder() # find the best LR
-        self.get_optimizer() # get the optimizer
-        self.get_scheduler() # get the scheduler
         
         train_acc = []
         test_acc = []
@@ -63,7 +59,9 @@ class Main:
                             Training size:   {len(self.train_loader)}
                             Test size:       {len(self.test_loader)}
                             Device:          {self.device.type}
-                            ''')
+                            '''
+                    )
+
         #writer = SummaryWriter(comment=f'BS_{self.conf['batch_size']}')
         for e in range(1, self.conf['epochs']):
             print("================================")
@@ -78,7 +76,15 @@ class Main:
         
         # Save the current model
         current_directory = os.getcwd() 
-        torch.save(self.model.state_dict(), current_directory + 'saved_models/no_depth_epoch_{}_{}_{}.pth'.format(self.conf['epochs'], datetime.now(), uuid.uuid4()))
+        checkpoint = {
+                        'epoch': self.conf['epochs'] + 1,
+                        'state_dict': self.model.state_dict(),
+                        'optimizer': self.optimizer.state_dict()
+                     }
+        torch.save(checkpoint, current_directory + 'saved_models/class-{0}_epoch_{1}_{2}_{3}.pth'.format(self.conf['model_initializer']['n_classes'], 
+                                                                                                         self.conf['epochs'], 
+                                                                                                         datetime.now(), 
+                                                                                                         uuid.uuid4()))
         
     def plot_graphs(self, train_loss, tests_loss, train_acc, test_acc):
         plt.figure(figsize=(8,8))
@@ -108,13 +114,16 @@ class Main:
           count += 1
 
     def get_model(self):
+        model_obj = GetModel(self.conf, self.height, self.width )
         if self.load_model is None:
-            model_obj = GetModel(self.conf, self.height, self.width )
             self.model = model_obj.return_model()
             self.device = model_obj.get_device()
         else:
-            model_obj = torch.load_model
-        #return self.model 
+            checkpoint = torch.load(self.load_model)
+            self.conf['epochs'] = checkpoint['epoch']
+            self.model = self.model.load_state_dict(checkpoint['state_dict'])
+            self.optimizer = self.model.load_state_dict(checkpoint['optimizer'])
+            self.device = model_obj.get_device()
 
     def get_loaders(self):
         obj = DepthDataLoader(self.conf, 
@@ -213,7 +222,7 @@ class Main:
         scheduler = globals()[self.conf['scheduler']['type']]
         self.conf['scheduler'].pop('type')
         self.scheduler = scheduler(self.optimizer,
-                                   'min' if self.model.n_classes > 1 else 'max',
+                                   'min',
                                    **self.conf['scheduler'])
 
     def lr_finder(self):
