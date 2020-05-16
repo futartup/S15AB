@@ -23,6 +23,7 @@ The goal is to segment the cars(which is the case in my case) in an image and pr
 
 ## Loss functions
 I have used CrossEntropyLoss for mask prediction and MSELoss for depth estimation.
+These loss functions can be defines in [here](https://github.com/futartup/S15AB/blob/master/config.py)
 
 ## Creation of dataset
 ### Choosing of background images
