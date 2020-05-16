@@ -51,7 +51,7 @@ class DepthDataLoader:
 class DepthDataSet(Dataset):
   """ Dataset for Depth and mask prediction """
 
-  def __init__(self, conf, fg_bg_dir, mask_dir, depth_dir, transform=None, scale=1):
+  def __init__(self, conf, fg_bg_dir, mask_dir, depth_dir, bg_dir, transform=None, scale=1):
     """
     Args:
         conf = configuration file
@@ -63,6 +63,7 @@ class DepthDataSet(Dataset):
     self.fg_bg_dir = fg_bg_dir
     self.mask_dir = mask_dir 
     self.depth_dir = depth_dir 
+    self.bg_dir = bg_dir
     self.scale = scale
     self.transform = transform
     self.ids = [file for file in listdir(fg_bg_dir) if not file.startswith('.')]
