@@ -158,11 +158,18 @@ Each fg_bg images are passed through [this model](https://github.com/ialhashim/D
 - There will be total 400K mask images [here](https://drive.google.com/drive/u/0/folders/1zHdntBaQzseCn_UX-ppLu32t9sfGYGO9)
 - There will be total 400K depth images [here](https://drive.google.com/drive/u/0/folders/1qSgL904seTUoUB3jbaEDY7qqtVRuJTe1)
 
+| Data             | Total Files.        | Mean | Std | Channels |
+| ----------------- | ----------- |-------|-----|------|
+|          fg_bg   | 400K   | | | RGB|
+|          mask   | 400K   | | | L|
+|          depth   | 400K   | | | L|
+|          bg   | 100   | | | RGB|
+
 
 ### Accuracy
 | Model             | Acc.        |
 | ----------------- | ----------- |
-|       |   UNet   | 90%
+|       |   UNet   | 90%.   |
 
 ## File Structure
 - [library](https://github.com/futartup/S15AB/tree/master/library) (The library code)
