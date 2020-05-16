@@ -159,15 +159,17 @@ Each fg_bg images are passed through [this model](https://github.com/ialhashim/D
 - There will be total 400K depth images [here](https://drive.google.com/drive/u/0/folders/1qSgL904seTUoUB3jbaEDY7qqtVRuJTe1)
 
 
-### Results and some observations S15A submission
-
-
 ### Accuracy
 | Model             | Acc.        |
 | ----------------- | ----------- |
-|       |      |
+|       |   UNet   | 90%
 
 ## File Structure
+| Name   |   Age | University   |
+|--------+-------+--------------|
+| Hassan |    21 | LUMS         |
+| Ali    |    22 | FAST         |
+| Ahmed  |    23 | UET          |
 
 
 ## About me
