@@ -11,8 +11,6 @@ model_mapping = {
 class GetModel:
     def __init__(self, conf):
         self.conf = conf 
-        self.input_height = input_height
-        self.input_width = input_width
         self.model = self.return_model()
         self.get_summary()
 
