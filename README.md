@@ -17,12 +17,48 @@ I would also like to thank www.theschoolofai.in to give me this opporthunity to 
 [train.py](https://github.com/futartup/S15AB/blob/master/train.py)
 ```
 !cd S15AB; CUDA_LAUNCH_BLOCKING=1 python3 train.py --h
+usage: train.py [-h] --conf_dir CONF_DIR [--channels CHANNELS]
+                [--height HEIGHT] [--width WIDTH] --data_dir DATA_DIR
+                [--load_model LOAD_MODEL]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --conf_dir CONF_DIR   path to the configuration file
+  --channels CHANNELS   The number of channels in an image
+  --height HEIGHT       The height of an image
+  --width WIDTH         The width of an image
+  --data_dir DATA_DIR   The Directory to the data
+  --load_model LOAD_MODEL
+                        Load the saved model
 ```
 
 ## To predict the output
 [predict1.py](https://github.com/futartup/S15AB/blob/master/predict1.py)
 ```
 !cd S15AB; CUDA_LAUNCH_BLOCKING=1 python3 predict1.py --h
+usage: predict1.py [-h] [--model FILE] --input INPUT [INPUT ...]
+                   [--output INPUT [INPUT ...]] [--viz] [--no-save]
+                   [--mask-threshold MASK_THRESHOLD] [--scale SCALE]
+
+Predict masks from input images
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --model FILE, -m FILE
+                        Specify the file in which the model is stored
+                        (default: MODEL.pth)
+  --input INPUT [INPUT ...], -i INPUT [INPUT ...]
+                        filenames of input images (default: None)
+  --output INPUT [INPUT ...], -o INPUT [INPUT ...]
+                        Filenames of ouput images (default: None)
+  --viz, -v             Visualize the images as they are processed (default:
+                        False)
+  --no-save, -n         Do not save the output masks (default: False)
+  --mask-threshold MASK_THRESHOLD, -t MASK_THRESHOLD
+                        Minimum probability value to consider a mask pixel
+                        white (default: 0.5)
+  --scale SCALE, -s SCALE
+                        Scale factor for the input images (default: 0.5)
 ```
 
 
