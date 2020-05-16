@@ -126,7 +126,8 @@ class Main:
             checkpoint = torch.load(self.load_model)
             self.model = model_obj.return_model()
             self.conf['epochs'] = checkpoint.get('epoch', self.conf['epochs'])
-            self.model = self.model.load_state_dict(checkpoint.get('state_dict', self.model))
+            if 'state_dict' in checkpoint:
+                self.model = self.model.load_state_dict(checkpoint.get('state_dict'))
             self.optimizer = self.model.load_state_dict(checkpoint.get('optimizer', self.get_optimizer()))
             self.device = model_obj.get_device()
 
