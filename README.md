@@ -13,9 +13,17 @@ I would also like to thank www.theschoolofai.in to give me this opporthunity to 
 - PyTorch 1.0+
 - GIMP
 
+## To train the model
+```
+!cd S15AB; CUDA_LAUNCH_BLOCKING=1 python3 train.py --h
+```
+
 ## Constructing the model architecture
 To solve this problem i have implemented UNet with total trainable params of 31, 043, 521.
 The model code can be found [here](https://github.com/futartup/S15AB/blob/master/library/model/u_net.py)
+
+The saved models are stored in [here](https://github.com/futartup/S15AB/tree/master/saved_models).
+The code for storing the saved model can be found [here](https://github.com/futartup/S15AB/blob/master/train.py).
 
 ## Representation of task
 The goal is to segment the cars(which is the case in my case) in an image and predict the depth in an image. Simply, my goal is to take either a RGB color image (height×width×3) or a grayscale image (height×width×1) and output a segmentation map where each pixel contains a class label represented as an integer (height×width×1).
