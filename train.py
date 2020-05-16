@@ -1,4 +1,5 @@
 import json
+import os
 import argparse
 import uuid
 import logging
@@ -25,7 +26,7 @@ class Main:
     main class where the program diverge to various modules
     It is as an entry point
     """
-    def __init__(self, conf, height=32, width=32, data_dir='./data'):   
+    def __init__(self, conf, data_dir='./data', load_model=None):   
         # Sanity check 
         assert bool(conf) == True, "Please set configurations for your journey"
         assert "model" in conf, "Please define the model name"
@@ -35,6 +36,7 @@ class Main:
         self.width = int(width)
         self.data_dir = data_dir
         self.get_model()
+        self.load_model = load_model
         assert self.conf['loss'] in globals(), "The loss function name doesn't match with names available"
         self.criterion = globals()[self.conf['loss']]()
 
@@ -68,17 +70,15 @@ class Main:
             print("Epoch number : {}".format(e))
             self.train(e, train_acc, train_loss, train_loss_decrease)
             
-            loss = self.test(test_acc, tests_loss, test_loss_decrease)
-            self.scheduler.step(loss)
+            self.test(test_acc, tests_loss, test_loss_decrease)
+            self.scheduler.step(test_loss_decrease)
             print("================================")
 
         self.plot_graphs(train_loss, tests_loss, train_acc, test_acc)
-        # plot the train and test accuracy graph
-
-        # Save the model, optimizer, 
-        # state = {'state_dict': self.model.state_dict(),
-        #          'optimizer': self.optimizer.state_dict()}
-        torch.save(self.model.state_dict(), '/content/drive/My Drive/Colab Notebooks/S15AB/saved_models/no_depth_epoch_{}_{}_{}.pth'.format(self.conf['epochs'], datetime.now(), uuid.uuid4()))
+        
+        # Save the current model
+        current_directory = os.getcwd() 
+        torch.save(self.model.state_dict(), current_directory + 'saved_models/no_depth_epoch_{}_{}_{}.pth'.format(self.conf['epochs'], datetime.now(), uuid.uuid4()))
         
     def plot_graphs(self, train_loss, tests_loss, train_acc, test_acc):
         plt.figure(figsize=(8,8))
@@ -108,9 +108,12 @@ class Main:
           count += 1
 
     def get_model(self):
-        model_obj = GetModel(self.conf, self.height, self.width )
-        self.model = model_obj.return_model()
-        self.device = model_obj.get_device()
+        if self.load_model is None:
+            model_obj = GetModel(self.conf, self.height, self.width )
+            self.model = model_obj.return_model()
+            self.device = model_obj.get_device()
+        else:
+            model_obj = torch.load_model
         #return self.model 
 
     def get_loaders(self):
@@ -118,6 +121,7 @@ class Main:
                               self.data_dir + '/fg_bg', 
                               self.data_dir + '/mask',  
                               self.data_dir + '/depth',
+                              self.data_dir + '/bg',
                               .30)
         self.train_loader = obj.get_train_loader()
         self.test_loader = obj.get_test_loader()
@@ -148,11 +152,10 @@ class Main:
 
                 test_loss_decrease += loss.item() 
 
-                accuracy = 100.00 - (100 * (test_loss_decrease/length))
+                accuracy = 100 * (test_loss_decrease/length)
 
-                pbar.set_description(desc= f'Loss={loss.item()} Accuracy={accuracy:0.2f}')
+                pbar.set_description(desc= f'Loss={loss.item()} Loss={accuracy:0.2f}')
                 test_acc.append(test_loss)
-        return test_loss
 
     def train(self, epoch, train_acc, train_los, train_loss_decrease):
         self.model.train()
@@ -191,8 +194,8 @@ class Main:
             loss.backward()
             self.optimizer.step()
             
-            accuracy = 100.00 - (100*(train_loss_decrease/length))
-            pbar.set_description(desc= f'Loss={loss.item()} Accuracy ={accuracy:0.2f}')
+            accuracy = 100*(train_loss_decrease/length)
+            pbar.set_description(desc= f'Loss={loss.item()} Loss ={accuracy:0.2f}')
             train_acc.append(accuracy)            
     
     def get_optimizer(self):
@@ -245,4 +248,4 @@ if __name__ == '__main__':
     conf = args.get('conf_dir')
     with open(conf, 'r') as fp:
         conf = json.load(fp)
-    Main(conf, args.get('height'), args.get('width'), args.get('data_dir'))
+    Main(conf, args.get('data_dir'), args.get('load_model'))
