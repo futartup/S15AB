@@ -61,6 +61,12 @@ optional arguments:
                         Scale factor for the input images (default: 0.5)
 ```
 
+## Output images
+![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/depth_pred_output_color.jpeg)
+!(alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/depth_predict_output.jpeg)
+![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/mask_and_depth_prediction.png)
+!(alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/mask_and_depth_prediction_1.jpeg)
+
 
 ## Constructing the model architecture
 To solve this problem i have implemented UNet with total trainable params of 31, 043, 521.
@@ -91,6 +97,10 @@ These loss functions can be defined in [here](https://github.com/futartup/S15AB/
 ## Loss curves
 Train loss curve for CrossEntropyLoss, ReduceLROnPlateau, SGD
 ![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/train_loss%20(1).jpg)
+
+Test Loss
+![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/test_loss%20(1).jpg)
+
 
 ## Creation of dataset
 ### Choosing of background images
