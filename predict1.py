@@ -7,11 +7,26 @@ import torch
 import torch.nn.functional as F
 from PIL import Image
 from torchvision import transforms
+import matplotlib.pyplot as plt
 
-from unet import UNet
-from utils.data_vis import plot_img_and_mask
-from utils.dataset import BasicDataset
+from library.model.u_net import UNet
+from library.loader.data_loader import DepthDataSet
 
+def plot_img_and_mask(img, mask, filename):
+    classes = mask.shape[2] if len(mask.shape) > 2 else 1
+    fig, ax = plt.subplots(1, classes + 1)
+    ax[0].set_title('Input image')
+    ax[0].imshow(img)
+    if classes > 1:
+        for i in range(classes):
+            ax[i+1].set_title(f'Output mask (class {i+1})')
+            ax[i+1].imshow(mask[:, :, i])
+    else:
+        ax[1].set_title(f'Output mask')
+        ax[1].imshow(mask)
+    plt.xticks([]), plt.yticks([])
+    #plt.savefig('/content/drive/My Drive/Colab Notebooks/S15AB/data/output/{}'.format(filename))
+    plt.savefig('/content/drive/My Drive/Colab Notebooks/S15AB/{}'.format(filename))
 
 def predict_img(net,
                 full_img,
@@ -20,7 +35,7 @@ def predict_img(net,
                 out_threshold=0.5):
     net.eval()
 
-    img = torch.from_numpy(BasicDataset.preprocess(full_img, scale_factor))
+    img = torch.from_numpy(DepthDataSet.preprocess(full_img, scale_factor))
 
     img = img.unsqueeze(0)
     img = img.to(device=device, dtype=torch.float32)
@@ -109,7 +124,19 @@ if __name__ == "__main__":
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     logging.info(f'Using device {device}')
     net.to(device=device)
-    net.load_state_dict(torch.load(args.model, map_location=device))
+
+    state_dict = torch.load(args.model, map_location=device)
+    from collections import OrderedDict
+    new_state_dict = OrderedDict()
+
+    for k, v in state_dict.items():
+        if 'module' not in k:
+            k = 'module.'+k
+        else:
+            k = k.replace('features.module.', 'module.features.')
+        new_state_dict[k]=v
+        
+    net.load_state_dict(new_state_dict, strict=False)
 
     logging.info("Model loaded !")
 
@@ -133,4 +160,4 @@ if __name__ == "__main__":
 
         if args.viz:
             logging.info("Visualizing results for image {}, close to continue ...".format(fn))
-            plot_img_and_mask(img, mask)
+            plot_img_and_mask(img, mask, 'mask.jpg')

@@ -11,7 +11,7 @@
     "num_workers": 2,
     "lr_step_size": 25,
     "lr_gamma": 0.001,
-    "loss": "CrossEntropyLoss",
+    "loss": "BCEWithLogitsLoss",
     "lr_finder": {
         "optimizer": {"lr": 1e-5},
         "range_test": {"end_lr":100, "step_mode": "exp"}
@@ -33,7 +33,7 @@
             "what": [
             {
                 "name": "Cutout",
-                "num_holes":3,
+                "num_holes":2,
                 "max_h_size": 20, 
                 "max_w_size": 20
             }
@@ -50,7 +50,7 @@
     "model": "unet",
     "model_initializer": {
         "n_channels": 3,
-        "n_classes": 2,
+        "n_classes": 1,
         "bilinear": false
     }
 }
