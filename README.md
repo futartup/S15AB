@@ -172,6 +172,11 @@ Each fg_bg images are passed through [this model](https://github.com/ialhashim/D
 - [saved_models](https://github.com/futartup/S15AB/tree/master/saved_models) (The models are saved here, though it is large its not stored in here and stored in google drive)
 - [data](https://github.com/futartup/S15AB/tree/master/data) (The data for test , train and validation)
 - [raw_images](https://github.com/futartup/S15AB/tree/master/raw_images) (All the raw images are stored in here)
+- [detect_and_remove_duplicate_images.py](https://github.com/futartup/S15AB/blob/master/detect_and_remove_duplicate_images.py)(Code to delete duplicate images using hash)
+- [overlay_images.py](https://github.com/futartup/S15AB/blob/master/overlay_images.py)(Code to produce 800K dataset from fg, bg images)
+- [train.py](https://github.com/futartup/S15AB/blob/master/train.py)(The training code and the main file, this is the entry point)
+- [predict1.py](https://github.com/futartup/S15AB/blob/master/predict1.py)(Code to predict the output of model)
+
 
 
 
