@@ -29,7 +29,7 @@ class Main:
     """
     def __init__(self, conf, data_dir='./data', load_model=None):   
         
-        self.writer = SummaryWriter("Monocular Depth Estimation and Mask prediction")
+        self.writer = SummaryWriter("runs/MDME")
 
         # Sanity check 
         assert bool(conf) == True, "Please set configurations for your journey"
@@ -120,8 +120,8 @@ class Main:
         images = next(iter(self.train_loader))
         images = images['image'][:20].numpy()  # convert images to numpy for display
         grid = torchvision.utils.make_grid(images)
-        writer.add_image('Transformed images', grid, 0)
-        writer.add_graph(model, images)
+        self.writer.add_image('Transformed images', grid, 0)
+        self.writer.add_graph(self.model, images)
         # count = 0
         # for im in images:
         #   im = T.ToPILImage(mode="RGB")(im)
