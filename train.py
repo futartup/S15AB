@@ -93,7 +93,7 @@ class Main:
                         'state_dict': self.model.state_dict(),
                         'optimizer': self.optimizer.state_dict()
                      }
-        torch.save(checkpoint, current_directory + '/saved_models/class-{0}_epoch_{1}_{2}_{3}.pth'.format(self.conf['model_initializer']['n_classes'], 
+        torch.save(checkpoint, '/content/drive/class-{0}_epoch_{1}_{2}_{3}.pth'.format(self.conf['model_initializer']['n_classes'], 
                                                                                                          self.conf['epochs'], 
                                                                                                          datetime.now(), 
                                                                                          uuid.uuid4()))
@@ -102,19 +102,19 @@ class Main:
     def plot_graphs(self, train_loss, tests_loss, train_acc, test_acc):
         plt.figure(figsize=(8,8))
         plt.plot(train_loss)
-        plt.savefig("train_loss.jpg")
+        plt.savefig("/content/drive/train_loss.jpg")
 
         plt.figure(figsize=(8,8))
         plt.plot(tests_loss)
-        plt.savefig("test_loss.jpg")
+        plt.savefig("/content/drive/test_loss.jpg")
 
         plt.figure(figsize=(8,8))
         plt.plot(train_acc)
-        plt.savefig("train_acc.jpg")
+        plt.savefig("/content/drive/train_acc.jpg")
 
         plt.figure(figsize=(8,8))
         plt.plot(test_acc)
-        plt.savefig("test_acc.jpg")
+        plt.savefig("/content/drive/test_acc.jpg")
 
     def visualize_tranformed_data(self):
         images = next(iter(self.train_loader))
