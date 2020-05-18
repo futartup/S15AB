@@ -118,10 +118,10 @@ class Main:
 
     def visualize_tranformed_data(self):
         images = next(iter(self.train_loader))
-        print(images)
+        #print(images)
         grid = torchvision.utils.make_grid(images['image'])
         self.writer.add_image('Transformed images', grid)
-        self.writer.add_graph(self.model, images['image'])
+        #self.writer.add_graph(self.model, images['image'])
         # count = 0
         # for im in images:
         #   im = T.ToPILImage(mode="RGB")(im)
