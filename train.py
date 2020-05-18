@@ -1,24 +1,25 @@
-import json
 import os
-import argparse
+import json
 import uuid
-import logging
-from datetime import datetime
-from library.model.get_model import GetModel
-from library.loader.data_loader import DataLoader, DepthDataLoader
-from tqdm import tqdm
 import torch
+import logging
+import argparse
+import matplotlib
+import torchvision
 import torch.nn as nn
-from torch.optim import *
-from torch.optim.lr_scheduler import OneCycleLR, ReduceLROnPlateau
-from library.lr_finder import LRFinder
+from tqdm import tqdm
 from torch.nn import *
+from torch.optim import *
+from datetime import datetime
 import torch.nn.functional as F
 import torchvision.transforms as T
-from mpl_toolkits.axes_grid1 import ImageGrid
-import matplotlib
 from matplotlib import pyplot as plt
+from library.lr_finder import LRFinder
+from library.model.get_model import GetModel
+from mpl_toolkits.axes_grid1 import ImageGrid
 from torch.utils.tensorboard import SummaryWriter
+from library.loader.data_loader import DataLoader, DepthDataLoader
+from torch.optim.lr_scheduler import OneCycleLR, ReduceLROnPlateau
 
 
 class Main:
@@ -27,6 +28,9 @@ class Main:
     It is as an entry point
     """
     def __init__(self, conf, data_dir='./data', load_model=None):   
+        
+        self.writer = SummaryWriter("Monocular Depth Estimation and Mask prediction")
+
         # Sanity check 
         assert bool(conf) == True, "Please set configurations for your journey"
         assert "model" in conf, "Please define the model name"
@@ -54,6 +58,10 @@ class Main:
         train_loss = []
         tests_loss = []
 
+        # Globals step
+        global_step_train = 0
+        global_step_test = 1
+
         train_loss_decrease = 0
         test_loss_decrease = 0
 
@@ -66,13 +74,13 @@ class Main:
                             '''
                     )
 
-        #writer = SummaryWriter(comment=f'BS_{self.conf['batch_size']}')
+        
         for e in range(1, self.conf['epochs']):
             print("================================")
             print("Epoch number : {}".format(e))
-            self.train(e, train_acc, train_loss, train_loss_decrease)
+            self.train(e, train_acc, train_loss, train_loss_decrease, global_step_train)
             
-            self.test(test_acc, tests_loss, test_loss_decrease)
+            self.test(test_acc, tests_loss, test_loss_decrease, global_step_test)
             self.scheduler.step(test_loss_decrease)
             print("================================")
 
@@ -89,6 +97,7 @@ class Main:
                                                                                                          self.conf['epochs'], 
                                                                                                          datetime.now(), 
                                                                                                          uuid.uuid4()))
+        self.writer.close()
         
     def plot_graphs(self, train_loss, tests_loss, train_acc, test_acc):
         plt.figure(figsize=(8,8))
@@ -110,12 +119,15 @@ class Main:
     def visualize_tranformed_data(self):
         images = next(iter(self.train_loader))
         images = images['image'][:20].numpy()  # convert images to numpy for display
-        count = 0
-        for im in images:
-          im = T.ToPILImage(mode="RGB")(im)
-          im.save('/content/drive/My Drive/Colab Notebooks/S15A-B/transformed_images/{}.jpg'.format(count))
-          im.close()
-          count += 1
+        grid = torchvision.utils.make_grid(images)
+        writer.add_image('Transformed images', grid, 0)
+        writer.add_graph(model, images)
+        # count = 0
+        # for im in images:
+        #   im = T.ToPILImage(mode="RGB")(im)
+        #   im.save('/content/drive/My Drive/Colab Notebooks/S15A-B/transformed_images/{}.jpg'.format(count))
+        #   im.close()
+        #   count += 1
 
     def get_model(self):
         model_obj = GetModel(self.conf)
@@ -143,14 +155,14 @@ class Main:
         self.test_loader = obj.get_test_loader()
         print("Total length of train and test is : {} and {}".format(len(self.train_loader), len(self.test_loader)))
 
-    def test(self, test_acc, tests_loss, test_loss_decrease):
+    def test(self, test_acc, tests_loss, test_loss_decrease, global_step_test):
         self.model.eval()
         test_loss = 0
         #correct = 0
         pbar = tqdm(self.test_loader)
         length = len(self.test_loader)
         print("Length of test loader is {}".format(length))
-        test_accuracy = []
+
         with torch.no_grad():
             for batch in pbar:
                 images, mask, depth = batch['image'], batch['mask'], batch['depth']
@@ -167,13 +179,16 @@ class Main:
                 #loss = loss_mask 
 
                 test_loss_decrease += loss.item() 
+                
+                self.writer.add_scalar('Loss/test', test_loss_decrease, global_step_test)
 
                 accuracy = 100 * (test_loss_decrease/length)
 
                 pbar.set_description(desc= f'Loss={loss.item()} Loss={accuracy:0.2f}')
                 test_acc.append(test_loss)
+                global_step_test += 1
 
-    def train(self, epoch, train_acc, train_los, train_loss_decrease):
+    def train(self, epoch, train_acc, train_los, train_loss_decrease, global_step_train):
         self.model.train()
         pbar = tqdm(self.train_loader)
         train_loss = 0
@@ -201,7 +216,7 @@ class Main:
 
             train_loss_decrease += loss.item() 
             
-            #writer.add_scalar('Loss/train', train_loss, global_step)
+            self.writer.add_scalar('Loss/train', train_loss_decrease, global_step_train)
 
             #pbar.set_postfix(**{'loss (batch)': train_loss})
             self.optimizer.zero_grad()
@@ -212,7 +227,8 @@ class Main:
             
             accuracy = 100*(train_loss_decrease/length)
             pbar.set_description(desc= f'Loss={loss.item()} Loss ={accuracy:0.2f}')
-            train_acc.append(accuracy)            
+            train_acc.append(accuracy)
+            global_step_train += 1            
     
     def get_optimizer(self):
         optimizer = globals()[self.conf['optimizer']['type']]
