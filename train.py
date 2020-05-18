@@ -40,7 +40,7 @@ class Main:
         self.load_model = load_model
         assert self.conf['loss'] in globals(), "The loss function name doesn't match with names available"
         self.criterion = globals()[self.conf['loss']]()
-        
+        self.criterion_depth = MSELoss()
         self.get_model()
         
         if not hasattr(Main, 'optimizer'):
@@ -93,7 +93,7 @@ class Main:
                         'state_dict': self.model.state_dict(),
                         'optimizer': self.optimizer.state_dict()
                      }
-        torch.save(checkpoint, '/content/drive/class-{0}_epoch_{1}_{2}_{3}.pth'.format(self.conf['model_initializer']['n_classes'], 
+        torch.save(checkpoint, current_directory + '/saved_models/class-{0}_epoch_{1}_{2}_{3}.pth'.format(self.conf['model_initializer']['n_classes'], 
                                                                                                          self.conf['epochs'], 
                                                                                                          datetime.now(), 
                                                                                          uuid.uuid4()))
@@ -102,23 +102,22 @@ class Main:
     def plot_graphs(self, train_loss, tests_loss, train_acc, test_acc):
         plt.figure(figsize=(8,8))
         plt.plot(train_loss)
-        plt.savefig("/content/drive/train_loss.jpg")
+        plt.savefig("train_loss.jpg")
 
         plt.figure(figsize=(8,8))
         plt.plot(tests_loss)
-        plt.savefig("/content/drive/test_loss.jpg")
+        plt.savefig("test_loss.jpg")
 
         plt.figure(figsize=(8,8))
         plt.plot(train_acc)
-        plt.savefig("/content/drive/train_acc.jpg")
+        plt.savefig("train_acc.jpg")
 
         plt.figure(figsize=(8,8))
         plt.plot(test_acc)
-        plt.savefig("/content/drive/test_acc.jpg")
+        plt.savefig("test_acc.jpg")
 
     def visualize_tranformed_data(self):
         images = next(iter(self.train_loader))
-        #print(images)
         grid = torchvision.utils.make_grid(images['image'])
         self.writer.add_image('Transformed images', grid)
         #self.writer.add_graph(self.model, images['image'])
@@ -174,11 +173,13 @@ class Main:
 
                 mask_pred = self.model(images)
                 loss = self.criterion(mask_pred, mask)
-                tests_loss.append(loss)
+                loss_d = self.criterion_depth(mask_pred, depth)
+                final_loss = loss + loss_d
+                tests_loss.append(final_loss)
                 #loss_depth = self.criterion(mask_pred, depth)
                 #loss = loss_mask 
 
-                test_loss_decrease += loss.item() 
+                test_loss_decrease += loss.item() + loss_d.item()
                 
                 self.writer.add_scalar('Loss/test', test_loss_decrease, global_step_test)
 
@@ -210,11 +211,13 @@ class Main:
 
             mask_pred = self.model(images)
             loss = self.criterion(mask_pred, mask)
-            train_los.append(loss)
+            loss_d = self.criterion_depth(mask_pred, depth)
+            final_loss = loss + loss_d
+            train_los.append(final_loss)
             #loss_depth = self.criterion(mask_pred, depth)
             #loss = loss_mask 
 
-            train_loss_decrease += loss.item() 
+            train_loss_decrease += loss.item() + loss_d.item()
             
             self.writer.add_scalar('Loss/train', train_loss_decrease, global_step_train)
 
@@ -222,7 +225,7 @@ class Main:
             self.optimizer.zero_grad()
 
             # Backpropagation
-            loss.backward()
+            final_loss.backward()
             self.optimizer.step()
             
             accuracy = 100*(train_loss_decrease/length)
