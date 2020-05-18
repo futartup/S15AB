@@ -85,7 +85,7 @@ class Main:
                         'state_dict': self.model.state_dict(),
                         'optimizer': self.optimizer.state_dict()
                      }
-        torch.save(checkpoint, current_directory + 'saved_models/class-{0}_epoch_{1}_{2}_{3}.pth'.format(self.conf['model_initializer']['n_classes'], 
+        torch.save(checkpoint, current_directory + '/saved_models/class-{0}_epoch_{1}_{2}_{3}.pth'.format(self.conf['model_initializer']['n_classes'], 
                                                                                                          self.conf['epochs'], 
                                                                                                          datetime.now(), 
                                                                                                          uuid.uuid4()))
