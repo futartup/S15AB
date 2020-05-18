@@ -1,6 +1,6 @@
-# EVA Assignment Submissions ( S15A and S15 )
+# Object Detector ( S15A and S15 )
 
-This is an original submission of assignments from S15A and S15. The goal is to segment vehicle in images as well as monocular depth estimation. I have created my own dataset.
+This repo is to detect cars in video. The goal is to segment vehicle in images as well as monocular depth estimation. I have created my own dataset.
 
 ## Acknowledgements
 
