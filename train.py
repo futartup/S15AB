@@ -207,7 +207,7 @@ class Main:
             images = images.to(device=self.device, dtype=torch.float)
             #mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
             mask = mask.to(device=device, dtype=torch.long)
-            depth = depth.to(device=device, dtype=torch.long)
+            depth = depth.to(device=device, dtype=torch.float32)
 
             mask_pred = self.model(images)
             loss = self.criterion(mask_pred, mask)
@@ -236,12 +236,10 @@ class Main:
     def get_optimizer(self):
         optimizer = globals()[self.conf['optimizer']['type']]
         self.conf['optimizer'].pop('type')
-        try:
-          self.max_lr = self.max_lr/10
-        except:
-          self.max_lr = 0.01
+       
+        self.max_lr = 0.01
         self.optimizer = optimizer(self.model.parameters(),
-                                    lr=self.max_lr/10,
+                                    lr=self.max_lr,
                                     **self.conf['optimizer'])
 
     def get_scheduler(self):
