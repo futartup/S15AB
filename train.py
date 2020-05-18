@@ -29,7 +29,7 @@ class Main:
     """
     def __init__(self, conf, data_dir='./data', load_model=None):   
         
-        self.writer = SummaryWriter("runs/MDME")
+        self.writer = SummaryWriter("/content/drive/My Drive/Colab Notebooks/S15AB/runs/MDME")
 
         # Sanity check 
         assert bool(conf) == True, "Please set configurations for your journey"
@@ -52,7 +52,7 @@ class Main:
 
     def execution_flow(self):
         self.get_loaders() # get the test and train loaders
-        
+        self.visualize_tranformed_data() # visualize the transformed data
         train_acc = []
         test_acc = []
         train_loss = []
@@ -96,7 +96,7 @@ class Main:
         torch.save(checkpoint, current_directory + '/saved_models/class-{0}_epoch_{1}_{2}_{3}.pth'.format(self.conf['model_initializer']['n_classes'], 
                                                                                                          self.conf['epochs'], 
                                                                                                          datetime.now(), 
-                                                                                                         uuid.uuid4()))
+                                                                                         uuid.uuid4()))
         self.writer.close()
         
     def plot_graphs(self, train_loss, tests_loss, train_acc, test_acc):
@@ -118,9 +118,10 @@ class Main:
 
     def visualize_tranformed_data(self):
         images = next(iter(self.train_loader))
-        grid = torchvision.utils.make_grid(images)
-        self.writer.add_image('Transformed images', grid, 0)
-        self.writer.add_graph(self.model, images)
+        print(images)
+        grid = torchvision.utils.make_grid(images['image'])
+        self.writer.add_image('Transformed images', grid)
+        self.writer.add_graph(self.model, images['image'])
         # count = 0
         # for im in images:
         #   im = T.ToPILImage(mode="RGB")(im)
