@@ -118,7 +118,6 @@ class Main:
 
     def visualize_tranformed_data(self):
         images = next(iter(self.train_loader))
-        images = images['image'][:20].numpy()  # convert images to numpy for display
         grid = torchvision.utils.make_grid(images)
         self.writer.add_image('Transformed images', grid, 0)
         self.writer.add_graph(self.model, images)
