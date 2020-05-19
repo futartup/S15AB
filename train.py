@@ -173,7 +173,7 @@ class Main:
 
                 mask_pred = self.model(images)
                 loss = self.criterion(mask_pred, mask)
-                loss_d = self.criterion_depth(mask_pred, depth)
+                loss_d = self.criterion_depth(mask_pred.view(depth.size()), depth)
                 final_loss = loss + loss_d
                 tests_loss.append(final_loss)
                 #loss_depth = self.criterion(mask_pred, depth)
@@ -211,7 +211,7 @@ class Main:
 
             mask_pred = self.model(images)
             loss = self.criterion(mask_pred, mask)
-            loss_d = self.criterion_depth(mask_pred, depth)
+            loss_d = self.criterion_depth(mask_pred.view(depth.size()), depth)
             final_loss = loss + loss_d
             train_los.append(final_loss)
             #loss_depth = self.criterion(mask_pred, depth)
