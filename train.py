@@ -37,6 +37,7 @@ class Main:
 
         self.conf = conf 
         self.data_dir = data_dir
+        self.get_loaders() # get the test and train loaders
         self.load_model = load_model
         assert self.conf['loss'] in globals(), "The loss function name doesn't match with names available"
         self.criterion = globals()[self.conf['loss']]()
@@ -51,7 +52,7 @@ class Main:
         self.execution_flow()
 
     def execution_flow(self):
-        self.get_loaders() # get the test and train loaders
+        
         self.visualize_tranformed_data() # visualize the transformed data
         train_acc = []
         test_acc = []
@@ -81,7 +82,7 @@ class Main:
             self.train(e, train_acc, train_loss, train_loss_decrease, global_step_train)
             
             self.test(test_acc, tests_loss, test_loss_decrease, global_step_test)
-            self.scheduler.step(test_loss_decrease)
+            #self.scheduler.step(test_loss_decrease)
             print("================================")
 
         self.plot_graphs(train_loss, tests_loss, train_acc, test_acc)
@@ -93,7 +94,7 @@ class Main:
                         'state_dict': self.model.state_dict(),
                         'optimizer': self.optimizer.state_dict()
                      }
-        torch.save(checkpoint, current_directory + '/content/drive/My Drive/Colab Notebooks/class-{0}_epoch_{1}_{2}_{3}.pth'.format(self.conf['model_initializer']['n_classes'], 
+        torch.save(checkpoint, '/content/drive/My Drive/Colab Notebooks/class-{0}_epoch_{1}_{2}_{3}.pth'.format(self.conf['model_initializer']['n_classes'], 
                                                                                                          self.conf['epochs'], 
                                                                                                          datetime.now(), 
                                                                                          uuid.uuid4()))
@@ -220,13 +221,13 @@ class Main:
             train_loss_decrease += loss.item() + loss_d.item()
             
             self.writer.add_scalar('Loss/train', train_loss_decrease, global_step_train)
-
+            #self.writer.add_scalar('LR/train', self.scheduler.get_last_lr(), global_step_train)
             #pbar.set_postfix(**{'loss (batch)': train_loss})
             self.optimizer.zero_grad()
 
             # Backpropagation
             final_loss.backward()
-            self.optimizer.step()
+            self.scheduler.step()
             
             accuracy = 100*(train_loss_decrease/length)
             pbar.set_description(desc= f'Loss={loss.item()} Loss ={accuracy:0.2f}')
@@ -246,7 +247,9 @@ class Main:
         scheduler = globals()[self.conf['scheduler']['type']]
         self.conf['scheduler'].pop('type')
         self.scheduler = scheduler(self.optimizer,
-                                   'min',
+                                   max_lr=0.01, 
+                                   epochs=self.conf['epochs'],
+                                   steps_per_epoch=len(self.train_loader)+len(self.test_loader),
                                    **self.conf['scheduler'])
 
     def lr_finder(self):
