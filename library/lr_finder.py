@@ -2,6 +2,7 @@ from __future__ import print_function, with_statement, division
 import copy
 import os
 import torch
+import torch.nn as nn
 from tqdm.autonotebook import tqdm
 from torch.optim.lr_scheduler import _LRScheduler
 import matplotlib.pyplot as plt
@@ -225,12 +226,19 @@ class LRFinder(object):
 
         self.optimizer.zero_grad()
         for i in range(accumulation_steps):
-            inputs, labels = iter_wrapper.get_batch()
-            inputs, labels = self._move_to_device(inputs, labels)
+            batch = iter_wrapper.get_batch()
+            images = batch['image'] # fg_bg images
+            mask = batch['mask'] # the mask images
+            depth = batch['depth'] # the depth images produced from densedepth
+
+            images = images.to(device=self.device, dtype=torch.float)
+            mask = mask.to(device=self.device, dtype=torch.long)
+            depth = depth.to(device=self.device, dtype=torch.float32)
+            #inputs, labels = self._move_to_device(inputs, labels)
 
             # Forward pass
-            outputs = self.model(inputs)
-            loss = self.criterion(outputs, labels)
+            outputs = self.model(images)
+            loss = self.criterion(outputs, mask) + nn.MSELoss(outputs,depth)
 
             # Loss should be averaged in each step
             loss /= accumulation_steps
@@ -456,14 +464,14 @@ class DataLoaderIterWrapper(object):
     def __next__(self):
         # Get a new set of inputs and labels
         try:
-            inputs, labels = next(self._iterator)
+            inputs = next(self._iterator)
         except StopIteration:
             if not self.auto_reset:
                 raise
             self._iterator = iter(self.data_loader)
-            inputs, labels, *_ = next(self._iterator)
+            inputs, *_ = next(self._iterator)
 
-        return inputs, labels
+        return inputs
 
     # make it compatible with python 2
     next = __next__

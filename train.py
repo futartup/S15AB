@@ -29,7 +29,7 @@ class Main:
     """
     def __init__(self, conf, data_dir='./data', load_model=None):   
         
-        self.writer = SummaryWriter("/content/drive/My Drive/Colab Notebooks/S15AB/runs/MDME")
+        self.writer = SummaryWriter("runs/MDME")
 
         # Sanity check 
         assert bool(conf) == True, "Please set configurations for your journey"
@@ -54,6 +54,7 @@ class Main:
     def execution_flow(self):
         
         self.visualize_tranformed_data() # visualize the transformed data
+        self.lr_finder() # Find the best lr 
         train_acc = []
         test_acc = []
         train_loss = []
@@ -223,11 +224,12 @@ class Main:
             self.writer.add_scalar('Loss/train', train_loss_decrease, global_step_train)
             #self.writer.add_scalar('LR/train', self.scheduler.get_last_lr(), global_step_train)
             #pbar.set_postfix(**{'loss (batch)': train_loss})
+            self.scheduler.step()
             self.optimizer.zero_grad()
 
             # Backpropagation
             final_loss.backward()
-            self.scheduler.step()
+            
             
             accuracy = 100*(train_loss_decrease/length)
             pbar.set_description(desc= f'Loss={loss.item()} Loss ={accuracy:0.2f}')
@@ -254,7 +256,7 @@ class Main:
 
     def lr_finder(self):
         criterion = globals()[self.conf['loss']]()
-        optimizer = globals()[self.conf['optimizer']['type']](self.model.parameters(), **self.conf['lr_finder']['optimizer'])
+        optimizer = globals()["SGD"](self.model.parameters(), **self.conf['lr_finder']['optimizer'])
         lr_finder = LRFinder(self.model, optimizer, criterion, self.device) #implemented LRFinder for SGD
         lr_finder.range_test(self.train_loader, num_iter=len(self.train_loader)*10, **self.conf['lr_finder']['range_test'])
         lr_finder.plot() # to inspect the loss-learning rate graph
