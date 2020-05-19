@@ -23,8 +23,9 @@
         "momentum": 0.9
     },
     "scheduler": {
-        "type": "ReduceLROnPlateau",
-        "patience": 2
+        "type": "OneCycleLR",
+        "pct_start": 0.2,
+        "anneal_strategy": "linear"
     },
     "lr_finder_use": true,
     "transformations": {
@@ -33,27 +34,16 @@
             "what": [
             {
                 "name": "Cutout",
-                "num_holes":2,
-                "max_h_size": 20, 
-                "max_w_size": 20
-            },
-            {
-                "name": "Normalize",
-                "mean": [0.43072554273179153, 0.4403776258001769, 0.4335964820201932] ,
-                "std": [0.28761761089190296, 0.2675504910801714, 0.2683254497043513],
-                "always_apply": true
+                "num_holes":1,
+                "max_h_size": 80, 
+                "max_w_size": 80
             }
         ]
         },
         "test": {
             "which": "albumentation",
             "what": [
-                {
-                    "name": "Normalize",
-                    "mean": [0.43072554273179153, 0.4403776258001769, 0.4335964820201932] ,
-                    "std": [0.28761761089190296, 0.2675504910801714, 0.2683254497043513],
-                    "always_apply": true
-                }
+                
             ]
         }
     },
