@@ -191,9 +191,10 @@ class Main:
                 depth = depth.to(device=self.device, dtype=torch.float32)
 
                 mask_pred = self.model(images)
+                bce_loss = self.criterion(mask_pred, mask.unsqueeze(1))
                 pred = torch.sigmoid(mask_pred)
                 pred = (pred > 0.5).float()
-                test_loss += self.dice_loss(pred, mask).item()
+                test_loss += self.dice_loss(pred, mask).item() + bce_loss.item()
 
                 test_loss_decrease += test_loss
                 tests_loss.append(test_loss)
