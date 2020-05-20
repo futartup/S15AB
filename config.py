@@ -49,6 +49,6 @@
     "model_initializer": {
         "n_channels": 3,
         "n_classes": 1,
-        "bilinear": false
+        "bilinear": true
     }
 }
