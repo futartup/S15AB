@@ -287,7 +287,7 @@ class Main:
         optimizer = globals()[self.conf['optimizer']['type']]
         self.conf['optimizer'].pop('type')
        
-        self.max_lr = 1e-4
+        self.max_lr = 0.01
         self.optimizer = optimizer(self.model.parameters(),
                                     lr=self.max_lr,
                                     **self.conf['optimizer'])
