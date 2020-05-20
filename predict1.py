@@ -8,14 +8,29 @@ import torch.nn.functional as F
 from PIL import Image
 from torchvision import transforms
 import matplotlib.pyplot as plt
-
+from matplotlib import cm
+import cv2
 from library.model.u_net import UNet
 from library.loader.data_loader import DepthDataSet
 
 def plot_img_and_mask(img, mask, filename):
     
     fig, ax = plt.subplots(1, 3)
-  
+    indices_list = np.where(np.all(mask != False, axis=-1))
+    print("excluded indices are", indices_list)
+    mask[indices_list] = 0
+    print(mask)
+    cv2.imwrite('/content/drive/My Drive/Colab Notebooks/S15AB/m.jpg', np.uint8(cm.gist_earth(mask))*255) 
+    # mask_black = np.any(mask != 1, axis=-1)
+    # mask_white = np.any(mask != 0, axis=-1)
+    # #mask1 = np.where(mask[0 , :, :]==True, 1, 0)
+    # #mask2 = np.where(mask[1 , :, :]==True, 1, 0)
+    # print(mask_white.shape)
+    # print(mask_black.shape)
+    # im = Image.fromarray(np.uint8(cm.gist_earth(mask_white))*255).convert('RGB')
+    # #im2 = Image.fromarray(np.uint8(cm.gist_earth(mask2))*255).convert('RGB')
+    # im.save('/content/drive/My Drive/Colab Notebooks/S15AB/{}'.format(filename))
+    #im2.save('/content/drive/My Drive/Colab Notebooks/S15AB/{}'.format("mask2.jpg"))
     # ax[0].imshow(img)
     # ax[1].imshow(mask[0 , :, :])
     #ax[2].imshow(mask[1 , :, :])
@@ -32,14 +47,14 @@ def plot_img_and_mask(img, mask, filename):
     # plt.subplot(222)
     # plt.imshow(mask[1 , :, :])
 
-    ax[0].set_title('Input image')
-    ax[0].imshow(img)
-    ax[1].set_title(f'Output firt mask')
-    ax[1].imshow(mask[0 , :, :])
-    ax[2].set_title(f'Output second mask')
-    ax[2].imshow(mask[1 , :, :])
+    # ax[0].set_title('Input image')
+    # ax[0].imshow(img)
+    # ax[1].set_title(f'Output firt mask')
+    # ax[1].imshow(np.where(mask[0 , :, :]==True, 1/255, 0))
+    # ax[2].set_title(f'Output second mask')
+    # ax[2].imshow(np.where(mask[1 , :, :]==True, 1/255, 0))
     # plt.xticks([]), plt.yticks([])
-    plt.savefig('/content/drive/My Drive/Colab Notebooks/S15AB/{}'.format(filename))
+    #plt.savefig('/content/drive/My Drive/Colab Notebooks/S15AB/{}'.format(filename))
 
 def predict_img(net,
                 full_img,
