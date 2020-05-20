@@ -194,8 +194,10 @@ class Main:
                 pred = torch.sigmoid(mask_pred)
                 pred = (pred > 0.5).float()
                 test_loss += self.dice_loss(pred, mask).item()
+
+                test_loss_decrease += test_loss
                 
-                self.writer.add_scalar('Loss/test', test_loss, global_step_test)
+                self.writer.add_scalar('Loss/test', test_loss_decrease, global_step_test)
 
                 accuracy = 100 * (tests_loss/length)
 
@@ -246,7 +248,7 @@ class Main:
             accuracy = 100*(train_loss_decrease/length)
             pbar.set_description(desc= f'Loss={loss.item()} Loss ={accuracy:0.2f}')
             train_acc.append(accuracy)
-            self.writer.add_images('masks/true', mask, global_step_train)
+            self.writer.add_images('masks/true', mask.unsqueeze(1), global_step_train)
             self.writer.add_images('masks/pred', torch.sigmoid(mask_pred) > 0.5, global_step_train)
             global_step_train += 1   
                      
