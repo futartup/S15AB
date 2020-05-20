@@ -11,7 +11,7 @@
     "num_workers": 2,
     "lr_step_size": 25,
     "lr_gamma": 0.001,
-    "loss": "CrossEntropyLoss",
+    "loss": "BCEWithLogitsLoss",
     "lr_finder": {
         "optimizer": {"lr": 1e-5},
         "range_test": {"end_lr":100, "step_mode": "exp"}
