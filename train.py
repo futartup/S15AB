@@ -13,6 +13,7 @@ from torch.optim import *
 from datetime import datetime
 import torch.nn.functional as F
 import torchvision.transforms as T
+from torch.autograd import Function
 from matplotlib import pyplot as plt
 from library.lr_finder import LRFinder
 from library.model.get_model import GetModel
@@ -21,18 +22,46 @@ from torch.utils.tensorboard import SummaryWriter
 from library.loader.data_loader import DataLoader, DepthDataLoader
 from torch.optim.lr_scheduler import OneCycleLR, ReduceLROnPlateau
 
-class DiceLoss(torch.nn.Module):
-    def init(self):
-        super(diceLoss, self).init()
 
-    def forward(self,pred, target):
-       smooth = 1.
-       iflat = pred.contiguous().view(-1)
-       tflat = target.contiguous().view(-1)
-       intersection = (iflat * tflat).sum()
-       A_sum = torch.sum(iflat * iflat)
-       B_sum = torch.sum(tflat * tflat)
-       return 1 - ((2. * intersection + smooth) / (A_sum + B_sum + smooth) )
+class DiceCoeff(Function):
+    """Dice coeff for individual examples"""
+
+    def forward(self, input, target):
+        self.save_for_backward(input, target)
+        eps = 0.0001
+        self.inter = torch.dot(input.view(-1), target.view(-1))
+        self.union = torch.sum(input) + torch.sum(target) + eps
+
+        t = (2 * self.inter.float() + eps) / self.union.float()
+        return t
+
+    # This function has only a single output, so it gets only one gradient
+    def backward(self, grad_output):
+
+        input, target = self.saved_variables
+        grad_input = grad_target = None
+
+        if self.needs_input_grad[0]:
+            grad_input = grad_output * 2 * (target * self.union - self.inter) \
+                         / (self.union * self.union)
+        if self.needs_input_grad[1]:
+            grad_target = None
+
+        return grad_input, grad_target
+
+
+def dice_coeff(input, target):
+    """Dice coeff for batches"""
+    if input.is_cuda:
+        s = torch.FloatTensor(1).cuda().zero_()
+    else:
+        s = torch.FloatTensor(1).zero_()
+
+    for i, c in enumerate(zip(input, target)):
+        s = s + DiceCoeff().forward(c[0], c[1])
+
+    return s / (i + 1)
+
 
 class Main:
     """
@@ -54,7 +83,6 @@ class Main:
         assert self.conf['loss'] in globals(), "The loss function name doesn't match with names available"
         self.criterion = globals()[self.conf['loss']]()
         self.criterion_depth = MSELoss()
-        self.dice_loss = DiceLoss()
         self.get_model()
         
         if not hasattr(Main, 'optimizer'):
@@ -191,10 +219,9 @@ class Main:
                 depth = depth.to(device=self.device, dtype=torch.float32)
 
                 mask_pred = self.model(images)
-                bce_loss = self.criterion(mask_pred, mask.unsqueeze(1))
                 pred = torch.sigmoid(mask_pred)
                 pred = (pred > 0.5).float()
-                test_loss += self.dice_loss(pred, mask).item() + bce_loss.item()
+                test_loss += dice_coeff(pred, mask).item() 
 
                 test_loss_decrease += test_loss
                 tests_loss.append(test_loss)
@@ -232,8 +259,8 @@ class Main:
             mask_pred = self.model(images)
             loss = self.criterion(mask_pred, mask.unsqueeze(1)) 
             #loss_d = self.criterion_depth(mask_pred.view(depth.size()), depth)
-            final_loss = loss 
-            train_los.append(final_loss)
+            #final_loss = loss 
+            train_los.append(loss)
             #loss_depth = self.criterion(mask_pred, depth)
             #loss = loss_mask 
 
@@ -245,7 +272,7 @@ class Main:
             
             self.optimizer.zero_grad()
             # Backpropagation
-            final_loss.backward()
+            loss.backward()
             
             
             accuracy = 100*(train_loss_decrease/length)
