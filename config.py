@@ -18,8 +18,7 @@
     },
     "optimizer": {
         "type": "Adam",
-        "weight_decay": 1e-8,
-        "momentum": 0.9
+        "weight_decay": 1e-8
     },
     "scheduler": {
         "type": "ReduceLROnPlateau",
