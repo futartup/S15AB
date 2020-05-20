@@ -103,7 +103,7 @@ class Main:
 
         # Globals step
         global_step_train = 0
-        global_step_test = 1
+        global_step_test = 0
 
         train_loss_decrease = 0
         test_loss_decrease = 0
@@ -222,12 +222,12 @@ class Main:
                 # pred = torch.sigmoid(mask_pred)
                 # pred = (pred > 0.5).float()
                 # test_loss += dice_coeff(pred, mask).item() 
-                test_loss = self.criterion(mask_pred, mask.unsqueeze(1)) 
+                loss = self.criterion(mask_pred, mask.unsqueeze(1)) 
 
-                test_loss_decrease += test_loss.item()
+                test_loss += loss.item()
                 tests_loss.append(test_loss)
                 
-                self.writer.add_scalar('Loss/test', test_loss_decrease, global_step_test)
+                self.writer.add_scalar('Loss/test', test_loss, global_step_test)
 
                 accuracy = 100 * (test_loss/length)
 
