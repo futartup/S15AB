@@ -21,6 +21,18 @@ from torch.utils.tensorboard import SummaryWriter
 from library.loader.data_loader import DataLoader, DepthDataLoader
 from torch.optim.lr_scheduler import OneCycleLR, ReduceLROnPlateau
 
+class DiceLoss(torch.nn.Module):
+    def init(self):
+        super(diceLoss, self).init()
+
+    def forward(self,pred, target):
+       smooth = 1.
+       iflat = pred.contiguous().view(-1)
+       tflat = target.contiguous().view(-1)
+       intersection = (iflat * tflat).sum()
+       A_sum = torch.sum(iflat * iflat)
+       B_sum = torch.sum(tflat * tflat)
+       return 1 - ((2. * intersection + smooth) / (A_sum + B_sum + smooth) )
 
 class Main:
     """
@@ -42,6 +54,7 @@ class Main:
         assert self.conf['loss'] in globals(), "The loss function name doesn't match with names available"
         self.criterion = globals()[self.conf['loss']]()
         self.criterion_depth = MSELoss()
+        self.dice_loss = DiceLoss()
         self.get_model()
         
         if not hasattr(Main, 'optimizer'):
@@ -54,7 +67,7 @@ class Main:
     def execution_flow(self):
         
         self.visualize_tranformed_data() # visualize the transformed data
-        self.lr_finder() # Find the best lr 
+        #self.lr_finder() # Find the best lr 
         train_acc = []
         test_acc = []
         train_loss = []
@@ -120,7 +133,11 @@ class Main:
 
     def visualize_tranformed_data(self):
         images = next(iter(self.train_loader))
-        grid = torchvision.utils.make_grid(images['image'])
+        fg_bg = images['image']
+        #mask = images['mask'][:5]
+        #depth = images['depth'][:5]
+        #final_image = fg_bg + mask + depth
+        grid = torchvision.utils.make_grid(fg_bg)
         self.writer.add_image('Transformed images', grid)
         #self.writer.add_graph(self.model, images['image'])
         # count = 0
@@ -170,11 +187,11 @@ class Main:
 
                 images = images.to(device=self.device, dtype=torch.float32)
                 #mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
-                mask = mask.to(device=self.device, dtype=torch.long)
-                depth = depth.to(device=self.device, dtype=torch.long)
+                mask = mask.to(device=self.device, dtype=torch.float32)
+                depth = depth.to(device=self.device, dtype=torch.float32)
 
                 mask_pred = self.model(images)
-                loss = self.criterion(mask_pred, mask)
+                loss = self.criterion(mask_pred, mask.unsqueeze(1))
                 loss_d = self.criterion_depth(mask_pred.view(depth.size()), depth)
                 final_loss = loss + loss_d
                 tests_loss.append(final_loss)
@@ -190,7 +207,7 @@ class Main:
                 pbar.set_description(desc= f'Loss={loss.item()} Loss={accuracy:0.2f}')
                 test_acc.append(test_loss)
                 global_step_test += 1
-
+  
     def train(self, epoch, train_acc, train_los, train_loss_decrease, global_step_train):
         self.model.train()
         pbar = tqdm(self.train_loader)
@@ -208,24 +225,25 @@ class Main:
 
             images = images.to(device=self.device, dtype=torch.float)
             #mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
-            mask = mask.to(device=device, dtype=torch.long)
+            mask = mask.to(device=device, dtype=torch.float32)
             depth = depth.to(device=device, dtype=torch.float32)
 
             mask_pred = self.model(images)
-            loss = self.criterion(mask_pred, mask)
-            loss_d = self.criterion_depth(mask_pred.view(depth.size()), depth)
-            final_loss = loss + loss_d
+            loss = self.criterion(mask_pred, mask.unsqueeze(1)) + self.dice_loss(mask_pred, mask.unsqueeze(1))
+            #loss_d = self.criterion_depth(mask_pred.view(depth.size()), depth)
+            final_loss = loss 
             train_los.append(final_loss)
             #loss_depth = self.criterion(mask_pred, depth)
             #loss = loss_mask 
 
-            train_loss_decrease += loss.item() + loss_d.item()
+            train_loss_decrease += loss.item() 
             
             self.writer.add_scalar('Loss/train', train_loss_decrease, global_step_train)
             #self.writer.add_scalar('LR/train', self.scheduler.get_last_lr(), global_step_train)
             #pbar.set_postfix(**{'loss (batch)': train_loss})
-            self.scheduler.step()
+            
             self.optimizer.zero_grad()
+            self.scheduler.step()
 
             # Backpropagation
             final_loss.backward()
@@ -240,7 +258,7 @@ class Main:
         optimizer = globals()[self.conf['optimizer']['type']]
         self.conf['optimizer'].pop('type')
        
-        self.max_lr = 0.01
+        self.max_lr = 1e-4
         self.optimizer = optimizer(self.model.parameters(),
                                     lr=self.max_lr,
                                     **self.conf['optimizer'])
@@ -249,9 +267,6 @@ class Main:
         scheduler = globals()[self.conf['scheduler']['type']]
         self.conf['scheduler'].pop('type')
         self.scheduler = scheduler(self.optimizer,
-                                   max_lr=0.01, 
-                                   epochs=self.conf['epochs'],
-                                   steps_per_epoch=len(self.train_loader)+len(self.test_loader),
                                    **self.conf['scheduler'])
 
     def lr_finder(self):
