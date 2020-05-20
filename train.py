@@ -198,7 +198,7 @@ class Main:
                 test_loss_decrease += test_loss
                 tests_loss.append(test_loss)
                 
-                self.writer.add_scalar('Loss/test', tests_loss, global_step_test)
+                self.writer.add_scalar('Loss/test', test_loss, global_step_test)
 
                 accuracy = 100 * (test_loss/length)
 
@@ -237,7 +237,7 @@ class Main:
 
             train_loss_decrease += loss.item() 
             
-            self.writer.add_scalar('Loss/train', train_los, global_step_train)
+            self.writer.add_scalar('Loss/train', loss, global_step_train)
             #self.writer.add_scalar('LR/train', self.scheduler.get_last_lr(), global_step_train)
             #pbar.set_postfix(**{'loss (batch)': train_loss})
             
