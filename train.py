@@ -95,8 +95,8 @@ class Main:
             print("Epoch number : {}".format(e))
             self.train(e, train_acc, train_loss, train_loss_decrease, global_step_train)
             
-            self.test(test_acc, tests_loss, test_loss_decrease, global_step_test)
-            #self.scheduler.step(test_loss_decrease)
+            val_loss = self.test(test_acc, tests_loss, test_loss_decrease, global_step_test)
+            self.scheduler.step(val_loss)
             print("================================")
 
         self.plot_graphs(train_loss, tests_loss, train_acc, test_acc)
@@ -191,22 +191,18 @@ class Main:
                 depth = depth.to(device=self.device, dtype=torch.float32)
 
                 mask_pred = self.model(images)
-                loss = self.criterion(mask_pred, mask.unsqueeze(1))
-                loss_d = self.criterion_depth(mask_pred.view(depth.size()), depth)
-                final_loss = loss + loss_d
-                tests_loss.append(final_loss)
-                #loss_depth = self.criterion(mask_pred, depth)
-                #loss = loss_mask 
-
-                test_loss_decrease += loss.item() + loss_d.item()
+                pred = torch.sigmoid(mask_pred)
+                pred = (pred > 0.5).float()
+                test_loss += self.dice_loss(pred, mask).item()
                 
-                self.writer.add_scalar('Loss/test', test_loss_decrease, global_step_test)
+                self.writer.add_scalar('Loss/test', test_loss, global_step_test)
 
-                accuracy = 100 * (test_loss_decrease/length)
+                accuracy = 100 * (tests_loss/length)
 
-                pbar.set_description(desc= f'Loss={loss.item()} Loss={accuracy:0.2f}')
+                pbar.set_description(desc= f'Loss={tests_loss} Loss={accuracy:0.2f}')
                 test_acc.append(test_loss)
                 global_step_test += 1
+                return test_loss
   
     def train(self, epoch, train_acc, train_los, train_loss_decrease, global_step_train):
         self.model.train()
@@ -229,7 +225,7 @@ class Main:
             #depth = depth.to(device=device, dtype=torch.float32)
 
             mask_pred = self.model(images)
-            loss = self.criterion(mask_pred, mask.unsqueeze(1)) + self.dice_loss(mask_pred, mask.unsqueeze(1))
+            loss = self.criterion(mask_pred, mask.unsqueeze(1)) 
             #loss_d = self.criterion_depth(mask_pred.view(depth.size()), depth)
             final_loss = loss 
             train_los.append(final_loss)
@@ -243,8 +239,6 @@ class Main:
             #pbar.set_postfix(**{'loss (batch)': train_loss})
             
             self.optimizer.zero_grad()
-            self.scheduler.step()
-
             # Backpropagation
             final_loss.backward()
             
@@ -252,7 +246,10 @@ class Main:
             accuracy = 100*(train_loss_decrease/length)
             pbar.set_description(desc= f'Loss={loss.item()} Loss ={accuracy:0.2f}')
             train_acc.append(accuracy)
-            global_step_train += 1            
+            self.writer.add_images('masks/true', mask, global_step_train)
+            self.writer.add_images('masks/pred', torch.sigmoid(masks_pred) > 0.5, global_step_train)
+            global_step_train += 1   
+                     
     
     def get_optimizer(self):
         optimizer = globals()[self.conf['optimizer']['type']]
