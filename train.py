@@ -247,7 +247,7 @@ class Main:
             pbar.set_description(desc= f'Loss={loss.item()} Loss ={accuracy:0.2f}')
             train_acc.append(accuracy)
             self.writer.add_images('masks/true', mask, global_step_train)
-            self.writer.add_images('masks/pred', torch.sigmoid(masks_pred) > 0.5, global_step_train)
+            self.writer.add_images('masks/pred', torch.sigmoid(mask_pred) > 0.5, global_step_train)
             global_step_train += 1   
                      
     
