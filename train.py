@@ -205,7 +205,8 @@ class Main:
                 pbar.set_description(desc= f'Loss={tests_loss} Loss={accuracy:0.2f}')
                 test_acc.append(test_loss)
                 global_step_test += 1
-                return test_loss
+        self.model.train()
+        return test_loss/length
   
     def train(self, epoch, train_acc, train_los, train_loss_decrease, global_step_train):
         self.model.train()
