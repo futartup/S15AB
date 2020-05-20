@@ -225,7 +225,7 @@ class Main:
 
             images = images.to(device=self.device, dtype=torch.float)
             #mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
-            mask = mask.to(device=device, dtype=torch.long)
+            mask = mask.to(device=device, dtype=torch.float32)
             #depth = depth.to(device=device, dtype=torch.float32)
 
             mask_pred = self.model(images)
