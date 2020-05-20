@@ -219,14 +219,15 @@ class Main:
                 depth = depth.to(device=self.device, dtype=torch.float32)
 
                 mask_pred = self.model(images)
-                pred = torch.sigmoid(mask_pred)
-                pred = (pred > 0.5).float()
-                test_loss += dice_coeff(pred, mask).item() 
+                # pred = torch.sigmoid(mask_pred)
+                # pred = (pred > 0.5).float()
+                # test_loss += dice_coeff(pred, mask).item() 
+                test_loss = self.criterion(mask_pred, mask.unsqueeze(1)) 
 
-                test_loss_decrease += test_loss
+                test_loss_decrease += test_loss.item()
                 tests_loss.append(test_loss)
                 
-                self.writer.add_scalar('Loss/test', test_loss, global_step_test)
+                self.writer.add_scalar('Loss/test', test_loss_decrease, global_step_test)
 
                 accuracy = 100 * (test_loss/length)
 
@@ -234,7 +235,7 @@ class Main:
                 test_acc.append(test_loss)
                 global_step_test += 1
         self.model.train()
-        return test_loss/length
+        return test_loss
   
     def train(self, epoch, train_acc, train_los, train_loss_decrease, global_step_train):
         self.model.train()
