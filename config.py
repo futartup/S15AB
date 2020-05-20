@@ -17,15 +17,14 @@
         "range_test": {"end_lr":100, "step_mode": "exp"}
     },
     "optimizer": {
-        "type": "SGD",
+        "type": "Adam",
         "weight_decay": 1e-8,
-        "nesterov": true,
         "momentum": 0.9
     },
     "scheduler": {
-        "type": "OneCycleLR",
-        "pct_start": 0.2,
-        "anneal_strategy": "linear"
+        "type": "ReduceLROnPlateau",
+        "mode": "min",
+        "patience": 2
     },
     "lr_finder_use": true,
     "transformations": {
