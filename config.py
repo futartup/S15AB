@@ -34,24 +34,13 @@
                 "num_holes":1,
                 "max_h_size": 80, 
                 "max_w_size": 80
-            },
-            {
-                    "name": "Normalize",
-                    "mean": [0.42, 0.44, 0.43] ,
-                    "std":[0.28, 0.27, 0.27],
-                    "always_apply": true
-                }
+            }
         ]
         },
         "test": {
             "which": "albumentation",
             "what": [
-            {
-                    "name": "Normalize",
-                    "mean": [0.43, 0.44, 0.43] ,
-                    "std":[0.29, 0.27, 0.27],
-                    "always_apply": true
-                }
+          
             ]
         }
     },
