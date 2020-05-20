@@ -41,7 +41,7 @@ class Main:
     """
     def __init__(self, conf, data_dir='./data', load_model=None):   
         
-        self.writer = SummaryWriter("runs/MDME")
+        self.writer = SummaryWriter(self.conf['log_dir'])
 
         # Sanity check 
         assert bool(conf) == True, "Please set configurations for your journey"

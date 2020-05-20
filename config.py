@@ -50,5 +50,6 @@
         "n_channels": 3,
         "n_classes": 1,
         "bilinear": true
-    }
+    },
+    "log_dir": "/content/drive/My Drive/Colab Notebooks/S15AB/runs/MDME"
 }
