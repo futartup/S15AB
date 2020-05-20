@@ -202,7 +202,7 @@ class Main:
 
                 accuracy = 100 * (test_loss/length)
 
-                pbar.set_description(desc= f'Loss={tests_loss} Loss={accuracy:0.2f}')
+                pbar.set_description(desc= f'Loss={test_loss} Loss={accuracy:0.2f}')
                 test_acc.append(test_loss)
                 global_step_test += 1
         self.model.train()
