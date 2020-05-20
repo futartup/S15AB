@@ -124,7 +124,7 @@ class Main:
             self.train(e, train_acc, train_loss, train_loss_decrease, global_step_train)
             
             val_loss = self.test(test_acc, tests_loss, test_loss_decrease, global_step_test)
-            self.scheduler.step(val_loss)
+            #self.scheduler.step(val_loss)
             print("================================")
 
         self.plot_graphs(train_loss, tests_loss, train_acc, test_acc)
@@ -219,10 +219,10 @@ class Main:
                 depth = depth.to(device=self.device, dtype=torch.float32)
 
                 mask_pred = self.model(images)
-                # pred = torch.sigmoid(mask_pred)
-                # pred = (pred > 0.5).float()
-                # test_loss += dice_coeff(pred, mask).item() 
-                loss = self.criterion(mask_pred, mask.unsqueeze(1)) 
+                pred = torch.sigmoid(mask_pred)
+                pred = (pred > 0.5).float()
+                loss = dice_coeff(pred, mask)
+                #loss = self.criterion(mask_pred, mask.unsqueeze(1)) 
 
                 test_loss += loss.item()
                 tests_loss.append(test_loss)
@@ -274,7 +274,8 @@ class Main:
             self.optimizer.zero_grad()
             # Backpropagation
             loss.backward()
-            
+            self.optimizer.step()
+            self.scheduler.step()
             
             accuracy = 100*(train_loss_decrease/length)
             pbar.set_description(desc= f'Loss={loss.item()} Loss ={accuracy:0.2f}')
@@ -288,7 +289,7 @@ class Main:
         optimizer = globals()[self.conf['optimizer']['type']]
         self.conf['optimizer'].pop('type')
        
-        self.max_lr = 0.01
+        self.max_lr = 0.002
         self.optimizer = optimizer(self.model.parameters(),
                                     lr=self.max_lr,
                                     **self.conf['optimizer'])
@@ -297,6 +298,8 @@ class Main:
         scheduler = globals()[self.conf['scheduler']['type']]
         self.conf['scheduler'].pop('type')
         self.scheduler = scheduler(self.optimizer,
+                                    max_lr=self.max_lr,
+                                    steps_per_epoch = len(self.train_loader)+len(self.test_loader),
                                    **self.conf['scheduler'])
 
     def lr_finder(self):
