@@ -238,7 +238,7 @@ class LRFinder(object):
 
             # Forward pass
             outputs = self.model(images)
-            loss = self.criterion(outputs, mask) + nn.MSELoss(outputs,depth)
+            loss = self.criterion(outputs, mask.unsqueeze(1)) + nn.MSELoss(outputs.view(depth.size()),depth)
 
             # Loss should be averaged in each step
             loss /= accumulation_steps
