@@ -284,7 +284,7 @@ class Main:
             self.writer.add_images('masks/images', images, global_step_train)
             self.writer.add_images('masks/true', mask.unsqueeze(1), global_step_train)
             self.writer.add_images('masks/pred', torch.sigmoid(mask_pred) > 0.5, global_step_train)
-            self.writer.add_images('masks/depth', torch.sigmoid(depth), global_step_train)
+            self.writer.add_images('masks/depth', depth.unsqueeze(1), global_step_train)
             global_step_train += 1   
                      
     
