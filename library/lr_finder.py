@@ -229,6 +229,8 @@ class LRFinder(object):
             batch = iter_wrapper.get_batch()
             print(type(batch))
             print(batch['image'])
+            print(batch['mask'])
+            print(batch['depth'])
             images = batch['image'] # fg_bg images
             mask = batch['mask'] # the mask images
             depth = batch['depth'] # the depth images produced from densedepth
