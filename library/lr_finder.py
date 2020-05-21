@@ -238,10 +238,11 @@ class LRFinder(object):
 
             # Forward pass
             outputs = self.model(images)
-            loss = self.criterion(outputs, mask.unsqueeze(1)) + nn.MSELoss(outputs.view(depth.size()),depth)
-
+            loss = self.criterion(outputs, mask.unsqueeze(1)) 
+            loss_d = nn.MSELoss(outputs.view(depth.size()),depth)
+            final_loss = loss + loss_d
             # Loss should be averaged in each step
-            loss /= accumulation_steps
+            final_loss /= accumulation_steps
 
             # Backward pass
             if IS_AMP_AVAILABLE and hasattr(self.optimizer, "_amp_stash"):
@@ -254,12 +255,12 @@ class LRFinder(object):
                 ) as scaled_loss:
                     scaled_loss.backward()
             else:
-                loss.backward()
+                final_loss.backward()
 
             if total_loss is None:
-                total_loss = loss
+                total_loss = final_loss
             else:
-                total_loss += loss
+                total_loss += final_loss
 
         self.optimizer.step()
 
