@@ -225,7 +225,7 @@ class Main:
                 loss_m = self.criterion(mask_pred, mask.unsqueeze(1)) 
                 loss_d = self.criterion_depth(mask_pred.view(depth.size()), depth)
 
-                test_loss += loss.item() + loss_d.item()
+                test_loss += loss_m.item() + loss_d.item()
                 tests_loss.append(test_loss)
                 
                 self.writer.add_scalar('Loss/test', test_loss, global_step_test)
