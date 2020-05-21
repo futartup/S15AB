@@ -94,7 +94,7 @@ class Main:
 
     def execution_flow(self):
         
-        self.visualize_tranformed_data() # visualize the transformed data
+        #self.visualize_tranformed_data() # visualize the transformed data
         #self.lr_finder() # Find the best lr 
         train_acc = []
         test_acc = []
@@ -281,8 +281,10 @@ class Main:
             accuracy = 100*(train_loss_decrease/length)
             pbar.set_description(desc= f'Loss={final_loss.item()} Loss ={accuracy:0.2f}')
             train_acc.append(accuracy)
+            self.writer.add_images('masks/images', images, global_step_train)
             self.writer.add_images('masks/true', mask.unsqueeze(1), global_step_train)
             self.writer.add_images('masks/pred', torch.sigmoid(mask_pred) > 0.5, global_step_train)
+            self.writer.add_images('masks/depth', torch.sigmoid(depth), global_step_train)
             global_step_train += 1   
                      
     
