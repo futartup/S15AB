@@ -358,6 +358,7 @@ class LRFinder(object):
         # Show only if the figure was created internally
         if fig is not None:
             plt.show()
+            plt.save('/content/drive/My Drive/Colab Notebooks/S15AB/lr.jpg')
 
         return ax
 
