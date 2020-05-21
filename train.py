@@ -256,7 +256,7 @@ class Main:
             images = images.to(device=self.device, dtype=torch.float)
             #mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
             mask = mask.to(device=device, dtype=torch.float32)
-            depth = depth.to(device=device, dtype=torch.long)
+            depth = depth.to(device=device, dtype=torch.float32)
 
             mask_pred = self.model(images)
             loss_m = self.criterion(mask_pred, mask.unsqueeze(1)) 
@@ -269,7 +269,7 @@ class Main:
             train_loss_decrease += loss_m.item() + loss_d.item()
             
             self.writer.add_scalar('Loss/train', final_loss, global_step_train)
-            self.writer.add_scalar('LR/train', self.scheduler.get_last_lr(), global_step_train)
+            self.writer.add_scalar('LR/train', torch.tensor(self.scheduler.get_last_lr()), global_step_train)
             
             self.optimizer.zero_grad()
             
@@ -297,19 +297,18 @@ class Main:
 
     def get_scheduler(self):
         scheduler = globals()[self.conf['scheduler']['type']]
-        self.conf['scheduler'].pop('type')
         params = {}
-        if isinstance(scheduler, OneCycleLR):
+        if 'OneCycleLR' == self.conf['scheduler']['type']:
             params['epochs'] = self.conf['epochs']
             params['optimizer'] = self.optimizer
             params['steps_per_epoch'] = len(self.train_loader)+len(self.test_loader)
             params['max_lr'] = self.max_lr
-        if isinstance(scheduler, ReduceLROnPlateau):
+        elif 'ReduceLROnPlateau' == self.conf['scheduler']['type']:
             params['optimizer'] = self.optimizer
             params['mode'] = 'min'
-
-        if params.keys() in self.conf['scheduler'].keys():
-            raise Exception("Duplicate keys found in conf file. Please check the readme file in github")
+        self.conf['scheduler'].pop('type')
+        #if params.keys() in self.conf['scheduler'].keys():
+        #    raise Exception("Duplicate keys found in conf file. Please check the readme file in github")
         self.scheduler = scheduler(**params, **self.conf['scheduler'])
 
     def lr_finder(self):
