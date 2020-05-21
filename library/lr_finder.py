@@ -223,7 +223,7 @@ class LRFinder(object):
     def _train_batch(self, iter_wrapper, accumulation_steps):
         self.model.train()
         total_loss = None  # for late initialization
-
+        
         self.optimizer.zero_grad()
         for i in range(accumulation_steps):
             batch = iter_wrapper.get_batch()
@@ -471,7 +471,7 @@ class DataLoaderIterWrapper(object):
             if not self.auto_reset:
                 raise
             self._iterator = iter(self.data_loader)
-            inputs, *_ = next(self._iterator)
+            inputs = next(self._iterator)
 
         return inputs
 

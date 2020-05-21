@@ -85,9 +85,9 @@ class Main:
         self.criterion_depth = MSELoss()
         self.get_model()
         
-        if not hasattr(Main, 'optimizer'):
+        if not hasattr(self, 'optimizer'):
             self.get_optimizer() # get the optimizer
-        if not hasattr(Main, 'scheduler'):
+        if not hasattr(self, 'scheduler'):
             self.get_scheduler() # get the scheduler
 
         self.execution_flow()
@@ -291,8 +291,9 @@ class Main:
     def get_optimizer(self):
         optimizer = globals()[self.conf['optimizer']['type']]
         self.conf['optimizer'].pop('type')
-        if not hasattr(Main, 'max_lr'):
+        if not hasattr(self, 'max_lr'):
             self.max_lr = 0.002
+
         self.optimizer = optimizer(self.model.parameters(),
                                     lr=self.max_lr,
                                     **self.conf['optimizer'])
