@@ -227,10 +227,7 @@ class LRFinder(object):
         self.optimizer.zero_grad()
         for i in range(accumulation_steps):
             batch = iter_wrapper.get_batch()
-            print(type(batch))
-            print(batch['image'])
-            print(batch['mask'])
-            print(batch['depth'])
+        
             images = batch['image'] # fg_bg images
             mask = batch['mask'] # the mask images
             depth = batch['depth'] # the depth images produced from densedepth
