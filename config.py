@@ -3,7 +3,7 @@
     "data": "custom",
     "num_workers": 2,
     "shuffle": true,
-    "epochs": 50,
+    "epochs": 20,
     "multiclass": true,
     "batch_size": 10,
     "num_workers": 2,
@@ -22,9 +22,7 @@
     },
     "scheduler": {
         "type": "OneCycleLR",
-        "anneal_strategy": "linear",
-        "epochs": 10
-
+        "anneal_strategy": "linear"
     },
     "lr_finder_use": true,
     "transformations": {

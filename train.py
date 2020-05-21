@@ -222,9 +222,10 @@ class Main:
                 #pred = torch.sigmoid(mask_pred)
                 #pred = (pred > 0.5).float()
                 #loss = dice_coeff(pred, mask)
-                loss = self.criterion(mask_pred, mask.unsqueeze(1)) 
+                loss_m = self.criterion(mask_pred, mask.unsqueeze(1)) 
+                loss_d = self.criterion_depth(mask_pred.view(depth.size()), depth)
 
-                test_loss += loss.item()
+                test_loss += loss.item() + loss_d.item()
                 tests_loss.append(test_loss)
                 
                 self.writer.add_scalar('Loss/test', test_loss, global_step_test)
@@ -255,30 +256,30 @@ class Main:
             images = images.to(device=self.device, dtype=torch.float)
             #mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
             mask = mask.to(device=device, dtype=torch.float32)
-            #depth = depth.to(device=device, dtype=torch.float32)
+            depth = depth.to(device=device, dtype=torch.long)
 
             mask_pred = self.model(images)
-            loss = self.criterion(mask_pred, mask.unsqueeze(1)) 
-            #loss_d = self.criterion_depth(mask_pred.view(depth.size()), depth)
-            #final_loss = loss 
-            train_los.append(loss)
+            loss_m = self.criterion(mask_pred, mask.unsqueeze(1)) 
+            loss_d = self.criterion_depth(mask_pred.view(depth.size()), depth)
+            final_loss = loss_m + loss_d
+            train_los.append(final_loss)
             #loss_depth = self.criterion(mask_pred, depth)
             #loss = loss_mask 
 
-            train_loss_decrease += loss.item() 
+            train_loss_decrease += loss_m.item() + loss_d.item()
             
-            self.writer.add_scalar('Loss/train', loss, global_step_train)
-            #self.writer.add_scalar('LR/train', self.scheduler.get_last_lr(), global_step_train)
-            #pbar.set_postfix(**{'loss (batch)': train_loss})
+            self.writer.add_scalar('Loss/train', final_loss, global_step_train)
+            self.writer.add_scalar('LR/train', self.scheduler.get_last_lr(), global_step_train)
             
             self.optimizer.zero_grad()
-            # Backpropagation
-            loss.backward()
+            
+            final_loss.backward()
+            
             self.optimizer.step()
             self.scheduler.step()
             
             accuracy = 100*(train_loss_decrease/length)
-            pbar.set_description(desc= f'Loss={loss.item()} Loss ={accuracy:0.2f}')
+            pbar.set_description(desc= f'Loss={final_loss.item()} Loss ={accuracy:0.2f}')
             train_acc.append(accuracy)
             self.writer.add_images('masks/true', mask.unsqueeze(1), global_step_train)
             self.writer.add_images('masks/pred', torch.sigmoid(mask_pred) > 0.5, global_step_train)
@@ -297,10 +298,19 @@ class Main:
     def get_scheduler(self):
         scheduler = globals()[self.conf['scheduler']['type']]
         self.conf['scheduler'].pop('type')
-        self.scheduler = scheduler(self.optimizer,
-                                    max_lr=self.max_lr,
-                                    steps_per_epoch = len(self.train_loader)+len(self.test_loader),
-                                   **self.conf['scheduler'])
+        params = {}
+        if isinstance(scheduler, OneCycleLR):
+            params['epochs'] = self.conf['epochs']
+            params['optimizer'] = self.optimizer
+            params['steps_per_epoch'] = len(self.train_loader)+len(self.test_loader)
+            params['max_lr'] = self.max_lr
+        if isinstance(scheduler, ReduceLROnPlateau):
+            params['optimizer'] = self.optimizer
+            params['mode'] = 'min'
+
+        if params.keys() in self.conf['scheduler'].keys():
+            raise Exception("Duplicate keys found in conf file. Please check the readme file in github")
+        self.scheduler = scheduler(**params, **self.conf['scheduler'])
 
     def lr_finder(self):
         criterion = globals()[self.conf['loss']]()
