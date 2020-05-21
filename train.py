@@ -291,8 +291,8 @@ class Main:
     def get_optimizer(self):
         optimizer = globals()[self.conf['optimizer']['type']]
         self.conf['optimizer'].pop('type')
-       
-        self.max_lr = 0.002
+        if not hasattr(Main, 'max_lr'):
+            self.max_lr = 0.002
         self.optimizer = optimizer(self.model.parameters(),
                                     lr=self.max_lr,
                                     **self.conf['optimizer'])
@@ -323,6 +323,7 @@ class Main:
         loss = lr_finder.history['loss']
         lr = lr_finder.history['lr']
         max_lr = lr[loss.index(min(loss))]
+        print("The max lr found as : {}".format(max_lr))
         self.max_lr = max_lr 
 
 
