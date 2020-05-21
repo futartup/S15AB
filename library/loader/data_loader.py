@@ -66,7 +66,7 @@ class DepthDataSet(Dataset):
     self.bg_dir = bg_dir
     self.scale = scale
     self.transform = transform
-    self.ids = [file for file in listdir(fg_bg_dir)[:5] if not file.startswith('.')]
+    self.ids = [file for file in listdir(fg_bg_dir) if not file.startswith('.')]
 
   def __len__(self):
     return len(self.ids)
