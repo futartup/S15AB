@@ -232,7 +232,7 @@ class LRFinder(object):
             depth = batch['depth'] # the depth images produced from densedepth
 
             images = images.to(device=self.device, dtype=torch.float)
-            mask = mask.to(device=self.device, dtype=torch.long)
+            mask = mask.to(device=self.device, dtype=torch.float32)
             depth = depth.to(device=self.device, dtype=torch.float32)
             #inputs, labels = self._move_to_device(inputs, labels)
 
