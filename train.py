@@ -261,7 +261,7 @@ class Main:
 
             mask_pred = self.model(images)
             #loss_m = self.criterion(mask_pred, mask.unsqueeze(1)) 
-            loss_d = self.criterion_depth(mask_pred.view(depth.size()), depth)
+            loss_d = self.criterion(mask_pred, depth.unsqueeze(1))
             #final_loss = loss_d
             train_los.append(loss_d)
             #loss_depth = self.criterion(mask_pred, depth)
@@ -284,7 +284,7 @@ class Main:
             train_acc.append(accuracy)
             self.writer.add_images('masks/images', images, global_step_train)
             #self.writer.add_images('masks/true', mask.unsqueeze(1), global_step_train)
-            self.writer.add_images('masks/pred', torch.sigmoid(mask_pred) > 0.5, global_step_train)
+            self.writer.add_images('masks/pred', torch.sigmoid(mask_pred), global_step_train)
             self.writer.add_images('masks/depth', depth.unsqueeze(1), global_step_train)
             global_step_train += 1   
                      
