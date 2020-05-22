@@ -15,7 +15,7 @@
         "range_test": {"end_lr":100, "step_mode": "exp"}
     },
     "optimizer": {
-        "type": "RMSProp",
+        "type": "RMSprop",
         "weight_decay": 1e-4,
         "momentum": 0.9
     },
