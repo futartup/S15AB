@@ -292,7 +292,7 @@ class Main:
         optimizer = globals()[self.conf['optimizer']['type']]
         self.conf['optimizer'].pop('type')
         if not hasattr(self, 'max_lr'):
-            self.max_lr = 0.002
+            self.max_lr = 0.04570881896148755
 
         self.optimizer = optimizer(self.model.parameters(),
                                     lr=self.max_lr,
@@ -304,7 +304,7 @@ class Main:
         if 'OneCycleLR' == self.conf['scheduler']['type']:
             params['epochs'] = self.conf['epochs']
             params['optimizer'] = self.optimizer
-            params['steps_per_epoch'] = len(self.train_loader)+len(self.test_loader)
+            params['steps_per_epoch'] = len(self.train_loader)
             params['max_lr'] = self.max_lr
         elif 'ReduceLROnPlateau' == self.conf['scheduler']['type']:
             params['optimizer'] = self.optimizer
