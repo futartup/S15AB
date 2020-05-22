@@ -95,7 +95,7 @@ class Main:
     def execution_flow(self):
         
         #self.visualize_tranformed_data() # visualize the transformed data
-        self.lr_finder() # Find the best lr 
+        #self.lr_finder() # Find the best lr 
         train_acc = []
         test_acc = []
         train_loss = []
