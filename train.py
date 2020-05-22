@@ -95,7 +95,8 @@ class Main:
     def execution_flow(self):
         
         #self.visualize_tranformed_data() # visualize the transformed data
-        #self.lr_finder() # Find the best lr 
+        if self.conf['lr_finder_use']:
+            self.lr_finder() # Find the best lr 
         train_acc = []
         test_acc = []
         train_loss = []
@@ -292,7 +293,8 @@ class Main:
         optimizer = globals()[self.conf['optimizer']['type']]
         self.conf['optimizer'].pop('type')
         if not hasattr(self, 'max_lr'):
-            self.max_lr = 0.04570881896148755
+            #self.max_lr = 0.04570881896148755
+            self.max_lr = 0.001
 
         self.optimizer = optimizer(self.model.parameters(),
                                     lr=self.max_lr,

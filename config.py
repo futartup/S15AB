@@ -15,16 +15,15 @@
         "range_test": {"end_lr":100, "step_mode": "exp"}
     },
     "optimizer": {
-        "type": "SGD",
+        "type": "RMSProp",
         "weight_decay": 1e-4,
-        "nesterov": true,
         "momentum": 0.9
     },
     "scheduler": {
-        "type": "OneCycleLR",
-        "anneal_strategy": "linear"
+        "type": "ReduceLROnPlateau",
+        "patience": 2
     },
-    "lr_finder_use": true,
+    "lr_finder_use": false,
     "transformations": {
         "train": {
             "which": "albumentation",
