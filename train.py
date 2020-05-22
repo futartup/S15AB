@@ -124,8 +124,8 @@ class Main:
             print("Epoch number : {}".format(e))
             self.train(e, train_acc, train_loss, train_loss_decrease, global_step_train)
             
-            val_loss = self.test(test_acc, tests_loss, test_loss_decrease, global_step_test)
-            #self.scheduler.step(val_loss)
+            self.test(test_acc, tests_loss, test_loss_decrease, global_step_test)
+            self.scheduler.step()
             print("================================")
 
         self.plot_graphs(train_loss, tests_loss, train_acc, test_acc)
@@ -270,14 +270,14 @@ class Main:
             train_loss_decrease += loss_m.item() + loss_d.item()
             
             self.writer.add_scalar('Loss/train', final_loss, global_step_train)
-            self.writer.add_scalar('LR/train', torch.tensor(self.scheduler.get_last_lr()), global_step_train)
+            #self.writer.add_scalar('LR/train', torch.tensor(self.scheduler.get_last_lr()), global_step_train)
             
             self.optimizer.zero_grad()
             
             final_loss.backward()
             
             self.optimizer.step()
-            self.scheduler.step()
+            #self.scheduler.step()
             
             accuracy = 100*(train_loss_decrease/length)
             pbar.set_description(desc= f'Loss={final_loss.item()} Loss ={accuracy:0.2f}')
