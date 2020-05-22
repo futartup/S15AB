@@ -216,17 +216,17 @@ class Main:
 
                 images = images.to(device=self.device, dtype=torch.float32)
                 #mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
-                mask = mask.to(device=self.device, dtype=torch.float32)
+                #mask = mask.to(device=self.device, dtype=torch.float32)
                 depth = depth.to(device=self.device, dtype=torch.float32)
 
                 mask_pred = self.model(images)
                 #pred = torch.sigmoid(mask_pred)
                 #pred = (pred > 0.5).float()
                 #loss = dice_coeff(pred, mask)
-                loss_m = self.criterion(mask_pred, mask.unsqueeze(1)) 
+                #loss_m = self.criterion(mask_pred, mask.unsqueeze(1)) 
                 loss_d = self.criterion_depth(mask_pred.view(depth.size()), depth)
 
-                test_loss += loss_m.item() + loss_d.item()
+                test_loss += loss_d.item()
                 tests_loss.append(test_loss)
                 
                 self.writer.add_scalar('Loss/test', test_loss, global_step_test)
@@ -251,23 +251,23 @@ class Main:
         for batch in pbar:
             # get samples
             images = batch['image'] # fg_bg images
-            mask = batch['mask'] # the mask images
+            #mask = batch['mask'] # the mask images
             depth = batch['depth'] # the depth images produced from densedepth
 
             images = images.to(device=self.device, dtype=torch.float)
             #mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
-            mask = mask.to(device=device, dtype=torch.float32)
+            #mask = mask.to(device=device, dtype=torch.float32)
             depth = depth.to(device=device, dtype=torch.float32)
 
             mask_pred = self.model(images)
-            loss_m = self.criterion(mask_pred, mask.unsqueeze(1)) 
+            #loss_m = self.criterion(mask_pred, mask.unsqueeze(1)) 
             loss_d = self.criterion_depth(mask_pred.view(depth.size()), depth)
-            final_loss = loss_m + loss_d
+            final_loss = loss_d
             train_los.append(final_loss)
             #loss_depth = self.criterion(mask_pred, depth)
             #loss = loss_mask 
 
-            train_loss_decrease += loss_m.item() + loss_d.item()
+            train_loss_decrease += loss_d.item()
             
             self.writer.add_scalar('Loss/train', final_loss, global_step_train)
             #self.writer.add_scalar('LR/train', torch.tensor(self.scheduler.get_last_lr()), global_step_train)
@@ -294,7 +294,7 @@ class Main:
         self.conf['optimizer'].pop('type')
         if not hasattr(self, 'max_lr'):
             #self.max_lr = 0.04570881896148755
-            self.max_lr = 0.001
+            self.max_lr = self.conf['lr']
 
         self.optimizer = optimizer(self.model.parameters(),
                                     lr=self.max_lr,

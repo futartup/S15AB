@@ -1,5 +1,6 @@
 {
     "seed": 1,
+    "lr": 0.001,
     "data": "custom",
     "num_workers": 2,
     "shuffle": true,
