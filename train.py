@@ -262,8 +262,8 @@ class Main:
             mask_pred = self.model(images)
             #loss_m = self.criterion(mask_pred, mask.unsqueeze(1)) 
             loss_d = self.criterion_depth(mask_pred.view(depth.size()), depth)
-            final_loss = loss_d
-            train_los.append(final_loss)
+            #final_loss = loss_d
+            train_los.append(loss_d)
             #loss_depth = self.criterion(mask_pred, depth)
             #loss = loss_mask 
 
@@ -274,13 +274,13 @@ class Main:
             
             self.optimizer.zero_grad()
             
-            final_loss.backward()
+            loss_d.backward()
             
             self.optimizer.step()
             #self.scheduler.step()
             
             accuracy = 100*(train_loss_decrease/length)
-            pbar.set_description(desc= f'Loss={final_loss.item()} Loss ={accuracy:0.2f}')
+            pbar.set_description(desc= f'Loss={loss_d.item()} Loss ={accuracy:0.2f}')
             train_acc.append(accuracy)
             self.writer.add_images('masks/images', images, global_step_train)
             #self.writer.add_images('masks/true', mask.unsqueeze(1), global_step_train)
