@@ -269,7 +269,7 @@ class Main:
 
             train_loss_decrease += loss_d.item()
             
-            self.writer.add_scalar('Loss/train', final_loss, global_step_train)
+            self.writer.add_scalar('Loss/train', train_loss_decrease, global_step_train)
             #self.writer.add_scalar('LR/train', torch.tensor(self.scheduler.get_last_lr()), global_step_train)
             
             self.optimizer.zero_grad()
