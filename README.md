@@ -67,7 +67,7 @@ I would also like to thank www.theschoolofai.in to give me this opporthunity to 
     "log_dir": <str: path to the log file, tensorboard will read it from here>
 }
 ```
-
+The json will be validated using jsonschema validator [here](https://github.com/futartup/S15AB/blob/master/train.py)
 ## To train the model
 [train.py](https://github.com/futartup/S15AB/blob/master/train.py)
 ```
