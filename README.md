@@ -89,7 +89,13 @@ The fg_bg and bg images are feed into the model. The masks and depth are used as
 |          Mask Prediction   |  BCEWithLogitsLoss  | I want to find the loss between each pixels from fg and the mask of it. The mask is all white pixels and the surrounding is black pixels in the mask image. Therefore its a binary logits classification. |
 | Depth | MSELoss | There is no class as such , i want to find the cross entropy between each input and output pixels |
 
-Alongwith the BCEWithLogitsLoss , dice loss can also be used [here](https://github.com/futartup/S15AB/blob/master/train.py).
+Alongwith the BCEWithLogitsLoss , dice loss can also be used [here](https://github.com/futartup/S15AB/blob/master/library/custom_loss.py).
+The dice coefficient can be said as the amount of overlap between target and input.
+```
+dice_coeff = 2 |A . B| / |A| + |B|
+```
+This dice loss can be use to test the accuracy of the model.
+
 These loss functions can be defined in [here](https://github.com/futartup/S15AB/blob/master/config.py)
 
 ## Loss curves
