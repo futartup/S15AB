@@ -244,9 +244,58 @@ Each fg_bg images are passed through [this model](https://github.com/ialhashim/D
 - [train.py](https://github.com/futartup/S15AB/blob/master/train.py)(The training code and the main file, this is the entry point)
 - [predict1.py](https://github.com/futartup/S15AB/blob/master/predict1.py)(Code to predict the output of model)
 
-
-
-
+```
+├── README.md
+├── Untitled.ipynb
+├── concatenate.py
+├── config
+├── config-schema.json
+├── config.py
+├── detect_and_remove_duplicate_images.py
+├── find_mean.py
+├── flip_images.py
+├── library
+│   ├── __pycache__
+│   │   └── lr_finder.cpython-36.pyc
+│   ├── augmentation
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-36.pyc
+│   │   │   └── data_augmenter.cpython-36.pyc
+│   │   └── data_augmenter.py
+│   ├── custom_loss.py
+│   ├── loader
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-36.pyc
+│   │   │   └── data_loader.cpython-36.pyc
+│   │   └── data_loader.py
+│   ├── lr_finder.py
+│   └── model
+│       ├── __init__.py
+│       ├── __pycache__
+│       │   ├── __init__.cpython-36.pyc
+│       │   ├── get_model.cpython-36.pyc
+│       │   ├── resnet18.cpython-36.pyc
+│       │   └── u_net.cpython-36.pyc
+│       ├── get_model.py
+│       ├── res_u_net.py
+│       ├── resnet18.py
+│       └── u_net.py
+├── main.ipynb
+├── overlay_images.py
+├── predict.py
+├── predict1.py
+├── predict3.ipynb
+├── runs
+│   └── MDME
+│       └── events.out.tfevents.1589873658.AnupGogoi.local.2269.0
+├── saved_models
+│   ├── __init__.py
+│   └── no_depth_epoch_50_2020-05-15\ 13_41_36.061556_14c14ac5-e61a-455e-8f4b-bbc010d1c6c4.pth
+├── tensorboard_test.py
+└── train.py
+```
 
 ## About me
 My name is Anup Gogoi and i am an computer vision and AI enthusiast. My dream is to develop products which actually augment the intelligence of mankind in specially medical domain. Human brain can do very complex things, But still it will take some time to figure out the best medicine for Coronavirus pandemic, whereas a combined effort of human and artificial intelligence can do that in very less time.
