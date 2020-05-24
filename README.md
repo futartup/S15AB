@@ -15,6 +15,7 @@ I would also like to thank www.theschoolofai.in to give me this opporthunity to 
 
 ## Configuration file
 
+[config](https://github.com/futartup/S15AB/blob/master/config.py)
 ```
 {
     "seed": <int>,
