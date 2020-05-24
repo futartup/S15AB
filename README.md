@@ -84,10 +84,15 @@ The fg_bg and bg images are feed into the model. The masks and depth are used as
 ![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/depth.png)
 
 ## Loss functions
-I have used CrossEntropyLoss for mask prediction and MSELoss for depth estimation. 
+| Task             | Loss Function     |  Reason to choose |
+| ----------------- | ----------- | -----------------------|
+|          Mask Prediction   |  BCEWithLogitsLoss  | Only one class to classify binary logits classification|
+| Depth | MSELoss | There is no class as such , i want to find the cross entropy between each input and output pixels |
+
+I have used BCEWithLogitsLoss for mask prediction and MSELoss for depth estimation. 
 There is only one class which is vehicle in out dataset now. I have plans to add some more classes in the dataset. 
 
-For the depth prediction MSELoss function is used since i want to find the loss for the each pixels.
+For the depth prediction MSELoss function is used since i want to find the loss for the each pixels. Depth estimation is not a classification task , rather i want to measure the cross entropy between the target and input pixels each.
 
 These loss functions can be defined in [here](https://github.com/futartup/S15AB/blob/master/config.py)
 
