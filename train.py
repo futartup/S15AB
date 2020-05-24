@@ -1,10 +1,12 @@
 import os
+import sys
 import json
 import uuid
 import torch
 import logging
 import argparse
 import matplotlib
+import jsonschema
 import torchvision
 import torch.nn as nn
 from tqdm import tqdm
@@ -13,54 +15,14 @@ from torch.optim import *
 from datetime import datetime
 import torch.nn.functional as F
 import torchvision.transforms as T
-from torch.autograd import Function
 from matplotlib import pyplot as plt
 from library.lr_finder import LRFinder
+from library.custom_loss import DiceCoeff
 from library.model.get_model import GetModel
 from mpl_toolkits.axes_grid1 import ImageGrid
 from torch.utils.tensorboard import SummaryWriter
 from library.loader.data_loader import DataLoader, DepthDataLoader
 from torch.optim.lr_scheduler import OneCycleLR, ReduceLROnPlateau
-
-
-class DiceCoeff(Function):
-    """Dice coeff for individual examples"""
-
-    def forward(self, input, target):
-        self.save_for_backward(input, target)
-        eps = 0.0001
-        self.inter = torch.dot(input.view(-1), target.view(-1))
-        self.union = torch.sum(input) + torch.sum(target) + eps
-
-        t = (2 * self.inter.float() + eps) / self.union.float()
-        return t
-
-    # This function has only a single output, so it gets only one gradient
-    def backward(self, grad_output):
-
-        input, target = self.saved_variables
-        grad_input = grad_target = None
-
-        if self.needs_input_grad[0]:
-            grad_input = grad_output * 2 * (target * self.union - self.inter) \
-                         / (self.union * self.union)
-        if self.needs_input_grad[1]:
-            grad_target = None
-
-        return grad_input, grad_target
-
-
-def dice_coeff(input, target):
-    """Dice coeff for batches"""
-    if input.is_cuda:
-        s = torch.FloatTensor(1).cuda().zero_()
-    else:
-        s = torch.FloatTensor(1).zero_()
-
-    for i, c in enumerate(zip(input, target)):
-        s = s + DiceCoeff().forward(c[0], c[1])
-
-    return s / (i + 1)
 
 
 class Main:
@@ -81,8 +43,8 @@ class Main:
         self.get_loaders() # get the test and train loaders
         self.load_model = load_model
         assert self.conf['loss'] in globals(), "The loss function name doesn't match with names available"
-        self.criterion = globals()[self.conf['loss']]()
-        self.criterion_depth = MSELoss()
+        self.criterion = globals()[self.conf['loss']['mask'][0]]()
+        self.criterion_depth = globals()[self.conf['loss']['depth'][1]]()
         self.get_model()
         
         if not hasattr(self, 'optimizer'):
@@ -284,7 +246,7 @@ class Main:
             train_acc.append(accuracy)
             self.writer.add_images('masks/images', images, global_step_train)
             #self.writer.add_images('masks/true', mask.unsqueeze(1), global_step_train)
-            self.writer.add_images('masks/pred', torch.sigmoid(mask_pred), global_step_train)
+            self.writer.add_images('masks/pred', torch.sigmoid(mask_pred)*255, global_step_train)
             self.writer.add_images('masks/depth', depth.unsqueeze(1), global_step_train)
             global_step_train += 1   
                      
@@ -331,6 +293,7 @@ class Main:
 
 
 if __name__ == '__main__':
+    
     # Main file
     ap = argparse.ArgumentParser()
     ap.add_argument("--conf_dir", required=True,
@@ -347,6 +310,20 @@ if __name__ == '__main__':
                     help="Load the saved model")
     args = vars(ap.parse_args())
     conf = args.get('conf_dir')
-    with open(conf, 'r') as fp:
-        conf = json.load(fp)
-    Main(conf, args.get('data_dir'), args.get('load_model'))
+    BASE_DIR = os.getcwd()
+    # Open the config json file
+    with open(conf, 'r') as cfp:
+        conf = json.load(cfp)
+        # Check the json schema of config
+        with open(BASE_DIR + '/config-schema.json', 'r') as fp:
+            json_schema = json.load(fp)
+            error_messages = []
+            v = jsonschema.Draft6Validator(json_schema)
+            errors = sorted(v.iter_errors(conf), key=lambda e: e.path)
+            for error in errors:
+                    error_messages.append({error.message: error.instance})
+            print(error_messages)
+            if bool(error_messages):
+                sys.exit(0)
+    
+        Main(conf, args.get('data_dir'), args.get('load_model'))
