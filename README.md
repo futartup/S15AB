@@ -13,6 +13,60 @@ I would also like to thank www.theschoolofai.in to give me this opporthunity to 
 - PyTorch 1.0+
 - GIMP
 
+## Configuration file
+
+```
+{
+    "seed": <int>,
+    "lr": <float>,
+    "data": <str: whether the data is build custom or inbuilt; declare custom>,
+    "num_workers": <int>,
+    "shuffle": <boolean>,
+    "epochs": <int>,
+    "multiclass": <boolean>,
+    "batch_size": <int>,
+    "num_workers": <int>,
+    "lr_step_size": <int>,
+    "lr_gamma": <float>,
+    "loss": { <str: what to predict>: [<str: loss function name>], <str: what to predict another>: [<str: loss function name>]},
+    "lr_finder_use": <boolean: whether lr finder to be used or not>,
+    "lr_finder": {
+        "optimizer": {"lr": <float>},
+        "range_test": {"end_lr":<int>, "step_mode": <str>}
+    },
+    "optimizer": {
+        "type": <str: name of the optimizer>,
+        "weight_decay": <float: params goes accordingly>
+    },
+    "scheduler": {
+        "type": <str: name of the scheduler>,
+        "patience": <int: params goes accordingly>
+    },
+    "transformations": {
+        "train": {
+            "which": <str: albumentation or pytorch>,
+            "what": [
+            {
+                "name": <str: Name of the albumentation>,
+                "num_holes":<int: Params goes accordingly>
+            }
+        ]
+        },
+        "test": {
+            "which": <str: albumentation or pytorch>,
+            "what": <list: albumentation or pytorch transformations, got the declaration idea from train>
+        }
+    },
+    "model": <str: name of the model>,
+    "model_initializer": {
+        "n_channels": <int: number of input channels>,
+        "n_classes": <int: number of classes>,
+        "bilinear": <boolean: whether bilinear or not>
+    },
+    "log_dir": <str: path to the log file, tensorboard will read it from here>
+}
+```
+
 ## To train the model
 [train.py](https://github.com/futartup/S15AB/blob/master/train.py)
 ```
@@ -89,7 +143,7 @@ The fg_bg and bg images are feed into the model. The masks and depth are used as
 |          Mask Prediction   |  BCEWithLogitsLoss  | I want to find the loss between each pixels from fg and the mask of it. The mask is all white pixels and the surrounding is black pixels in the mask image. Therefore its a binary logits classification. |
 | Depth | MSELoss | There is no class as such , i want to find the cross entropy between each input and output pixels |
 
-Alongwith the BCEWithLogitsLoss , dice loss can also be used [here](https://github.com/futartup/S15AB/blob/master/library/custom_loss.py).
+Alongwith the BCEWithLogitsLoss , dice loss can also be used [code](https://github.com/futartup/S15AB/blob/master/library/custom_loss.py).
 The dice coefficient can be said as the amount of overlap between target and input.
 ```
 dice_coeff = 2 |A . B| / |A| + |B|
@@ -99,7 +153,8 @@ This dice loss can be use to test the accuracy of the model.
 These loss functions can be defined in [here](https://github.com/futartup/S15AB/blob/master/config.py)
 
 ## Loss curves
-Train loss curve for CrossEntropyLoss, ReduceLROnPlateau, SGD
+Train loss curve for BCEWithLogitsLoss, ReduceLROnPlateau, Adam
+
 ![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/train_loss%20(1).jpg)
 
 Test Loss

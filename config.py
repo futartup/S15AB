@@ -38,7 +38,7 @@
             {
                 "name": "Blur",
                 "always_apply": false,
-                "blur_limit"= (3,7),
+                "blur_limit": (3,7),
                 "p": 0.2
             },
             {

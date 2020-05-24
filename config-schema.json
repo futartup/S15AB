@@ -1,0 +1,1178 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "seed": 1,
+            "lr": 0.001,
+            "data": "custom",
+            "num_workers": 2,
+            "shuffle": true,
+            "epochs": 20,
+            "multiclass": true,
+            "batch_size": 10,
+            "lr_step_size": 25,
+            "lr_gamma": 0.001,
+            "loss": {
+                "mask": [
+                    "BCEWithLogitsLoss"
+                ],
+                "depth": [
+                    "MSELoss"
+                ]
+            },
+            "lr_finder": {
+                "optimizer": {
+                    "lr": 1e-05
+                },
+                "range_test": {
+                    "end_lr": 100,
+                    "step_mode": "exp"
+                }
+            },
+            "optimizer": {
+                "type": "Adam",
+                "weight_decay": 0.0001
+            },
+            "scheduler": {
+                "type": "ReduceLROnPlateau",
+                "patience": 2
+            },
+            "lr_finder_use": false,
+            "transformations": {
+                "train": {
+                    "which": "albumentation",
+                    "what": [
+                        {
+                            "name": "Cutout",
+                            "num_holes": 1,
+                            "max_h_size": 80,
+                            "max_w_size": 80,
+                            "always_apply": true
+                        },
+                        {
+                            "name": "Blur",
+                            "always_apply": false,
+                            "p": 0.2
+                        },
+                        {
+                            "name": "Solarize",
+                            "always_apply": false,
+                            "p": 0.2
+                        },
+                        {
+                            "name": "GaussNoise",
+                            "always_apply": false,
+                            "p": 0.2
+                        },
+                        {
+                            "name": "Normalize",
+                            "mean": [
+                                0.429694425216733,
+                                0.43985525255137686,
+                                0.43281280297561686
+                            ],
+                            "std": [
+                                0.28715867313016924,
+                                0.266891016687173,
+                                0.26731143118502665
+                            ],
+                            "always_apply": true
+                        }
+                    ]
+                },
+                "test": {
+                    "which": "albumentation",
+                    "what": [
+                        {
+                            "name": "Normalize",
+                            "mean": [
+                                0.4316956210782655,
+                                0.4422608771711209,
+                                0.43416351285063187
+                            ],
+                            "std": [
+                                0.2876632239505755,
+                                0.26742029335370965,
+                                0.26840916462077713
+                            ],
+                            "always_apply": true
+                        }
+                    ]
+                }
+            },
+            "model": "unet",
+            "model_initializer": {
+                "n_channels": 3,
+                "n_classes": 1,
+                "bilinear": true
+            },
+            "log_dir": "/content/drive/My Drive/Colab Notebooks/S15AB/runs/MDME"
+        }
+    ],
+    "required": [
+        "seed",
+        "lr",
+        "data",
+        "num_workers",
+        "shuffle",
+        "epochs",
+        "multiclass",
+        "batch_size",
+        "lr_step_size",
+        "lr_gamma",
+        "loss",
+        "lr_finder",
+        "optimizer",
+        "scheduler",
+        "lr_finder_use",
+        "transformations",
+        "model",
+        "model_initializer",
+        "log_dir"
+    ],
+    "additionalProperties": true,
+    "properties": {
+        "seed": {
+            "$id": "#/properties/seed",
+            "type": "integer",
+            "title": "The seed schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                1
+            ]
+        },
+        "lr": {
+            "$id": "#/properties/lr",
+            "type": "number",
+            "title": "The lr schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0.0,
+            "examples": [
+                0.001
+            ]
+        },
+        "data": {
+            "$id": "#/properties/data",
+            "type": "string",
+            "title": "The data schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "custom"
+            ]
+        },
+        "num_workers": {
+            "$id": "#/properties/num_workers",
+            "type": "integer",
+            "title": "The num_workers schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                2
+            ]
+        },
+        "shuffle": {
+            "$id": "#/properties/shuffle",
+            "type": "boolean",
+            "title": "The shuffle schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": false,
+            "examples": [
+                true
+            ]
+        },
+        "epochs": {
+            "$id": "#/properties/epochs",
+            "type": "integer",
+            "title": "The epochs schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                20
+            ]
+        },
+        "multiclass": {
+            "$id": "#/properties/multiclass",
+            "type": "boolean",
+            "title": "The multiclass schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": false,
+            "examples": [
+                true
+            ]
+        },
+        "batch_size": {
+            "$id": "#/properties/batch_size",
+            "type": "integer",
+            "title": "The batch_size schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                10
+            ]
+        },
+        "lr_step_size": {
+            "$id": "#/properties/lr_step_size",
+            "type": "integer",
+            "title": "The lr_step_size schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                25
+            ]
+        },
+        "lr_gamma": {
+            "$id": "#/properties/lr_gamma",
+            "type": "number",
+            "title": "The lr_gamma schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0.0,
+            "examples": [
+                0.001
+            ]
+        },
+        "loss": {
+            "$id": "#/properties/loss",
+            "type": "object",
+            "title": "The loss schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "mask": [
+                        "BCEWithLogitsLoss"
+                    ],
+                    "depth": [
+                        "MSELoss"
+                    ]
+                }
+            ],
+            "required": [
+                "mask",
+                "depth"
+            ],
+            "additionalProperties": true,
+            "properties": {
+                "mask": {
+                    "$id": "#/properties/loss/properties/mask",
+                    "type": "array",
+                    "title": "The mask schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": [],
+                    "examples": [
+                        [
+                            "BCEWithLogitsLoss"
+                        ]
+                    ],
+                    "additionalItems": true,
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$id": "#/properties/loss/properties/mask/items/anyOf/0",
+                                "type": "string",
+                                "title": "The first anyOf schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "BCEWithLogitsLoss"
+                                ]
+                            }
+                        ],
+                        "$id": "#/properties/loss/properties/mask/items"
+                    }
+                },
+                "depth": {
+                    "$id": "#/properties/loss/properties/depth",
+                    "type": "array",
+                    "title": "The depth schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": [],
+                    "examples": [
+                        [
+                            "MSELoss"
+                        ]
+                    ],
+                    "additionalItems": true,
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$id": "#/properties/loss/properties/depth/items/anyOf/0",
+                                "type": "string",
+                                "title": "The first anyOf schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "MSELoss"
+                                ]
+                            }
+                        ],
+                        "$id": "#/properties/loss/properties/depth/items"
+                    }
+                }
+            }
+        },
+        "lr_finder": {
+            "$id": "#/properties/lr_finder",
+            "type": "object",
+            "title": "The lr_finder schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "optimizer": {
+                        "lr": 1e-05
+                    },
+                    "range_test": {
+                        "end_lr": 100,
+                        "step_mode": "exp"
+                    }
+                }
+            ],
+            "required": [
+                "optimizer",
+                "range_test"
+            ],
+            "additionalProperties": true,
+            "properties": {
+                "optimizer": {
+                    "$id": "#/properties/lr_finder/properties/optimizer",
+                    "type": "object",
+                    "title": "The optimizer schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "examples": [
+                        {
+                            "lr": 1e-05
+                        }
+                    ],
+                    "required": [
+                        "lr"
+                    ],
+                    "additionalProperties": true,
+                    "properties": {
+                        "lr": {
+                            "$id": "#/properties/lr_finder/properties/optimizer/properties/lr",
+                            "type": "number",
+                            "title": "The lr schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": 0.0,
+                            "examples": [
+                                1e-05
+                            ]
+                        }
+                    }
+                },
+                "range_test": {
+                    "$id": "#/properties/lr_finder/properties/range_test",
+                    "type": "object",
+                    "title": "The range_test schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "examples": [
+                        {
+                            "end_lr": 100,
+                            "step_mode": "exp"
+                        }
+                    ],
+                    "required": [
+                        "end_lr",
+                        "step_mode"
+                    ],
+                    "additionalProperties": true,
+                    "properties": {
+                        "end_lr": {
+                            "$id": "#/properties/lr_finder/properties/range_test/properties/end_lr",
+                            "type": "integer",
+                            "title": "The end_lr schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": 0,
+                            "examples": [
+                                100
+                            ]
+                        },
+                        "step_mode": {
+                            "$id": "#/properties/lr_finder/properties/range_test/properties/step_mode",
+                            "type": "string",
+                            "title": "The step_mode schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "exp"
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "optimizer": {
+            "$id": "#/properties/optimizer",
+            "type": "object",
+            "title": "The optimizer schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "type": "Adam",
+                    "weight_decay": 0.0001
+                }
+            ],
+            "required": [
+                "type",
+                "weight_decay"
+            ],
+            "additionalProperties": true,
+            "properties": {
+                "type": {
+                    "$id": "#/properties/optimizer/properties/type",
+                    "type": "string",
+                    "title": "The type schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "Adam"
+                    ]
+                },
+                "weight_decay": {
+                    "$id": "#/properties/optimizer/properties/weight_decay",
+                    "type": "number",
+                    "title": "The weight_decay schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": 0.0,
+                    "examples": [
+                        0.0001
+                    ]
+                }
+            }
+        },
+        "scheduler": {
+            "$id": "#/properties/scheduler",
+            "type": "object",
+            "title": "The scheduler schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "type": "ReduceLROnPlateau",
+                    "patience": 2
+                }
+            ],
+            "required": [
+                "type",
+                "patience"
+            ],
+            "additionalProperties": true,
+            "properties": {
+                "type": {
+                    "$id": "#/properties/scheduler/properties/type",
+                    "type": "string",
+                    "title": "The type schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "ReduceLROnPlateau"
+                    ]
+                },
+                "patience": {
+                    "$id": "#/properties/scheduler/properties/patience",
+                    "type": "integer",
+                    "title": "The patience schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": 0,
+                    "examples": [
+                        2
+                    ]
+                }
+            }
+        },
+        "lr_finder_use": {
+            "$id": "#/properties/lr_finder_use",
+            "type": "boolean",
+            "title": "The lr_finder_use schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": false,
+            "examples": [
+                false
+            ]
+        },
+        "transformations": {
+            "$id": "#/properties/transformations",
+            "type": "object",
+            "title": "The transformations schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "train": {
+                        "which": "albumentation",
+                        "what": [
+                            {
+                                "name": "Cutout",
+                                "num_holes": 1,
+                                "max_h_size": 80,
+                                "max_w_size": 80,
+                                "always_apply": true
+                            },
+                            {
+                                "name": "Blur",
+                                "always_apply": false,
+                                "p": 0.2
+                            },
+                            {
+                                "name": "Solarize",
+                                "always_apply": false,
+                                "p": 0.2
+                            },
+                            {
+                                "name": "GaussNoise",
+                                "always_apply": false,
+                                "p": 0.2
+                            },
+                            {
+                                "name": "Normalize",
+                                "mean": [
+                                    0.429694425216733,
+                                    0.43985525255137686,
+                                    0.43281280297561686
+                                ],
+                                "std": [
+                                    0.28715867313016924,
+                                    0.266891016687173,
+                                    0.26731143118502665
+                                ],
+                                "always_apply": true
+                            }
+                        ]
+                    },
+                    "test": {
+                        "which": "albumentation",
+                        "what": [
+                            {
+                                "name": "Normalize",
+                                "mean": [
+                                    0.4316956210782655,
+                                    0.4422608771711209,
+                                    0.43416351285063187
+                                ],
+                                "std": [
+                                    0.2876632239505755,
+                                    0.26742029335370965,
+                                    0.26840916462077713
+                                ],
+                                "always_apply": true
+                            }
+                        ]
+                    }
+                }
+            ],
+            "required": [
+                "train",
+                "test"
+            ],
+            "additionalProperties": true,
+            "properties": {
+                "train": {
+                    "$id": "#/properties/transformations/properties/train",
+                    "type": "object",
+                    "title": "The train schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "examples": [
+                        {
+                            "which": "albumentation",
+                            "what": [
+                                {
+                                    "name": "Cutout",
+                                    "num_holes": 1,
+                                    "max_h_size": 80,
+                                    "max_w_size": 80,
+                                    "always_apply": true
+                                },
+                                {
+                                    "name": "Blur",
+                                    "always_apply": false,
+                                    "p": 0.2
+                                },
+                                {
+                                    "name": "Solarize",
+                                    "always_apply": false,
+                                    "p": 0.2
+                                },
+                                {
+                                    "name": "GaussNoise",
+                                    "always_apply": false,
+                                    "p": 0.2
+                                },
+                                {
+                                    "name": "Normalize",
+                                    "mean": [
+                                        0.429694425216733,
+                                        0.43985525255137686,
+                                        0.43281280297561686
+                                    ],
+                                    "std": [
+                                        0.28715867313016924,
+                                        0.266891016687173,
+                                        0.26731143118502665
+                                    ],
+                                    "always_apply": true
+                                }
+                            ]
+                        }
+                    ],
+                    "required": [
+                        "which",
+                        "what"
+                    ],
+                    "additionalProperties": true,
+                    "properties": {
+                        "which": {
+                            "$id": "#/properties/transformations/properties/train/properties/which",
+                            "type": "string",
+                            "title": "The which schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "albumentation"
+                            ]
+                        },
+                        "what": {
+                            "$id": "#/properties/transformations/properties/train/properties/what",
+                            "type": "array",
+                            "title": "The what schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": [],
+                            "examples": [
+                                [
+                                    {
+                                        "name": "Cutout",
+                                        "num_holes": 1,
+                                        "max_h_size": 80,
+                                        "max_w_size": 80,
+                                        "always_apply": true
+                                    },
+                                    {
+                                        "name": "Blur",
+                                        "always_apply": false,
+                                        "p": 0.2
+                                    }
+                                ]
+                            ],
+                            "additionalItems": true,
+                            "items": {
+                                "anyOf": [
+                                    {
+                                        "$id": "#/properties/transformations/properties/train/properties/what/items/anyOf/0",
+                                        "type": "object",
+                                        "title": "The first anyOf schema",
+                                        "description": "An explanation about the purpose of this instance.",
+                                        "default": {},
+                                        "examples": [
+                                            {
+                                                "name": "Cutout",
+                                                "num_holes": 1,
+                                                "max_h_size": 80,
+                                                "max_w_size": 80,
+                                                "always_apply": true
+                                            }
+                                        ],
+                                        "required": [
+                                            "name",
+                                            "num_holes",
+                                            "max_h_size",
+                                            "max_w_size",
+                                            "always_apply"
+                                        ],
+                                        "additionalProperties": true,
+                                        "properties": {
+                                            "name": {
+                                                "$id": "#/properties/transformations/properties/train/properties/what/items/anyOf/0/properties/name",
+                                                "type": "string",
+                                                "title": "The name schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": "",
+                                                "examples": [
+                                                    "Cutout"
+                                                ]
+                                            },
+                                            "num_holes": {
+                                                "$id": "#/properties/transformations/properties/train/properties/what/items/anyOf/0/properties/num_holes",
+                                                "type": "integer",
+                                                "title": "The num_holes schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": 0,
+                                                "examples": [
+                                                    1
+                                                ]
+                                            },
+                                            "max_h_size": {
+                                                "$id": "#/properties/transformations/properties/train/properties/what/items/anyOf/0/properties/max_h_size",
+                                                "type": "integer",
+                                                "title": "The max_h_size schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": 0,
+                                                "examples": [
+                                                    80
+                                                ]
+                                            },
+                                            "max_w_size": {
+                                                "$id": "#/properties/transformations/properties/train/properties/what/items/anyOf/0/properties/max_w_size",
+                                                "type": "integer",
+                                                "title": "The max_w_size schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": 0,
+                                                "examples": [
+                                                    80
+                                                ]
+                                            },
+                                            "always_apply": {
+                                                "$id": "#/properties/transformations/properties/train/properties/what/items/anyOf/0/properties/always_apply",
+                                                "type": "boolean",
+                                                "title": "The always_apply schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": false,
+                                                "examples": [
+                                                    true
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "$id": "#/properties/transformations/properties/train/properties/what/items/anyOf/1",
+                                        "type": "object",
+                                        "title": "The second anyOf schema",
+                                        "description": "An explanation about the purpose of this instance.",
+                                        "default": {},
+                                        "examples": [
+                                            {
+                                                "name": "Blur",
+                                                "always_apply": false,
+                                                "p": 0.2
+                                            }
+                                        ],
+                                        "required": [
+                                            "name",
+                                            "always_apply",
+                                            "p"
+                                        ],
+                                        "additionalProperties": true,
+                                        "properties": {
+                                            "name": {
+                                                "$id": "#/properties/transformations/properties/train/properties/what/items/anyOf/1/properties/name",
+                                                "type": "string",
+                                                "title": "The name schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": "",
+                                                "examples": [
+                                                    "Blur"
+                                                ]
+                                            },
+                                            "always_apply": {
+                                                "$id": "#/properties/transformations/properties/train/properties/what/items/anyOf/1/properties/always_apply",
+                                                "type": "boolean",
+                                                "title": "The always_apply schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": false,
+                                                "examples": [
+                                                    false
+                                                ]
+                                            },
+                                            "p": {
+                                                "$id": "#/properties/transformations/properties/train/properties/what/items/anyOf/1/properties/p",
+                                                "type": "number",
+                                                "title": "The p schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": 0.0,
+                                                "examples": [
+                                                    0.2
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "$id": "#/properties/transformations/properties/train/properties/what/items/anyOf/2",
+                                        "type": "object",
+                                        "title": "The third anyOf schema",
+                                        "description": "An explanation about the purpose of this instance.",
+                                        "default": {},
+                                        "examples": [
+                                            {
+                                                "name": "Normalize",
+                                                "mean": [
+                                                    0.429694425216733,
+                                                    0.43985525255137686,
+                                                    0.43281280297561686
+                                                ],
+                                                "std": [
+                                                    0.28715867313016924,
+                                                    0.266891016687173,
+                                                    0.26731143118502665
+                                                ],
+                                                "always_apply": true
+                                            }
+                                        ],
+                                        "required": [
+                                            "name",
+                                            "mean",
+                                            "std",
+                                            "always_apply"
+                                        ],
+                                        "additionalProperties": true,
+                                        "properties": {
+                                            "name": {
+                                                "$id": "#/properties/transformations/properties/train/properties/what/items/anyOf/2/properties/name",
+                                                "type": "string",
+                                                "title": "The name schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": "",
+                                                "examples": [
+                                                    "Normalize"
+                                                ]
+                                            },
+                                            "mean": {
+                                                "$id": "#/properties/transformations/properties/train/properties/what/items/anyOf/2/properties/mean",
+                                                "type": "array",
+                                                "title": "The mean schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": [],
+                                                "examples": [
+                                                    [
+                                                        0.429694425216733,
+                                                        0.43985525255137686
+                                                    ]
+                                                ],
+                                                "additionalItems": true,
+                                                "items": {
+                                                    "anyOf": [
+                                                        {
+                                                            "$id": "#/properties/transformations/properties/train/properties/what/items/anyOf/2/properties/mean/items/anyOf/0",
+                                                            "type": "number",
+                                                            "title": "The first anyOf schema",
+                                                            "description": "An explanation about the purpose of this instance.",
+                                                            "default": 0.0,
+                                                            "examples": [
+                                                                0.429694425216733,
+                                                                0.43985525255137686
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "$id": "#/properties/transformations/properties/train/properties/what/items/anyOf/2/properties/mean/items"
+                                                }
+                                            },
+                                            "std": {
+                                                "$id": "#/properties/transformations/properties/train/properties/what/items/anyOf/2/properties/std",
+                                                "type": "array",
+                                                "title": "The std schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": [],
+                                                "examples": [
+                                                    [
+                                                        0.28715867313016924,
+                                                        0.266891016687173
+                                                    ]
+                                                ],
+                                                "additionalItems": true,
+                                                "items": {
+                                                    "anyOf": [
+                                                        {
+                                                            "$id": "#/properties/transformations/properties/train/properties/what/items/anyOf/2/properties/std/items/anyOf/0",
+                                                            "type": "number",
+                                                            "title": "The first anyOf schema",
+                                                            "description": "An explanation about the purpose of this instance.",
+                                                            "default": 0.0,
+                                                            "examples": [
+                                                                0.28715867313016924,
+                                                                0.266891016687173
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "$id": "#/properties/transformations/properties/train/properties/what/items/anyOf/2/properties/std/items"
+                                                }
+                                            },
+                                            "always_apply": {
+                                                "$id": "#/properties/transformations/properties/train/properties/what/items/anyOf/2/properties/always_apply",
+                                                "type": "boolean",
+                                                "title": "The always_apply schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": false,
+                                                "examples": [
+                                                    true
+                                                ]
+                                            }
+                                        }
+                                    }
+                                ],
+                                "$id": "#/properties/transformations/properties/train/properties/what/items"
+                            }
+                        }
+                    }
+                },
+                "test": {
+                    "$id": "#/properties/transformations/properties/test",
+                    "type": "object",
+                    "title": "The test schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "examples": [
+                        {
+                            "which": "albumentation",
+                            "what": [
+                                {
+                                    "name": "Normalize",
+                                    "mean": [
+                                        0.4316956210782655,
+                                        0.4422608771711209,
+                                        0.43416351285063187
+                                    ],
+                                    "std": [
+                                        0.2876632239505755,
+                                        0.26742029335370965,
+                                        0.26840916462077713
+                                    ],
+                                    "always_apply": true
+                                }
+                            ]
+                        }
+                    ],
+                    "required": [
+                        "which",
+                        "what"
+                    ],
+                    "additionalProperties": true,
+                    "properties": {
+                        "which": {
+                            "$id": "#/properties/transformations/properties/test/properties/which",
+                            "type": "string",
+                            "title": "The which schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "albumentation"
+                            ]
+                        },
+                        "what": {
+                            "$id": "#/properties/transformations/properties/test/properties/what",
+                            "type": "array",
+                            "title": "The what schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": [],
+                            "examples": [
+                                [
+                                    {
+                                        "name": "Normalize",
+                                        "mean": [
+                                            0.4316956210782655,
+                                            0.4422608771711209,
+                                            0.43416351285063187
+                                        ],
+                                        "std": [
+                                            0.2876632239505755,
+                                            0.26742029335370965,
+                                            0.26840916462077713
+                                        ],
+                                        "always_apply": true
+                                    }
+                                ]
+                            ],
+                            "additionalItems": true,
+                            "items": {
+                                "anyOf": [
+                                    {
+                                        "$id": "#/properties/transformations/properties/test/properties/what/items/anyOf/0",
+                                        "type": "object",
+                                        "title": "The first anyOf schema",
+                                        "description": "An explanation about the purpose of this instance.",
+                                        "default": {},
+                                        "examples": [
+                                            {
+                                                "name": "Normalize",
+                                                "mean": [
+                                                    0.4316956210782655,
+                                                    0.4422608771711209,
+                                                    0.43416351285063187
+                                                ],
+                                                "std": [
+                                                    0.2876632239505755,
+                                                    0.26742029335370965,
+                                                    0.26840916462077713
+                                                ],
+                                                "always_apply": true
+                                            }
+                                        ],
+                                        "required": [
+                                            "name",
+                                            "mean",
+                                            "std",
+                                            "always_apply"
+                                        ],
+                                        "additionalProperties": true,
+                                        "properties": {
+                                            "name": {
+                                                "$id": "#/properties/transformations/properties/test/properties/what/items/anyOf/0/properties/name",
+                                                "type": "string",
+                                                "title": "The name schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": "",
+                                                "examples": [
+                                                    "Normalize"
+                                                ]
+                                            },
+                                            "mean": {
+                                                "$id": "#/properties/transformations/properties/test/properties/what/items/anyOf/0/properties/mean",
+                                                "type": "array",
+                                                "title": "The mean schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": [],
+                                                "examples": [
+                                                    [
+                                                        0.4316956210782655,
+                                                        0.4422608771711209
+                                                    ]
+                                                ],
+                                                "additionalItems": true,
+                                                "items": {
+                                                    "anyOf": [
+                                                        {
+                                                            "$id": "#/properties/transformations/properties/test/properties/what/items/anyOf/0/properties/mean/items/anyOf/0",
+                                                            "type": "number",
+                                                            "title": "The first anyOf schema",
+                                                            "description": "An explanation about the purpose of this instance.",
+                                                            "default": 0.0,
+                                                            "examples": [
+                                                                0.4316956210782655,
+                                                                0.4422608771711209
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "$id": "#/properties/transformations/properties/test/properties/what/items/anyOf/0/properties/mean/items"
+                                                }
+                                            },
+                                            "std": {
+                                                "$id": "#/properties/transformations/properties/test/properties/what/items/anyOf/0/properties/std",
+                                                "type": "array",
+                                                "title": "The std schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": [],
+                                                "examples": [
+                                                    [
+                                                        0.2876632239505755,
+                                                        0.26742029335370965
+                                                    ]
+                                                ],
+                                                "additionalItems": true,
+                                                "items": {
+                                                    "anyOf": [
+                                                        {
+                                                            "$id": "#/properties/transformations/properties/test/properties/what/items/anyOf/0/properties/std/items/anyOf/0",
+                                                            "type": "number",
+                                                            "title": "The first anyOf schema",
+                                                            "description": "An explanation about the purpose of this instance.",
+                                                            "default": 0.0,
+                                                            "examples": [
+                                                                0.2876632239505755,
+                                                                0.26742029335370965
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "$id": "#/properties/transformations/properties/test/properties/what/items/anyOf/0/properties/std/items"
+                                                }
+                                            },
+                                            "always_apply": {
+                                                "$id": "#/properties/transformations/properties/test/properties/what/items/anyOf/0/properties/always_apply",
+                                                "type": "boolean",
+                                                "title": "The always_apply schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": false,
+                                                "examples": [
+                                                    true
+                                                ]
+                                            }
+                                        }
+                                    }
+                                ],
+                                "$id": "#/properties/transformations/properties/test/properties/what/items"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "model": {
+            "$id": "#/properties/model",
+            "type": "string",
+            "title": "The model schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "unet"
+            ]
+        },
+        "model_initializer": {
+            "$id": "#/properties/model_initializer",
+            "type": "object",
+            "title": "The model_initializer schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "n_channels": 3,
+                    "n_classes": 1,
+                    "bilinear": true
+                }
+            ],
+            "required": [
+                "n_channels",
+                "n_classes",
+                "bilinear"
+            ],
+            "additionalProperties": true,
+            "properties": {
+                "n_channels": {
+                    "$id": "#/properties/model_initializer/properties/n_channels",
+                    "type": "integer",
+                    "title": "The n_channels schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": 0,
+                    "examples": [
+                        3
+                    ]
+                },
+                "n_classes": {
+                    "$id": "#/properties/model_initializer/properties/n_classes",
+                    "type": "integer",
+                    "title": "The n_classes schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": 0,
+                    "examples": [
+                        1
+                    ]
+                },
+                "bilinear": {
+                    "$id": "#/properties/model_initializer/properties/bilinear",
+                    "type": "boolean",
+                    "title": "The bilinear schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": false,
+                    "examples": [
+                        true
+                    ]
+                }
+            }
+        },
+        "log_dir": {
+            "$id": "#/properties/log_dir",
+            "type": "string",
+            "title": "The log_dir schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "/content/drive/My Drive/Colab Notebooks/S15AB/runs/MDME"
+            ]
+        }
+    }
+}
