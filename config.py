@@ -32,14 +32,44 @@
                 "name": "Cutout",
                 "num_holes":1,
                 "max_h_size": 80, 
-                "max_w_size": 80
+                "max_w_size": 80,
+                "always_apply": true
+            },
+            {
+                "name": "Blur",
+                "always_apply": false,
+                "blur_limit"= (3,7),
+                "p": 0.2
+            },
+            {
+                "name": "Solarize",
+                "always_apply": false,
+                "threshold": (128, 128),
+                "p": 0.2
+            },
+            {
+                "name": "GaussNoise",
+                "always_apply": false,
+                "p": 0.2,
+                "var_limit": (10.0, 291.9499816894531)                
+            },
+            {
+                "name": "Normalize",
+                "mean": [0.429694425216733, 0.43985525255137686, 0.43281280297561686] ,
+                "std":[0.28715867313016924, 0.266891016687173, 0.26731143118502665],
+                "always_apply": true
             }
         ]
         },
         "test": {
             "which": "albumentation",
             "what": [
-          
+                {
+                    "name": "Normalize",
+                    "mean": [0.4316956210782655, 0.4422608771711209, 0.43416351285063187],
+                    "std": [0.2876632239505755, 0.26742029335370965, 0.26840916462077713],
+                    "always_apply": true
+                }
             ]
         }
     },
