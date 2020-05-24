@@ -246,15 +246,14 @@ Each fg_bg images are passed through [this model](https://github.com/ialhashim/D
 
 ```
 ├── README.md
-├── Untitled.ipynb
 ├── concatenate.py
 ├── config
 ├── config-schema.json
 ├── config.py
-├── detect_and_remove_duplicate_images.py
+├── [detect_and_remove_duplicate_images.py](https://github.com/futartup/S15AB/blob/master/detect_and_remove_duplicate_images.py)(Code to delete duplicate images using hash))
 ├── find_mean.py
 ├── flip_images.py
-├── library
+├── [library](https://github.com/futartup/S15AB/tree/master/library) (The library code)
 │   ├── __pycache__
 │   │   └── lr_finder.cpython-36.pyc
 │   ├── augmentation
