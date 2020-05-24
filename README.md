@@ -125,6 +125,8 @@ To solve this problem i have implemented UNet with total trainable params of 31,
 The model code can be found [here](https://github.com/futartup/S15AB/blob/master/library/model/u_net.py)
 ![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/unet.png)
 
+There is another implemention of mixed model of resnet34 and UNet. The encoder part is the resnet34 and the decoder part is the UNet. The model is implemented [here](https://github.com/futartup/S15AB/blob/master/library/model/res_u_net.py). The reason for choosing resnet34 is that it is light and serves most of the purpose. The resnet34 can be transfer learned. 
+
 The saved models are stored in [here](https://drive.google.com/drive/u/3/folders/1A8jBzOUM_WPFKIa-gjjYs3H9tTffAGyL).
 The code for storing the saved model can be found [here](https://github.com/futartup/S15AB/blob/master/train.py).
 
@@ -223,16 +225,11 @@ Each fg_bg images are passed through [this model](https://github.com/ialhashim/D
 
 | Data             | Total Files.        | Mean | Std | Channels |
 | ----------------- | ----------- |-------|-----|------|
-|          fg_bg   | 400K   | | | RGB|
+|          fg_bg   | 400K   | [0.429694425216733, 0.43985525255137686, 0.43281280297561686]| [0.28715867313016924, 0.266891016687173, 0.26731143118502665]| RGB|
 |          mask   | 400K   | | | L|
 |          depth   | 400K   | | | L|
 |          bg   | 100   | | | RGB|
 
-
-### Accuracy
-| Model             | Acc.        |
-| ----------------- | ----------- |
-|       |   UNet   | 90%.   |
 
 ## File Structure
 - [library](https://github.com/futartup/S15AB/tree/master/library) (The library code)
