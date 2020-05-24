@@ -1,4 +1,4 @@
-# Object Detector ( S15A and S15 )
+# Mask and Monocular depth Prediction ( S15A and S15 )
 [paper implementation U-Net](https://arxiv.org/abs/1505.04597)
 This repo is to detect cars in video. The goal is to segment vehicle in images as well as monocular depth estimation. I have created my own dataset.
 
