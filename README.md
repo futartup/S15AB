@@ -62,7 +62,7 @@ optional arguments:
 ```
 
 ## Output images
-![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/mask_and_depth_prediction.png)
+![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/output.jpg)
 
 
 ## Constructing the model architecture
