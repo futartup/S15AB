@@ -232,67 +232,37 @@ Each fg_bg images are passed through [this model](https://github.com/ialhashim/D
 
 
 ## File Structure
-- [library](https://github.com/futartup/S15AB/tree/master/library) (The library code)
-  - [augmentation](https://github.com/futartup/S15AB/tree/master/library/augmentation) (The augmentation code)
-  - [loader](https://github.com/futartup/S15AB/tree/master/library/loader) (The dataloader code)
-  - [model](https://github.com/futartup/S15AB/tree/master/library/model) (The model code)
-- [saved_models](https://github.com/futartup/S15AB/tree/master/saved_models) (The models are saved here, though it is large its not stored in here and stored in google drive)
-- [data](https://github.com/futartup/S15AB/tree/master/data) (The data for test , train and validation)
-- [raw_images](https://github.com/futartup/S15AB/tree/master/raw_images) (All the raw images are stored in here)
-- [detect_and_remove_duplicate_images.py](https://github.com/futartup/S15AB/blob/master/detect_and_remove_duplicate_images.py)(Code to delete duplicate images using hash)
-- [overlay_images.py](https://github.com/futartup/S15AB/blob/master/overlay_images.py)(Code to produce 800K dataset from fg, bg images)
-- [train.py](https://github.com/futartup/S15AB/blob/master/train.py)(The training code and the main file, this is the entry point)
-- [predict1.py](https://github.com/futartup/S15AB/blob/master/predict1.py)(Code to predict the output of model)
-
 ```
 ├── README.md
-├── concatenate.py
-├── config
-├── config-schema.json
-├── config.py
-├── [detect_and_remove_duplicate_images.py](https://github.com/futartup/S15AB/blob/master/detect_and_remove_duplicate_images.py)(Code to delete duplicate images using hash))
-├── find_mean.py
+├── config-schema.json (Schema file of config to validate the input)
+├── config.py (Configuration file)
+├── detect_and_remove_duplicate_images.py (Detect and remove duplicate images using hash)
+├── find_mean.py (find the mean and standard deviation of images)
 ├── flip_images.py
-├── [library](https://github.com/futartup/S15AB/tree/master/library) (The library code)
-│   ├── __pycache__
-│   │   └── lr_finder.cpython-36.pyc
+├── library  (The main library folder)
 │   ├── augmentation
 │   │   ├── __init__.py
-│   │   ├── __pycache__
-│   │   │   ├── __init__.cpython-36.pyc
-│   │   │   └── data_augmenter.cpython-36.pyc
 │   │   └── data_augmenter.py
 │   ├── custom_loss.py
 │   ├── loader
 │   │   ├── __init__.py
-│   │   ├── __pycache__
-│   │   │   ├── __init__.cpython-36.pyc
-│   │   │   └── data_loader.cpython-36.pyc
 │   │   └── data_loader.py
 │   ├── lr_finder.py
 │   └── model
 │       ├── __init__.py
-│       ├── __pycache__
-│       │   ├── __init__.cpython-36.pyc
-│       │   ├── get_model.cpython-36.pyc
-│       │   ├── resnet18.cpython-36.pyc
-│       │   └── u_net.cpython-36.pyc
 │       ├── get_model.py
 │       ├── res_u_net.py
 │       ├── resnet18.py
 │       └── u_net.py
-├── main.ipynb
+├── main.ipynb  (Main file to execute in colab)
 ├── overlay_images.py
-├── predict.py
 ├── predict1.py
-├── predict3.ipynb
 ├── runs
 │   └── MDME
 │       └── events.out.tfevents.1589873658.AnupGogoi.local.2269.0
 ├── saved_models
 │   ├── __init__.py
 │   └── no_depth_epoch_50_2020-05-15\ 13_41_36.061556_14c14ac5-e61a-455e-8f4b-bbc010d1c6c4.pth
-├── tensorboard_test.py
 └── train.py
 ```
 
