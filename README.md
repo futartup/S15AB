@@ -272,7 +272,6 @@ My name is Anup Gogoi and i am an computer vision and AI enthusiast. My dream is
 My github repo is public and collaborators, suggestions are always welcomed.
 
 ## Reference
-Corresponding paper to cite:
 
 ```
 @article{futartup,
