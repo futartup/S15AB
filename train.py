@@ -62,27 +62,15 @@ class Main:
         if self.conf['lr_finder_use']:
             self.lr_finder() # Find the best lr 
         
-        logging.info(f'''   Starting training:
-                            Epochs:          {self.conf['epochs']}
-                            Batch size:      {self.conf['batch_size']}
-                            Training size:   {len(self.train_loader)}
-                            Test size:       {len(self.test_loader)}
-                            Device:          {self.device.type}
-                            '''
-                    )
-
-        
-
         val_acc_history = []
         global_step = 0
-        best_model_wts = copy.deepcopy(model.state_dict())
+        best_model_wts = copy.deepcopy(self.model.state_dict())
         best_acc = 0.0
         for e in range(1, self.conf['epochs']):
             since = time.time()
             print("================================")
             print("Epoch number : {}".format(e))
             if 'prunning' in self.conf['model_optimization'] and self.conf['model_optimization']['prunning']:
-                self.conf['model_optimization'].pop('')
                 parameters_to_prune = (
                                         (self.model.down1, 'weight'),
                                         (self.model.down2, 'weight'),
