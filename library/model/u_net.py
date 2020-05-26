@@ -93,8 +93,8 @@ class UNet(nn.Module):
         self.up4 = Up(128, 64, bilinear)
         self.outc = OutConv(64, n_classes)
 
-    def forward(self, x):
-        x1 = self.inc(x)
+    def forward(self, xm, xd):
+        x1 = self.inc(xm)
         x2 = self.down1(x1)
         x3 = self.down2(x2)
         x4 = self.down3(x3)
@@ -103,5 +103,16 @@ class UNet(nn.Module):
         x = self.up2(x, x3)
         x = self.up3(x, x2)
         x = self.up4(x, x1)
-        logits = self.outc(x)
-        return logits
+        mask_logits = self.outc(x)
+
+        x11 = self.inc(xd)
+        x22 = self.down1(x11)
+        x33 = self.down2(x22)
+        x44 = self.down3(x33)
+        x55 = self.down4(x44)
+        x1 = self.up1(x55, x44)
+        x2 = self.up2(x1, x33)
+        x3 = self.up3(x2, x22)
+        x4 = self.up4(x3, x11)
+        depth_logits = self.outc(x4)
+        return mask_logits, depth_logits
