@@ -358,6 +358,7 @@ def sparsity(self):
 The model size before prunning is 787.66 MB , which after prunning becomes 630.56 MB with 20% drop of weights.
 The weights are dropped using L1 norm, which are lowest 20% connections across the model.
 
+
 ## File Structure
 ```
 ├── README.md
