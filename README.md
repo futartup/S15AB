@@ -355,8 +355,11 @@ def sparsity(self):
         )
 ```
 
-The model size before prunning is 787.66 MB , which after prunning becomes 630.56 MB with 20% drop of weights.
+The model size before prunning is 787.66 MB , which after prunning becomes 430.56 MB with 20% drop of weights.
 The weights are dropped using L1 norm, which are lowest 20% connections across the model.
+
+### Dynamic Quantization
+This is a technique which involves the conversion of weights and activations of model from float to int, which results in smaller model size according to [pytorch documentation](https://pytorch.org/tutorials/advanced/dynamic_quantization_tutorial.html). In the documentation LSTM model is used in experiment. However i have to try this method in my model as well.  
 
 
 ## File Structure
