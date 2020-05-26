@@ -230,6 +230,9 @@ Each fg_bg images are passed through [this model](https://github.com/ialhashim/D
 |          depth   | 400K   | | | L|
 |          bg   | 100   | | | RGB|
 
+## Model Optimization
+###Prunning
+
 
 ## File Structure
 ```
