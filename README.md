@@ -362,6 +362,7 @@ The weights are dropped using L1 norm, which are lowest 20% connections across t
 This is a technique which involves the conversion of weights and activations of model from float to int, which results in smaller model size according to [pytorch documentation](https://pytorch.org/tutorials/advanced/dynamic_quantization_tutorial.html). In the documentation LSTM model is used in experiment. However i have to try this method in my model as well.  
 
 
+
 ## File Structure
 ```
 ├── README.md
