@@ -68,7 +68,9 @@ I would also like to thank www.theschoolofai.in to give me this opporthunity to 
 }
 ```
 The json will be validated using jsonschema validator [here](https://github.com/futartup/S15AB/blob/master/train.py)
+
 ## To train the model
+[main.ipynb](https://github.com/futartup/S15AB/blob/master/main.ipynb) can be run in 
 [train.py](https://github.com/futartup/S15AB/blob/master/train.py)
 ```
 !cd S15AB; CUDA_LAUNCH_BLOCKING=1 python3 train.py --h
@@ -88,6 +90,7 @@ optional arguments:
 ```
 
 ## To predict the output
+[main.ipynb](https://github.com/futartup/S15AB/blob/master/main.ipynb) can be run in 
 [predict1.py](https://github.com/futartup/S15AB/blob/master/predict1.py)
 ```
 !cd S15AB; CUDA_LAUNCH_BLOCKING=1 python3 predict1.py --h
@@ -230,6 +233,130 @@ Each fg_bg images are passed through [this model](https://github.com/ialhashim/D
 |          depth   | 400K   | | | L|
 |          bg   | 100   | | | RGB|
 
+## Model Optimization
+### Prunning
+[reference](https://pytorch.org/tutorials/intermediate/pruning_tutorial.html)
+Inspired by real world biological neural activity where neurons die itself but creating more synapses. This is a technique which help heavier models to deploy easily making it lightweight. This also gaurentees privacy with private on device computation. However prunning may occur the accuracy to drops but not much. But still if we can be more smart then this drop in accuracy can be made very small. 
+But many of the deep learning applications seems to be not using this technique so much according to some of the blogs i read.
+Pytorch inbuilt prune class is used in [here](https://github.com/futartup/S15AB/blob/master/train.py). 
+
+Prune ----> Train ----> Test ----> Repeat
+
+```
+for e in range(1, self.conf['epochs']):
+            print("================================")
+            print("Epoch number : {}".format(e))
+            if 'prunning' in self.conf['model_optimization'] and self.conf['model_optimization']['prunning']:
+                self.conf['model_optimization'].pop('')
+                parameters_to_prune = (
+                                        (model.down1, 'weight'),
+                                        (model.down2, 'weight'),
+                                        (model.down3, 'weight'),
+                                        (model.down4, 'weight'),
+                                        (model.up1, 'weight'),
+                                        (model.up2, 'weight'),
+                                        (model.up3, 'weight'),
+                                        (model.up4, 'weight'),
+                                        (model.outc, 'weight'),
+                                      )
+                prune.global_unstructured(
+                                            parameters_to_prune,
+                                            pruning_method=prune.L1Unstructured,
+                                            amount=0.2,
+                                        )
+            self.train(e, train_acc, train_loss, train_loss_decrease, global_step_train)
+            
+            val_loss = self.test(test_acc, tests_loss, test_loss_decrease, global_step_test)
+            self.scheduler.step(val_loss)
+            print("================================")
+```
+Print the sparsity of each layer:
+```
+def sparsity(self):
+        print(
+                "Sparsity in self.model.down1.weight: {:.2f}%".format(
+                    100. * float(torch.sum(self.model.down1.weight == 0))
+                    / float(self.model.down1.weight.nelement())
+                )
+        )
+        print(
+            "Sparsity in self.model.down2.weight: {:.2f}%".format(
+                100. * float(torch.sum(self.model.down2.weight == 0))
+                / float(self.model.down2.weight.nelement())
+            )
+        )
+        print(
+            "Sparsity in self.model.down3.weight: {:.2f}%".format(
+                100. * float(torch.sum(self.model.down3.weight == 0))
+                / float(self.model.down3.weight.nelement())
+            )
+        )
+        print(
+            "Sparsity in self.model.down4.weight: {:.2f}%".format(
+                100. * float(torch.sum(self.model.down4.weight == 0))
+                / float(self.model.down4.weight.nelement())
+            )
+        )
+        print(
+            "Sparsity in self.model.up1.weight: {:.2f}%".format(
+                100. * float(torch.sum(self.model.up1.weight == 0))
+                / float(self.model.up1.weight.nelement())
+            )
+        )
+        print(
+            "Sparsity in self.model.up2.weight: {:.2f}%".format(
+                100. * float(torch.sum(self.model.up2.weight == 0))
+                / float(self.model.up2.weight.nelement())
+            )
+        )
+        print(
+            "Sparsity in self.model.up3.weight: {:.2f}%".format(
+                100. * float(torch.sum(self.model.up3.weight == 0))
+                / float(self.model.up3.weight.nelement())
+            )
+        )
+        print(
+            "Sparsity in self.model.up4.weight: {:.2f}%".format(
+                100. * float(torch.sum(self.model.up4.weight == 0))
+                / float(self.model.up4.weight.nelement())
+            )
+        )
+        print(
+            "Sparsity in self.model.outc.weight: {:.2f}%".format(
+                100. * float(torch.sum(self.model.outc.weight == 0))
+                / float(self.model.outc.weight.nelement())
+            )
+        )
+        print(
+            "Global sparsity: {:.2f}%".format(
+                100. * float(
+                    torch.sum(self.model.down1.weight == 0)
+                    + torch.sum(self.model.down2.weight == 0)
+                    + torch.sum(self.model.down3.weight == 0)
+                    + torch.sum(self.model.down4.weight == 0)
+                    + torch.sum(self.model.up1.weight == 0)
+                    + torch.sum(self.model.up2.weight == 0)
+                    + torch.sum(self.model.up3.weight == 0)
+                    + torch.sum(self.model.up4.weight == 0)
+                    + torch.sum(self.model.outc.weight == 0)
+                )
+                / float(
+                    self.model.down1.weight.nelement()
+                    + self.model.down2.weight.nelement()
+                    + self.model.down3.weight.nelement()
+                    + self.model.down4.weight.nelement()
+                    + self.model.up1.weight.nelement()
+                    + self.model.up2.weight.nelement()
+                    + self.model.up3.weight.nelement()
+                    + self.model.up4.weight.nelement()
+                    + self.model.outc.weight.nelement()
+                )
+            )
+        )
+```
+
+The model size before prunning is 787.66 MB , which after prunning becomes 630.56 MB with 20% drop of weights.
+The weights are dropped using L1 norm, which are lowest 20% connections across the model.
 
 ## File Structure
 ```
