@@ -38,20 +38,17 @@
             {
                 "name": "Blur",
                 "always_apply": false,
-                "blur_limit": (3,7),
                 "p": 0.2
             },
             {
                 "name": "Solarize",
                 "always_apply": false,
-                "threshold": (128, 128),
                 "p": 0.2
             },
             {
                 "name": "GaussNoise",
                 "always_apply": false,
-                "p": 0.2,
-                "var_limit": (10.0, 291.9499816894531)                
+                "p": 0.2
             },
             {
                 "name": "Normalize",
@@ -73,11 +70,13 @@
             ]
         }
     },
-    "model": "unet",
+    "model": "res34_unet",
     "model_initializer": {
-        "n_channels": 3,
-        "n_classes": 1,
+        "unet_classes": 1,
         "bilinear": true
+    },
+    "model_optimization": {
+        "prunning": true
     },
     "log_dir": "/content/drive/My Drive/Colab Notebooks/S15AB/runs/MDME"
 }
