@@ -11,26 +11,23 @@ model_mapping = {
 class GetModel:
     def __init__(self, conf):
         self.conf = conf 
-        self.model = self.return_model()
-        self.get_summary()
 
     def return_model(self):
         if self.conf.get('model') in model_mapping:
             model_name = self.conf.get('model').lower()
         else:
             print("The model names that you can define are resnet18, depth_prediction")
-        model = model_mapping[model_name](**self.conf['model_initializer'])
-        return model
-
-    def get_device(self):
-        return self.device
-
-    def get_summary(self):
+        self.model = model_mapping[model_name](**self.conf['model_initializer'])
         use_cuda = torch.cuda.is_available()
         print(use_cuda)
         if use_cuda:
             torch.cuda.manual_seed(self.conf.get('seed'))
         self.device = torch.device("cuda" if use_cuda else "cpu")
-        model = self.model.to(self.device)
+        model = self.model.to(device=self.device, dtype=torch.float)
         summary(model, input_size=(self.conf['model_initializer']['n_channels'], 
-                                   224, 224))
+                                  224, 224))
+        return model
+        
+    def get_device(self):
+        return self.device
+        
