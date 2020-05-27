@@ -177,7 +177,7 @@ Test Loss
 
 
 ## Data Augmentation
-*** Please note that while mentioning the albumentation names it should exactly matches with the name, case with the documentation, because the name is loaded using globals() magic function. Just to prevent lot of if else condition added that. For eg., Cutout cannot be named as something else as cutout, cutOut etc. It should exactly matches with the name mentioned in albumentation or pytorch library  ***
+***Please note that while mentioning the albumentation names it should exactly matches with the name, case with the documentation, because the name is loaded using globals() magic function. Just to prevent lot of if else condition added that. For eg., Cutout cannot be named as something else as cutout, cutOut etc. It should exactly matches with the name mentioned in albumentation or pytorch library.***
 ### Train dataset
 #### fg_bg images
 ```
