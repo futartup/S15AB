@@ -176,6 +176,50 @@ Test Loss
 ![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/test_loss%20(1).jpg)
 
 
+## Data Augmentation
+### Train dataset
+#### fg_bg images
+```
+{
+    "name": "Cutout",
+    "num_holes":1,
+    "max_h_size": 80, 
+    "max_w_size": 80,
+    "always_apply": true
+},
+{
+    "name": "Blur",
+    "always_apply": false,
+    "p": 0.2
+},
+{
+    "name": "GaussNoise",
+    "always_apply": false,
+    "p": 0.2
+},
+{
+    "name": "Normalize",
+    "mean": [0.429694425216733, 0.43985525255137686, 0.43281280297561686],
+    "std":[0.28715867313016924, 0.266891016687173, 0.26731143118502665],
+    "always_apply": true
+}
+```
+
+#### bg images
+same augmentation applied to fg_bg images
+
+#### mask and depth
+```
+{
+    "name": "Normalize",
+    "mean": [0.4316956210782655, 0.4422608771711209, 0.43416351285063187],
+    "std": [0.2876632239505755, 0.26742029335370965, 0.26840916462077713],
+    "always_apply": true
+}
+```
+
+
+
 ## Creation of dataset
 ### Choosing of background images
 For choosing background images i have choosen the natural scenery images. The scenery images are choosen in such a way that there are very less subjects in the image. I will overlay foreground images on top of these scene images on randon positions. 
