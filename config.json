@@ -72,7 +72,7 @@
         "bilinear": true
     },
     "model_optimization": {
-        "prunning": true
+        "prunning": false
     },
     "log_dir": "/content/drive/My Drive/Colab Notebooks/S15AB/runs/MDME"
 }
