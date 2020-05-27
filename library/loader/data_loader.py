@@ -69,7 +69,7 @@ class DepthDataSet(Dataset):
     self.scale = scale
     self.transform = transform
     self.ids = [file for file in listdir(fg_bg_dir) if not file.startswith('.')]
-    self.bg_images = list(paths.list_images(self.bg_dir))
+    self.bg_images = list(paths.list_images(bg_dir))
 
   def __len__(self):
     return len(self.ids)
