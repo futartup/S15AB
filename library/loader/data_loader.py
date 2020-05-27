@@ -115,7 +115,7 @@ class DepthDataSet(Dataset):
     fg_bg =  self.transform(image=fg_bg)
     #bg =  self.transform(image=bg)
     return {
-            'bg': bg,
+            'bg': bg[:3],
             'image': fg_bg['image'], 
             'mask': torch.from_numpy(np.array(mask)/255), 
             'depth': torch.from_numpy(np.array(depth)/255)
