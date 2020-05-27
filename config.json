@@ -65,9 +65,10 @@
             ]
         }
     },
-    "model": "res34_unet",
+    "model": "unet",
     "model_initializer": {
-        "unet_classes": 1,
+        "n_classes": 1,
+        "n_channels": 3,
         "bilinear": true
     },
     "model_optimization": {
