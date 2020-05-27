@@ -68,7 +68,7 @@
     "model": "unet",
     "model_initializer": {
         "n_classes": 1,
-        "n_channels": 3,
+        "n_channels": 6,
         "bilinear": true
     },
     "model_optimization": {

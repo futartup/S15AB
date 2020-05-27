@@ -119,8 +119,8 @@ class Main:
                         images = torch.cat([fg_bg, bg], dim=1).to(device=self.device, dtype=torch.float)
                         mask_pred, depth_pred = self.model(images)
                         
-                        mask_loss = self.criterion(mask_pred, mask) # the mask loss
-                        depth_loss = self.criterion_depth(depth_pred, depth) # the depth loss
+                        mask_loss = self.criterion(mask_pred, mask.unsqueeze(1)) # the mask loss
+                        depth_loss = self.criterion_depth(depth_pred, depth.unsqueeze(1)) # the depth loss
                         loss = mask_loss + 0.4 * depth_loss
                             
                         if phase == 'train':
