@@ -182,19 +182,19 @@ Test Loss
 #### fg_bg images
 ```
 {
-    "name": "Cutout",
+    "name": "Cutout",  (Used because i want the model to generalize on unseen data)
     "num_holes":1,
     "max_h_size": 80, 
     "max_w_size": 80,
     "always_apply": true
 },
 {
-    "name": "Blur",
+    "name": "Blur", (Used this because sometimes sometimes the camera can shake )
     "always_apply": false,
     "p": 0.2
 },
 {
-    "name": "GaussNoise",
+    "name": "GaussNoise", (Added noise)
     "always_apply": false,
     "p": 0.2
 },
