@@ -1,12 +1,14 @@
-from library.augmentation.data_augmenter import TransfomedDataSet
-import torchvision
 import torch
-from torch.utils.data import Dataset, DataLoader, random_split
-from os.path import splitext
-from os import listdir
-from glob import glob
+import torchvision
 import numpy as np 
+from random import *
 from PIL import Image
+from glob import glob
+from os import listdir
+from imutils import paths
+from os.path import splitext
+from torch.utils.data import Dataset, DataLoader, random_split
+from library.augmentation.data_augmenter import TransfomedDataSet
 
 
 data_dict = {
@@ -63,10 +65,11 @@ class DepthDataSet(Dataset):
     self.fg_bg_dir = fg_bg_dir
     self.mask_dir = mask_dir 
     self.depth_dir = depth_dir 
-    self.bg_dir = bg_dir
+    
     self.scale = scale
     self.transform = transform
     self.ids = [file for file in listdir(fg_bg_dir) if not file.startswith('.')]
+    self.bg_images = list(paths.list_images(self.bg_dir))
 
   def __len__(self):
     return len(self.ids)
@@ -100,7 +103,7 @@ class DepthDataSet(Dataset):
 
     # assert len(mask_file) > 1, "No mask found"
     # assert len(image_file) > 1, "No image found"
-    bg = Image.open(self.bg_dir+ '/'+ idx)
+    bg = Image.open(self.bg_images[randint(1, 100)])
     mask = Image.open(self.mask_dir + '/'+ idx)
     fg_bg = Image.open(self.fg_bg_dir + '/'+ idx)
     depth = Image.open(self.depth_dir + '/'+ idx)
