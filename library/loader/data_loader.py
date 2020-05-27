@@ -104,7 +104,8 @@ class DepthDataSet(Dataset):
     # assert len(mask_file) > 1, "No mask found"
     # assert len(image_file) > 1, "No image found"
     bg = Image.open(self.bg_images[randint(1, 100)])
-    print(bg.mode)
+    if bg.mode == 'RGBA':
+      bg = bg.convert('RGB')
     mask = Image.open(self.mask_dir + '/'+ idx)
     fg_bg = Image.open(self.fg_bg_dir + '/'+ idx)
     depth = Image.open(self.depth_dir + '/'+ idx)
