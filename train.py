@@ -139,7 +139,7 @@ class Main:
                     self.writer.add_images('input/images', fg_bg, global_step)
                     self.writer.add_images('masks/true', mask.unsqueeze(1), global_step)
                     self.writer.add_images('masks/pred', torch.sigmoid(mask_pred) > 0.5, global_step)
-                    self.writer.add_images('masks/depth', depth_pred.unsqueeze(1), global_step)
+                    self.writer.add_images('masks/depth', depth_pred, global_step)
             
             epoch_loss = running_loss / len(self.dataloaders[phase])
             epoch_acc = running_corrects.double() / len(self.dataloaders[phase])
