@@ -158,6 +158,15 @@ This dice loss can be use to test the accuracy of the model.
 
 These loss functions can be defined in [here](https://github.com/futartup/S15AB/blob/master/config.py)
 
+### Experiments which various loss functions
+ Loss function             | Training loss        | 
+| ----------------- | ----------- |
+| Mask - BCEWithLogitsLoss, Depth- SSIM | Mask - 0.0391, Depth - 0.2233|
+| Mask - BCEWithLogitsLoss, Depth - BCEWithLogitsLoss | Mask - 0.0391, Depth - 0.6537 |
+| Mask - SSIM, Depth - SSIM | Mask - 0.4995, Depth - 0.2306 |
+| Mask - MSELoss, Depth - MSELoss | Mask - 0.0057, Depth - 0.0312|
+| Mask - L1Loss, Depth - L1Loss | Mask - 0.0514, Depth - 0.1657|
+  
 ## Loss curves
 Train loss curve for BCEWithLogitsLoss, ReduceLROnPlateau, Adam
 
