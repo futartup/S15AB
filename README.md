@@ -13,6 +13,32 @@ I would also like to thank www.theschoolofai.in to give me this opporthunity to 
 - PyTorch 1.0+
 - GIMP
 
+## Learnings and Challenges
+### Challenges
+- I am completely new into the field so the learning curve is steep.
+- My planning to complete the task was completely unclear.
+- My internet was fluctuating very much these days, so had to work longer.
+- The keysteps identification was not clear.
+- Knowledge of various models was blurry.
+- Though basics was clear , but the application of these knowledges was the key.
+- There were some hidden tricks and the identification of these was the challenges. I can say it as an unseen challenges.
+- Google colab pro is not available in India.
+- My Backpain. But im not going to make it an excuse. May the back pain.
+
+
+### Learnings
+- The first and foremost learning is that , couple of days ago somewhere i came to read the quote ***"The job well begun is half done"***. I realized this quote to the bone of my spine. The data management is the key to get very good results. Prepare the data with utmost energy and never compromise on that. 
+- The model should be good. I tried with UNet and mix of resnet34 + UNet. There are lot of factors for which i cannot make the model very heavy as the time is fix.
+- There are many corner cases from start to end. We have to take care all of these. Right from data preparation to final output there are many situations which we have to take care. For eg., as you dataset is very large , you can have many techniques through which you can send your data to google drive. 
+- Patience is very important to try out many combination of models. Try from the simple one.
+- Domain knowledge is very important. The environment form where the inputs will come, if we can have the knowledge of that then it will be very good.
+- Data transformations are important.
+
+### Mistakes
+- The printing of the output is not very proper.
+- I didn't tried from simpler models. I tried only with UNet and mix of resnet34 + UNet.
+- The experimentation on resnet34 + UNet mix model is very less.
+
 ## Configuration file
 
 [config](https://github.com/futartup/S15AB/blob/master/config.py)
