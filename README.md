@@ -168,7 +168,7 @@ These loss functions can be defined in [here](https://github.com/futartup/S15AB/
 | Mask - L1Loss, Depth - L1Loss | Mask - 0.0514, Depth - 0.1657|
   
 ## Loss curves
-Train loss curve for BCEWithLogitsLoss, ReduceLROnPlateau, Adam
+Mask = BCEWithLogitsLoss, Depth=MSELoss, Scheduler=ReduceLROnPlateau, Optimizer=Adam
 
 Train Loss
 <img src='https://github.com/futartup/S15AB/blob/master/raw_images/train_loss%20(1).jpg' width="200" height="200">
