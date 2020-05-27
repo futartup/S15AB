@@ -189,7 +189,7 @@ Test Loss
     "always_apply": true
 },
 {
-    "name": "Blur", (Used this because sometimes sometimes the camera can shake )
+    "name": "Blur", (Used this because sometimes the camera can shake )
     "always_apply": false,
     "p": 0.2
 },
