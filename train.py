@@ -126,7 +126,7 @@ class Main:
                         if phase == 'train':
                             loss.backward()
                             self.optimizer.step()
-                            self.scheduler.step()
+                            self.scheduler.step(loss)
 
                     running_loss += loss.item()
                     _, predicted_mask = torch.max(mask_pred.data, 1)
