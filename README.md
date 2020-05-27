@@ -170,10 +170,10 @@ These loss functions can be defined in [here](https://github.com/futartup/S15AB/
 ## Loss curves
 Train loss curve for BCEWithLogitsLoss, ReduceLROnPlateau, Adam
 
-![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/train_loss%20(1).jpg =100*100)
+![alt-text-1]<img src='https://github.com/futartup/S15AB/blob/master/raw_images/train_loss%20(1).jpg' width="100" height="100">
 
 Test Loss
-![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/test_loss%20(1).jpg =100*100)
+![alt-text-1]<img src='https://github.com/futartup/S15AB/blob/master/raw_images/test_loss%20(1).jpg' width="100" height="100">
 
 
 ## Data Augmentation
