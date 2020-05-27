@@ -100,7 +100,7 @@ class DepthDataSet(Dataset):
 
     # assert len(mask_file) > 1, "No mask found"
     # assert len(image_file) > 1, "No image found"
-
+    bg = Image.open(self.bg_dir+ '/'+ idx)
     mask = Image.open(self.mask_dir + '/'+ idx)
     fg_bg = Image.open(self.fg_bg_dir + '/'+ idx)
     depth = Image.open(self.depth_dir + '/'+ idx)
@@ -110,7 +110,9 @@ class DepthDataSet(Dataset):
     #mask = self.preprocess(mask, self.scale)
     #depth = self.preprocess(depth, self.scale)
     fg_bg =  self.transform(image=fg_bg)
+    bg =  self.transform(image=bg)
     return {
+            'bg': bg['image'],
             'image': fg_bg['image'], 
             'mask': torch.from_numpy(np.array(mask)/255), 
             'depth': torch.from_numpy(np.array(depth)/255)
