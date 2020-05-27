@@ -116,7 +116,7 @@ class Main:
                         # Get the model inputs, which are fg_bg and bg.
                         # 
                         # Send the images to model, and get the output
-                        images = torch.cat([fg_bg, bg], dim=1)
+                        images = torch.cat([fg_bg, bg], dim=1).to(self.device)
                         mask_pred, depth_pred = self.model(images)
                         
                         mask_loss = self.criterion(mask_pred, mask) # the mask loss
