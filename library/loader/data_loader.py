@@ -112,7 +112,7 @@ class DepthDataSet(Dataset):
     #assert image.size == mask.size
     #img = self.preprocess(image, self.scale)
     #mask = self.preprocess(mask, self.scale)
-    bg = self.preprocess(depth, self.scale)
+    bg = self.preprocess(bg, self.scale)
     fg_bg =  self.transform(image=fg_bg)
     #bg =  self.transform(image=bg)
     return {
