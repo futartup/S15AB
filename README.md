@@ -150,7 +150,7 @@ optional arguments:
 
 
 ## Constructing the model architecture
-To solve this problem i have implemented UNet with total trainable params of 31, 043, 521.
+To solve this problem i have implemented UNet with total trainable params of 10, 043, 321.
 The model code can be found [here](https://github.com/futartup/S15AB/blob/master/library/model/u_net.py)
 ![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/model_diagram_res_unet.jpg)
 
