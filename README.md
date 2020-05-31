@@ -148,7 +148,7 @@ optional arguments:
 ## Output images
 | Input image             | Depth Output       | Mask Output |
 |-------------------------| -------------------| -------------|
-|![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/input.jpg)| ![alt-text-1(https://github.com/futartup/S15AB/blob/master/raw_images/depth.jpg) |![alt-text-1(https://github.com/futartup/S15AB/blob/master/raw_images/mask.jpg)|
+|<img src='https://github.com/futartup/S15AB/blob/master/raw_images/input.jpg' width="20" height="20">|<img src='https://github.com/futartup/S15AB/blob/master/raw_images/depth.jpg' width="20" height="20">|<img src='https://github.com/futartup/S15AB/blob/master/raw_images/mask.jpg' width="20" height="20">|
 
 
 ## Constructing the model architecture
