@@ -152,7 +152,7 @@ optional arguments:
 ## Constructing the model architecture
 To solve this problem i have implemented UNet with total trainable params of 10, 043, 321.
 The model code can be found [here](https://github.com/futartup/S15AB/blob/master/library/model/u_net.py)
-![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/model_diagram_res_unet.jpg)
+![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/model_diagram_res_unet1.jpg)
 
 There is another implemention of mixed model of resnet34 and UNet. The encoder part is the resnet34 and the decoder part is the UNet. The model is implemented [here](https://github.com/futartup/S15AB/blob/master/library/model/res_u_net.py). The reason for choosing resnet34 is that it is light and serves most of the purpose. The resnet34 can be transfer learned. 
 
