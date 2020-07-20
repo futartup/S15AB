@@ -65,11 +65,9 @@
             ]
         }
     },
-    "model": "unet",
+    "model": "mobilenet_v2",
     "model_initializer": {
-        "n_classes": 1,
-        "n_channels": 6,
-        "bilinear": true
+       
     },
     "model_optimization": {
         "prunning": false

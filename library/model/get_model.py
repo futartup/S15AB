@@ -2,10 +2,12 @@ import torch
 from torchsummary import summary
 from library.model.resnet18 import ResNet18
 from library.model.u_net import UNet
+from library.model.mobilenet_v2 import mobilenet_v2
 
 model_mapping = {
     "resnet18": ResNet18,
     "unet": UNet,
+    "mobilenet_v2": mobilenet_v2,
 }
 
 class GetModel:
