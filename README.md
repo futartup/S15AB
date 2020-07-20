@@ -1,5 +1,5 @@
 # Mask and Monocular depth Prediction ( S15A and S15 )
-[paper implementation U-Net](https://arxiv.org/abs/1505.04597)
+Initial model idea is taken from [paper implementation U-Net](https://arxiv.org/abs/1505.04597). The model is customized to take 2 inputs and 2 outputs.
 This repo is to detect cars in video. The goal is to segment vehicle in images as well as monocular depth estimation. I have created my own dataset.
 
 ## Acknowledgements
@@ -146,13 +146,15 @@ optional arguments:
 ```
 
 ## Output images
-![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/output.jpg)
+| Input image             | Depth Output       | Mask Output |
+|-------------------------| -------------------| -------------|
+|<img src='https://github.com/futartup/S15AB/blob/master/raw_images/input.jpg' width="200" height="200">|<img src='https://github.com/futartup/S15AB/blob/master/raw_images/depth.jpg' width="200" height="200">|<img src='https://github.com/futartup/S15AB/blob/master/raw_images/mask.jpg' width="200" height="200">|
 
 
 ## Constructing the model architecture
-To solve this problem i have implemented UNet with total trainable params of 31, 043, 521.
+To solve this problem i have implemented UNet with total trainable params of 10, 043, 321.
 The model code can be found [here](https://github.com/futartup/S15AB/blob/master/library/model/u_net.py)
-![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/unet.png)
+![alt-text-1](https://github.com/futartup/S15AB/blob/master/raw_images/model_diagram_res_unet1.jpg)
 
 There is another implemention of mixed model of resnet34 and UNet. The encoder part is the resnet34 and the decoder part is the UNet. The model is implemented [here](https://github.com/futartup/S15AB/blob/master/library/model/res_u_net.py). The reason for choosing resnet34 is that it is light and serves most of the purpose. The resnet34 can be transfer learned. 
 
