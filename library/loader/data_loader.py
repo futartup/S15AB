@@ -1,3 +1,4 @@
+import os
 import torch
 import torchvision
 import numpy as np 
@@ -18,17 +19,33 @@ data_dict = {
 
 
 class DepthDataLoader:
-  def __init__(self, conf, fg_bg_dir, mask_dir, depth_dir, bg_dir,  test_data_percentage):
+  def __init__(self, conf, flying_birds_d, large_quadcopters_d, small_quadcopters_d, winged_drones_d,  test_data_percentage):
     self.conf = conf  
-    self.train = DepthDataSet(conf, fg_bg_dir+ '/train', 
-                                    mask_dir+'/train', 
-                                    depth_dir+'/train', 
-                                    bg_dir,
+
+    # We will make the dataset in here
+    flying_birds = os.listdir(flying_birds_d)
+    large_quadcopters = os.listdir(large_quadcopters_d)
+    small_quadcopters = os.listdir(small_quadcopters_d)
+    winged_drones = os.listdir(winged_drones_d)
+
+    # Store all the results into final_data
+    flying_birds = [{'class': 0.1, 'image': flying_birds_d + '/' + x} for x in flying_birds] 
+    large_quadcopters = [{'class': 0.2, 'image': large_quadcopters_d + '/' + x} for x in large_quadcopters] 
+    small_quadcopters = [{'class': 0.3, 'image': small_quadcopters_d + '/' + x} for x in small_quadcopters] 
+    winged_drones = [{'class': 0.4, 'image': winged_drones_d + '/' + x} for x in winged_drones]
+    final_list = flying_birds + large_quadcopters + small_quadcopters + winged_drones
+    shuffle(final_list)
+
+    l = len(final_list)
+    x = int(l * test_data_percentage)
+    train_data, test_data = final_list[0:x], final_list[x+1:l-1]
+
+    print(train_data, test_data)
+    
+
+    self.train = DepthDataSet(conf, train_data,
                                     transform=TransfomedDataSet(self.conf['transformations']['train']))
-    self.test = DepthDataSet(conf, fg_bg_dir+ '/test', 
-                                    mask_dir+'/test', 
-                                    depth_dir+'/test', 
-                                    bg_dir,
+    self.test = DepthDataSet(conf, test_data,
                                     transform=TransfomedDataSet(self.conf['transformations']['test']))
     print(len(self.train))
     print(len(self.test))
@@ -53,7 +70,7 @@ class DepthDataLoader:
 class DepthDataSet(Dataset):
   """ Dataset for Depth and mask prediction """
 
-  def __init__(self, conf, fg_bg_dir, mask_dir, depth_dir, bg_dir, transform=None, scale=1):
+  def __init__(self, conf, data, transform=None, scale=1):
     """
     Args:
         conf = configuration file
@@ -62,14 +79,14 @@ class DepthDataSet(Dataset):
         transformation: transformations applied on that image
     """
     self.conf = conf
-    self.fg_bg_dir = fg_bg_dir
-    self.mask_dir = mask_dir 
-    self.depth_dir = depth_dir 
+    #self.fg_bg_dir = fg_bg_dir
+    #self.mask_dir = mask_dir 
+    #self.depth_dir = depth_dir 
     
     self.scale = scale
     self.transform = transform
-    self.ids = [file for file in listdir(fg_bg_dir) if not file.startswith('.')]
-    self.bg_images = list(paths.list_images(bg_dir))
+    self.ids = data
+    #self.bg_images = list(paths.list_images(bg_dir))
 
   def __len__(self):
     return len(self.ids)
@@ -103,20 +120,19 @@ class DepthDataSet(Dataset):
 
     # assert len(mask_file) > 1, "No mask found"
     # assert len(image_file) > 1, "No image found"
-    bg = Image.open(self.bg_images[randint(1, 100)])
-    mask = Image.open(self.mask_dir + '/'+ idx)
-    fg_bg = Image.open(self.fg_bg_dir + '/'+ idx)
-    depth = Image.open(self.depth_dir + '/'+ idx)
+    pil_image = Image.open(os.getcwd() + '/' + idx['image'])
+    #mask = Image.open(self.mask_dir + '/'+ idx)
+    #fg_bg = Image.open(self.fg_bg_dir + '/'+ idx)
+    #depth = Image.open(self.depth_dir + '/'+ idx)
     #if image.size != mask.size:
     #assert image.size == mask.size
     #img = self.preprocess(image, self.scale)
     #mask = self.preprocess(mask, self.scale)
-    bg = self.preprocess(bg, self.scale)
-    fg_bg =  self.transform(image=fg_bg)
+    #bg = self.preprocess(bg, self.scale)
+    image =  self.transform(image=pil_image)
+    
     #bg =  self.transform(image=bg)
     return {
-            'bg': bg,
-            'image': fg_bg['image'], 
-            'mask': torch.from_numpy(np.array(mask)/255), 
-            'depth': torch.from_numpy(np.array(depth)/255)
+            'image': image['image'], 
+            'class': idx['class'],
            }
