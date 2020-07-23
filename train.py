@@ -45,8 +45,8 @@ class Main:
         self.data_dir = data_dir
         self.get_loaders() # get the test and train loaders
         self.load_model = load_model
-        self.criterion = globals()[self.conf['loss']['mask'][0]]()
-        self.criterion_depth = globals()[self.conf['loss']['depth'][0]]()
+        self.criterion = globals()[self.conf['loss']['l1'][0]]()
+        #self.criterion_depth = globals()[self.conf['loss']['depth'][0]]()
         self.get_model()
         
         if not hasattr(self, 'optimizer'):
@@ -62,7 +62,7 @@ class Main:
         if self.conf['lr_finder_use']:
             self.lr_finder() # Find the best lr 
         
-        val_acc_history = []
+        #val_acc_history = []
         global_step = 0
         best_model_wts = copy.deepcopy(self.model.state_dict())
         best_acc = 0.0
@@ -102,10 +102,11 @@ class Main:
                 running_corrects = 0
 
                 for batch in self.dataloaders[phase]:
-                    bg = batch['bg'].to(device=self.device, dtype=torch.float) # bg images
-                    fg_bg = batch['image'].to(device=self.device, dtype=torch.float) # fg_bg images
-                    mask = batch['mask'].to(device=self.device, dtype=torch.float) # the mask images
-                    depth = batch['depth'].to(device=self.device, dtype=torch.float) # the depth images produced from densedepth
+                    image = batch['image'].to(device=self.device, dtype=torch.float) # bg images
+                    target = batch['class'].to(device=self.device, dtype=torch.long) # class label assigned to the image
+                    #fg_bg = batch['image'].to(device=self.device, dtype=torch.float) # fg_bg images
+                    #mask = batch['mask'].to(device=self.device, dtype=torch.float) # the mask images
+                    #depth = batch['depth'].to(device=self.device, dtype=torch.float) # the depth images produced from densedepth
 
                     # make the parameter gradients zero
                     self.optimizer.zero_grad()
@@ -116,12 +117,12 @@ class Main:
                         # Get the model inputs, which are fg_bg and bg.
                         # 
                         # Send the images to model, and get the output
-                        images = torch.cat([fg_bg, bg], dim=1).to(device=self.device, dtype=torch.float)
-                        mask_pred, depth_pred = self.model(images)
-                        
-                        mask_loss = self.criterion(mask_pred, mask.unsqueeze(1)) # the mask loss
-                        depth_loss = self.criterion_depth(depth_pred, depth.unsqueeze(1)) # the depth loss
-                        loss = mask_loss + 0.4 * depth_loss
+                        #images = torch.cat([fg_bg, bg], dim=1).to(device=self.device, dtype=torch.float)
+                        output = self.model(image)
+                      
+                        loss = self.criterion(output, target) # the loss
+                        #depth_loss = self.criterion_depth(depth_pred, depth.unsqueeze(1)) # the depth loss
+                        #loss = mask_loss + 0.4 * depth_loss
                             
                         if phase == 'train':
                             loss.backward()
@@ -129,20 +130,21 @@ class Main:
                             self.scheduler.step(loss)
 
                     running_loss += loss.item()
-                    _, predicted_mask = torch.max(mask_pred.data, 1)
-                    _, predicted_depth = torch.max(depth_pred.data, 1)
+                    _, predicted = torch.max(output, 1)
+                    #_, predicted_depth = torch.max(depth_pred.data, 1)
                     
-                    total += mask.nelement() + depth.nelement()
-                    running_corrects += predicted_mask.eq(mask.data).sum().item() + predicted_depth.eq(depth.data).sum().item()
+                    #total += mask.nelement() 
+                    running_corrects += (predicted == target).sum().item()
             
                     # write to tensorboard
-                    self.writer.add_images('input/images', fg_bg, global_step)
-                    self.writer.add_images('masks/true', mask.unsqueeze(1), global_step)
-                    self.writer.add_images('masks/pred', torch.sigmoid(mask_pred) > 0.5, global_step)
-                    self.writer.add_images('masks/depth', depth_pred, global_step)
+                    self.writer.add_images('input/images', image, global_step)
+                    #self.writer.add_images('masks/true', mask.unsqueeze(1), global_step)
+                    #self.writer.add_images('masks/pred', torch.sigmoid(mask_pred) > 0.5, global_step)
+                    #self.writer.add_images('masks/depth', depth_pred, global_step)
             
             epoch_loss = running_loss / len(self.dataloaders[phase])
-            epoch_acc = running_corrects.double() / len(self.dataloaders[phase])
+            epoch_acc = running_corrects / len(self.dataloaders[phase])
+            print(epoch_acc)
             
             # Load to tesnsorboard
             self.writer.add_scalar('Loss/{}'.format(phase), epoch_loss, global_step)
@@ -160,19 +162,14 @@ class Main:
                         'state_dict': self.model.state_dict(),
                         'optimizer': self.optimizer.state_dict()
                      }
-                torch.save(checkpoint, current_directory + '/saved-models/epoch_{1}_{2}_{3}.pth'.format( 
-                                                                                                         self.conf['epochs'], 
-                                                                                                         datetime.now(), 
-                                                                                                         uuid.uuid4())
-                                                                                                       )
+                torch.save(checkpoint, current_directory + '/saved-models/mobilenet-v2.pth')
             time_elapsed = time.time() - since
             print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
             global_step += 1
             print("================================")
 
         print('Best val Acc: {:4f}'.format(best_acc))
-        self.plot_graphs(train_loss, tests_loss, train_acc, test_acc)
-        
+        #self.plot_graphs(train_loss, tests_loss, train_acc, test_acc)
         self.writer.close()
 
     def sparsity(self):
@@ -291,10 +288,10 @@ class Main:
 
     def get_loaders(self):
         obj = DepthDataLoader(self.conf, 
-                              self.data_dir + '/fg_bg', 
-                              self.data_dir + '/mask',  
-                              self.data_dir + '/depth',
-                              self.data_dir + '/bg',
+                              self.data_dir + '/Flying Birds', 
+                              self.data_dir + '/Large QuadCopters',  
+                              self.data_dir + '/Small QuadCopters',
+                              self.data_dir + '/Winged Drones',
                               .30)
         #self.train_loader = obj.get_train_loader()
         #self.test_loader = obj.get_test_loader()
@@ -303,93 +300,6 @@ class Main:
         self.dataloaders['test'] = obj.get_test_loader()
         print("Total length of train and test is : {} and {}".format(len(self.dataloaders['train']), len(self.dataloaders['test'])))
 
-    def test(self, test_acc, tests_loss, test_loss_decrease, global_step_test):
-        self.model.eval()
-        test_loss = 0
-        #correct = 0
-        pbar = tqdm(self.test_loader)
-        length = len(self.test_loader)
-        print("Length of test loader is {}".format(length))
-
-        with torch.no_grad():
-            for batch in pbar:
-                images, mask, depth = batch['image'], batch['mask'], batch['depth']
-
-                images = images.to(device=self.device, dtype=torch.float32)
-                #mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
-                #mask = mask.to(device=self.device, dtype=torch.float32)
-                depth = depth.to(device=self.device, dtype=torch.float32)
-
-                mask_pred = self.model(images)
-                #pred = torch.sigmoid(mask_pred)
-                #pred = (pred > 0.5).float()
-                #loss = dice_coeff(pred, mask)
-                #loss_m = self.criterion(mask_pred, mask.unsqueeze(1)) 
-                loss_d = self.criterion_depth(mask_pred.view(depth.size()), depth)
-
-                test_loss += loss_d.item()
-                tests_loss.append(test_loss)
-                
-                self.writer.add_scalar('Loss/test', test_loss, global_step_test)
-
-                accuracy = 100 * (test_loss/length)
-
-                pbar.set_description(desc= f'Loss={test_loss} Loss={accuracy:0.2f}')
-                test_acc.append(test_loss)
-                global_step_test += 1
-        self.model.train()
-        return test_loss
-  
-    def train(self, epoch, train_acc, train_los, train_loss_decrease, global_step_train):
-        self.model.train()
-        pbar = tqdm(self.train_loader)
-        train_loss = 0
-        #train_acc = []
-        length = len(self.train_loader)
-        print("Length of train loader is {}".format(length))
-        device = self.device
-        self.model.to(self.device)
-        for batch in pbar:
-            # get samples
-            images = batch['image'] # fg_bg images
-            #mask = batch['mask'] # the mask images
-            depth = batch['depth'] # the depth images produced from densedepth
-
-            images = images.to(device=self.device, dtype=torch.float)
-            #mask_type = torch.float32 if self.model.n_classes == 1 else torch.long
-            #mask = mask.to(device=device, dtype=torch.float32)
-            depth = depth.to(device=device, dtype=torch.float32)
-
-            mask_pred = self.model(images)
-            #loss_m = self.criterion(mask_pred, mask.unsqueeze(1)) 
-            loss_d = self.criterion(mask_pred, depth.unsqueeze(1))
-            #final_loss = loss_d
-            train_los.append(loss_d)
-            #loss_depth = self.criterion(mask_pred, depth)
-            #loss = loss_mask 
-
-            train_loss_decrease += loss_d.item()
-            
-            self.writer.add_scalar('Loss/train', train_loss_decrease, global_step_train)
-            #self.writer.add_scalar('LR/train', torch.tensor(self.scheduler.get_last_lr()), global_step_train)
-            
-            self.optimizer.zero_grad()
-            
-            loss_d.backward()
-            
-            self.optimizer.step()
-            #self.scheduler.step()
-            
-            accuracy = 100*(train_loss_decrease/length)
-            pbar.set_description(desc= f'Loss={loss_d.item()} Loss ={accuracy:0.2f}')
-            train_acc.append(accuracy)
-            self.writer.add_images('masks/images', images, global_step_train)
-            #self.writer.add_images('masks/true', mask.unsqueeze(1), global_step_train)
-            self.writer.add_images('masks/pred', torch.sigmoid(mask_pred)*255, global_step_train)
-            self.writer.add_images('masks/depth', depth.unsqueeze(1), global_step_train)
-            global_step_train += 1   
-                     
-    
     def get_optimizer(self):
         optimizer = globals()[self.conf['optimizer']['type']]
         self.conf['optimizer'].pop('type')

@@ -10,7 +10,7 @@
     "num_workers": 2,
     "lr_step_size": 25,
     "lr_gamma": 0.001,
-    "loss": { "mask": ["BCEWithLogitsLoss"], "depth": ["MSELoss"]},
+    "loss": { "l1": ["CrossEntropyLoss"]},
     "lr_finder": {
         "optimizer": {"lr": 1e-5},
         "range_test": {"end_lr":100, "step_mode": "exp"}
@@ -28,6 +28,13 @@
         "train": {
             "which": "albumentation",
             "what": [
+            {
+                "name": "Resize",
+                "height":224,
+                "width": 224, 
+                "p": 1,
+                "always_apply": true
+            },
             {
                 "name": "Cutout",
                 "num_holes":1,
@@ -57,6 +64,13 @@
             "which": "albumentation",
             "what": [
                 {
+                    "name": "Resize",
+                    "height":224,
+                    "width": 224, 
+                    "p": 1,
+                    "always_apply": true
+                },
+                {
                     "name": "Normalize",
                     "mean": [0.4316956210782655, 0.4422608771711209, 0.43416351285063187],
                     "std": [0.2876632239505755, 0.26742029335370965, 0.26840916462077713],
@@ -72,5 +86,5 @@
     "model_optimization": {
         "prunning": false
     },
-    "log_dir": "/content/drive/My Drive/Colab Notebooks/S15AB/runs/MDME"
+    "log_dir": "/Users/anupgogoi/Documents/GitHub/S15AB"
 }
