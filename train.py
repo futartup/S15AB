@@ -118,7 +118,7 @@ class Main:
                         # 
                         # Send the images to model, and get the output
                         #images = torch.cat([fg_bg, bg], dim=1).to(device=self.device, dtype=torch.float)
-                        output = self.model(image.unsqueeze(1).permute(0, 1, 3, 2))
+                        output = self.model(image)
                         
                         loss = self.criterion(output, target) # the loss
                         #depth_loss = self.criterion_depth(depth_pred, depth.unsqueeze(1)) # the depth loss
@@ -135,7 +135,7 @@ class Main:
                         running_corrects += (predicted == target).sum().item()
             
                         # write to tensorboard
-                        self.writer.add_images('input/images', image.permute(0, 3, 1, 2), global_step)
+                        self.writer.add_images('input/images', image, global_step)
                         #self.writer.add_images('masks/true', mask.unsqueeze(1), global_step)
                         #self.writer.add_images('masks/pred', torch.sigmoid(mask_pred) > 0.5, global_step)
                         #self.writer.add_images('masks/depth', depth_pred, global_step)
