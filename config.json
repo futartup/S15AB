@@ -2,9 +2,9 @@
     "seed": 1,
     "lr": 0.001,
     "data": "custom",
-    "num_workers": 2,
+    "num_workers": 1,
     "shuffle": true,
-    "epochs": 20,
+    "epochs": 2,
     "multiclass": true,
     "batch_size": 10,
     "num_workers": 2,
@@ -51,12 +51,6 @@
                 "name": "GaussNoise",
                 "always_apply": false,
                 "p": 0.2
-            },
-            {
-                "name": "Normalize",
-                "mean": [0.429694425216733, 0.43985525255137686, 0.43281280297561686],
-                "std":[0.28715867313016924, 0.266891016687173, 0.26731143118502665],
-                "always_apply": true
             }
         ]
         },
@@ -68,12 +62,6 @@
                     "height":224,
                     "width": 224, 
                     "p": 1,
-                    "always_apply": true
-                },
-                {
-                    "name": "Normalize",
-                    "mean": [0.4316956210782655, 0.4422608771711209, 0.43416351285063187],
-                    "std": [0.2876632239505755, 0.26742029335370965, 0.26840916462077713],
                     "always_apply": true
                 }
             ]

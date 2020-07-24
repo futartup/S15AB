@@ -122,25 +122,24 @@ class DepthDataSet(Dataset):
     # assert len(image_file) > 1, "No image found"
     # avoid svg images
     pil_image = Image.open(idx['image'])
-    if pil_image.mode in ['RGBA']:
+    print(pil_image.mode)
+    if pil_image.mode in ['RGBA', 'RGB']:
       pil_image = pil_image.convert('RGB')
-    elif pil_image.mode in ['L', 'P']:
-      pil_image - Image.new('RGB', (224, 224), color=0)
-      print(pil_image.mode)
+    
 
     
-    #mask = Image.open(self.mask_dir + '/'+ idx)
-    #fg_bg = Image.open(self.fg_bg_dir + '/'+ idx)
-    #depth = Image.open(self.depth_dir + '/'+ idx)
-    #if image.size != mask.size:
-    #assert image.size == mask.size
-    #img = self.preprocess(image, self.scale)
-    #mask = self.preprocess(mask, self.scale)
-    #bg = self.preprocess(bg, self.scale)
-    image =  self.transform(image=pil_image)
-    
-    #bg =  self.transform(image=bg)
-    return {
-            'image': image['image'], 
-            'class': idx['class'],
-           }
+      #mask = Image.open(self.mask_dir + '/'+ idx)
+      #fg_bg = Image.open(self.fg_bg_dir + '/'+ idx)
+      #depth = Image.open(self.depth_dir + '/'+ idx)
+      #if image.size != mask.size:
+      #assert image.size == mask.size
+      #img = self.preprocess(image, self.scale)
+      #mask = self.preprocess(mask, self.scale)
+      #bg = self.preprocess(bg, self.scale)
+      image =  self.transform(image=pil_image)
+      
+      #bg =  self.transform(image=bg)
+      return {
+              'image': image['image'], 
+              'class': idx['class'],
+            }
