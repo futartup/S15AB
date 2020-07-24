@@ -122,8 +122,11 @@ class DepthDataSet(Dataset):
     # assert len(image_file) > 1, "No image found"
     # avoid svg images
     pil_image = Image.open(idx['image'])
-    if pil_image.mode in ['RGBA', 'L', 'P']:
+    if pil_image.mode in ['RGBA']:
       pil_image = pil_image.convert('RGB')
+    elif pil_image.mode in ['L', 'P']:
+      pil_image - Image.new('RGB', (224, 224), color=0)
+      print(pil_image.mode)
 
     
     #mask = Image.open(self.mask_dir + '/'+ idx)
