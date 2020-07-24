@@ -129,18 +129,16 @@ class Main:
                             self.optimizer.step()
                             self.scheduler.step(loss)
 
-                    running_loss += loss.item()
-                    _, predicted = torch.max(output, 1)
-                    #_, predicted_depth = torch.max(depth_pred.data, 1)
+                        running_loss += loss.item() * image.size(0)
+                        _, predicted = torch.max(output, 1)
                     
-                    #total += mask.nelement() 
-                    running_corrects += (predicted == target).sum().item()
+                        running_corrects += (predicted == target).sum().item()
             
-                    # write to tensorboard
-                    self.writer.add_images('input/images', image.permute(0, 3, 1, 2), global_step)
-                    #self.writer.add_images('masks/true', mask.unsqueeze(1), global_step)
-                    #self.writer.add_images('masks/pred', torch.sigmoid(mask_pred) > 0.5, global_step)
-                    #self.writer.add_images('masks/depth', depth_pred, global_step)
+                        # write to tensorboard
+                        self.writer.add_images('input/images', image.permute(0, 3, 1, 2), global_step)
+                        #self.writer.add_images('masks/true', mask.unsqueeze(1), global_step)
+                        #self.writer.add_images('masks/pred', torch.sigmoid(mask_pred) > 0.5, global_step)
+                        #self.writer.add_images('masks/depth', depth_pred, global_step)
             
                 epoch_loss = running_loss / len(self.dataloaders[phase])
                 epoch_acc = running_corrects / len(self.dataloaders[phase])
@@ -163,10 +161,10 @@ class Main:
                             'optimizer': self.optimizer.state_dict()
                         }
                     torch.save(checkpoint, current_directory + '/saved-models/mobilenet-v2.pth')
-                time_elapsed = time.time() - since
-                print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
-                global_step += 1
-                print("================================")
+            global_step += 1
+        time_elapsed = time.time() - since
+        print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
+        print("================================")
 
         print('Best val Acc: {:4f}'.format(best_acc))
         #self.plot_graphs(train_loss, tests_loss, train_acc, test_acc)
