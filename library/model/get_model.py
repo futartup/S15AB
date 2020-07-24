@@ -26,7 +26,7 @@ class GetModel:
             torch.cuda.manual_seed(self.conf.get('seed'))
         self.device = torch.device("cuda" if use_cuda else "cpu")
         model = self.model.to(device=self.device, dtype=torch.float)
-        summary(model, input_size=(1, 224, 224))
+        summary(model, input_size=(3, 224, 224))
         return model
         
     def get_device(self):
