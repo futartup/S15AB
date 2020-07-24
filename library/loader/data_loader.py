@@ -53,7 +53,7 @@ class DepthDataLoader:
     return torch.utils.data.DataLoader(self.train, 
                                        batch_size=self.conf.get('batch_size', 64),
                                        shuffle=self.conf.get('shuffle', True), 
-                                       num_workers=self.conf.get('num_workers', 2),
+                                       #num_workers=self.conf.get('num_workers', 2),
                                        pin_memory=self.conf.get('pin_memory', True)
                                        )
     
@@ -61,7 +61,7 @@ class DepthDataLoader:
     return torch.utils.data.DataLoader(self.test, 
                                        batch_size=self.conf.get('batch_size', 64),
                                        shuffle=self.conf.get('shuffle', True), 
-                                       num_workers=self.conf.get('num_workers', 2),
+                                       #num_workers=self.conf.get('num_workers', 2),
                                        pin_memory=self.conf.get('pin_memory', True)
                                        )
 
