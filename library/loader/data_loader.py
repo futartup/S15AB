@@ -123,6 +123,7 @@ class DepthDataSet(Dataset):
     pil_image = Image.open(idx['image'])
     if pil_image.mode in ['RGBA', 'RGB']:
       pil_image = pil_image.convert('L')
+
     
     #mask = Image.open(self.mask_dir + '/'+ idx)
     #fg_bg = Image.open(self.fg_bg_dir + '/'+ idx)

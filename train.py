@@ -118,8 +118,8 @@ class Main:
                         # 
                         # Send the images to model, and get the output
                         #images = torch.cat([fg_bg, bg], dim=1).to(device=self.device, dtype=torch.float)
-                        output = self.model(image)
-                      
+                        output = self.model(image.unsqueeze(1).permute(0, 1, 3, 2))
+                        
                         loss = self.criterion(output, target) # the loss
                         #depth_loss = self.criterion_depth(depth_pred, depth.unsqueeze(1)) # the depth loss
                         #loss = mask_loss + 0.4 * depth_loss
@@ -137,36 +137,36 @@ class Main:
                     running_corrects += (predicted == target).sum().item()
             
                     # write to tensorboard
-                    self.writer.add_images('input/images', image, global_step)
+                    self.writer.add_images('input/images', image.permute(0, 3, 1, 2), global_step)
                     #self.writer.add_images('masks/true', mask.unsqueeze(1), global_step)
                     #self.writer.add_images('masks/pred', torch.sigmoid(mask_pred) > 0.5, global_step)
                     #self.writer.add_images('masks/depth', depth_pred, global_step)
             
-            epoch_loss = running_loss / len(self.dataloaders[phase])
-            epoch_acc = running_corrects / len(self.dataloaders[phase])
-            print(epoch_acc)
-            
-            # Load to tesnsorboard
-            self.writer.add_scalar('Loss/{}'.format(phase), epoch_loss, global_step)
-            self.writer.add_scalar('Loss/{}'.format(phase), epoch_acc, global_step)
+                epoch_loss = running_loss / len(self.dataloaders[phase])
+                epoch_acc = running_corrects / len(self.dataloaders[phase])
+                print(epoch_acc)
+                
+                # Load to tesnsorboard
+                self.writer.add_scalar('Loss/{}'.format(phase), epoch_loss, global_step)
+                self.writer.add_scalar('Loss/{}'.format(phase), epoch_acc, global_step)
 
-            # Print to console
-            print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
+                # Print to console
+                print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
 
-            # Deep copy the model
-            if phase == 'test' and epoch_acc > best_acc:
-                best_acc = epoch_acc
-                best_model_wts = copy.deepcopy(self.model.state_dict())
-                current_directory = os.getcwd() 
-                checkpoint = {
-                        'state_dict': self.model.state_dict(),
-                        'optimizer': self.optimizer.state_dict()
-                     }
-                torch.save(checkpoint, current_directory + '/saved-models/mobilenet-v2.pth')
-            time_elapsed = time.time() - since
-            print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
-            global_step += 1
-            print("================================")
+                # Deep copy the model
+                if phase == 'test' and epoch_acc > best_acc:
+                    best_acc = epoch_acc
+                    best_model_wts = copy.deepcopy(self.model.state_dict())
+                    current_directory = os.getcwd() 
+                    checkpoint = {
+                            'state_dict': self.model.state_dict(),
+                            'optimizer': self.optimizer.state_dict()
+                        }
+                    torch.save(checkpoint, current_directory + '/saved-models/mobilenet-v2.pth')
+                time_elapsed = time.time() - since
+                print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
+                global_step += 1
+                print("================================")
 
         print('Best val Acc: {:4f}'.format(best_acc))
         #self.plot_graphs(train_loss, tests_loss, train_acc, test_acc)
