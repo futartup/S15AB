@@ -29,10 +29,10 @@ class DepthDataLoader:
     winged_drones = os.listdir(winged_drones_d)
 
     # Store all the results into final_data
-    flying_birds = [{'class': 0.1, 'image': flying_birds_d + '/' + x} for x in flying_birds] 
-    large_quadcopters = [{'class': 0.2, 'image': large_quadcopters_d + '/' + x} for x in large_quadcopters] 
-    small_quadcopters = [{'class': 0.3, 'image': small_quadcopters_d + '/' + x} for x in small_quadcopters] 
-    winged_drones = [{'class': 0.4, 'image': winged_drones_d + '/' + x} for x in winged_drones]
+    flying_birds = [{'class': 0.1, 'image': flying_birds_d + '/' + x} for x in flying_birds if '.svg' not in x] 
+    large_quadcopters = [{'class': 0.2, 'image': large_quadcopters_d + '/' + x} for x in large_quadcopters if '.svg' not in x] 
+    small_quadcopters = [{'class': 0.3, 'image': small_quadcopters_d + '/' + x} for x in small_quadcopters if '.svg' not in x] 
+    winged_drones = [{'class': 0.4, 'image': winged_drones_d + '/' + x} for x in winged_drones if '.svg' not in x]
     final_list = flying_birds + large_quadcopters + small_quadcopters + winged_drones
     shuffle(final_list)
 
@@ -120,9 +120,10 @@ class DepthDataSet(Dataset):
 
     # assert len(mask_file) > 1, "No mask found"
     # assert len(image_file) > 1, "No image found"
+    # avoid svg images
     pil_image = Image.open(idx['image'])
-    if pil_image.mode in ['RGBA', 'RGB']:
-      pil_image = pil_image.convert('L')
+    if pil_image.mode in ['RGBA', 'L', 'P']:
+      pil_image = pil_image.convert('RGB')
 
     
     #mask = Image.open(self.mask_dir + '/'+ idx)
