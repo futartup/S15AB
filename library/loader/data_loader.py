@@ -8,6 +8,9 @@ from glob import glob
 from os import listdir
 from imutils import paths
 from os.path import splitext
+from torch.utils.data import Subset
+from torchvision.datasets import ImageFolder
+from sklearn.model_selection import train_test_split
 from torch.utils.data import Dataset, DataLoader, random_split
 from library.augmentation.data_augmenter import TransfomedDataSet
 
@@ -17,43 +20,61 @@ data_dict = {
     'cifar100': torchvision.datasets.CIFAR100,
 }
 
+class_dict = {
+  0: 0.1,
+  1: 0.2,
+  2: 0.3,
+  3: 0.4,
+}
 
 class DepthDataLoader:
-  def __init__(self, conf, flying_birds_d, large_quadcopters_d, small_quadcopters_d, winged_drones_d,  test_data_percentage):
+  def __init__(self, conf, root,  test_data_percentage):
     self.conf = conf  
+    dataset = ImageFolder(root=root)
+    datasets = self.train_val_dataset(dataset, test_data_percentage)
 
+    #self.train = datasets['train']
+    #self.test = datasets['test']
     # We will make the dataset in here
-    flying_birds = os.listdir(flying_birds_d)
-    large_quadcopters = os.listdir(large_quadcopters_d)
-    small_quadcopters = os.listdir(small_quadcopters_d)
-    winged_drones = os.listdir(winged_drones_d)
+    # flying_birds = os.listdir(flying_birds_d)
+    # large_quadcopters = os.listdir(large_quadcopters_d)
+    # small_quadcopters = os.listdir(small_quadcopters_d)
+    # winged_drones = os.listdir(winged_drones_d)
 
     # Store all the results into final_data
-    flying_birds = [{'class': 0.1, 'image': flying_birds_d + '/' + x} for x in flying_birds if '.svg' not in x] 
-    large_quadcopters = [{'class': 0.2, 'image': large_quadcopters_d + '/' + x} for x in large_quadcopters if '.svg' not in x] 
-    small_quadcopters = [{'class': 0.3, 'image': small_quadcopters_d + '/' + x} for x in small_quadcopters if '.svg' not in x] 
-    winged_drones = [{'class': 0.4, 'image': winged_drones_d + '/' + x} for x in winged_drones if '.svg' not in x]
-    final_list = flying_birds + large_quadcopters + small_quadcopters + winged_drones
-    shuffle(final_list)
+    # flying_birds = [{'class': 0.1, 'image': flying_birds_d + '/' + x} for x in flying_birds if '.svg' not in x] 
+    # large_quadcopters = [{'class': 0.2, 'image': large_quadcopters_d + '/' + x} for x in large_quadcopters if '.svg' not in x] 
+    # small_quadcopters = [{'class': 0.3, 'image': small_quadcopters_d + '/' + x} for x in small_quadcopters if '.svg' not in x] 
+    # winged_drones = [{'class': 0.4, 'image': winged_drones_d + '/' + x} for x in winged_drones if '.svg' not in x]
+    # final_list = flying_birds + large_quadcopters + small_quadcopters + winged_drones
+    # shuffle(final_list)
 
-    l = len(final_list)
-    x = int(l * test_data_percentage)
-    train_data, test_data = final_list[0:x], final_list[x+1:l-1]
+    # l = len(final_list)
+    # x = int(l * test_data_percentage)
+    # train_data, test_data = final_list[0:x], final_list[x+1:l-1]
 
-    print(train_data, test_data)
+    # print(train_data, test_data)
     
 
-    self.train = DepthDataSet(conf, train_data,
+    self.train = DepthDataSet(conf, datasets['train'],
                                     transform=TransfomedDataSet(self.conf['transformations']['train']))
-    self.test = DepthDataSet(conf, test_data,
+    self.test = DepthDataSet(conf, datasets['test'],
                                     transform=TransfomedDataSet(self.conf['transformations']['test']))
-    print(len(self.train))
-    print(len(self.test))
+    # print(len(self.train))
+    # print(len(self.test))
+
+  def train_val_dataset(self, dataset, val_split=0.30):
+    train_idx, val_idx = train_test_split(list(range(len(dataset))), test_size=val_split)
+    datasets = {}
+    datasets['train'] = Subset(dataset, train_idx)
+    datasets['test'] = Subset(dataset, val_idx)
+    return datasets
+
   def get_train_loader(self):
     return torch.utils.data.DataLoader(self.train, 
                                        batch_size=self.conf.get('batch_size', 64),
                                        shuffle=self.conf.get('shuffle', True), 
-                                       #num_workers=self.conf.get('num_workers', 2),
+                                       num_workers=self.conf.get('num_workers', 4),
                                        pin_memory=self.conf.get('pin_memory', True)
                                        )
     
@@ -61,7 +82,7 @@ class DepthDataLoader:
     return torch.utils.data.DataLoader(self.test, 
                                        batch_size=self.conf.get('batch_size', 64),
                                        shuffle=self.conf.get('shuffle', True), 
-                                       #num_workers=self.conf.get('num_workers', 2),
+                                       num_workers=self.conf.get('num_workers', 4),
                                        pin_memory=self.conf.get('pin_memory', True)
                                        )
 
@@ -121,25 +142,24 @@ class DepthDataSet(Dataset):
     # assert len(mask_file) > 1, "No mask found"
     # assert len(image_file) > 1, "No image found"
     # avoid svg images
-    pil_image = Image.open(idx['image'])
-    print(pil_image.mode)
+    pil_image = idx[0]
+    print(pil_image.info)
     if pil_image.mode in ['RGBA', 'RGB']:
       pil_image = pil_image.convert('RGB')
-    
+  
 
+    #mask = Image.open(self.mask_dir + '/'+ idx)
+    #fg_bg = Image.open(self.fg_bg_dir + '/'+ idx)
+    #depth = Image.open(self.depth_dir + '/'+ idx)
+    #if image.size != mask.size:
+    #assert image.size == mask.size
+    #img = self.preprocess(image, self.scale)
+    #mask = self.preprocess(mask, self.scale)
+    #bg = self.preprocess(bg, self.scale)
+    image =  self.transform(image=pil_image)
     
-      #mask = Image.open(self.mask_dir + '/'+ idx)
-      #fg_bg = Image.open(self.fg_bg_dir + '/'+ idx)
-      #depth = Image.open(self.depth_dir + '/'+ idx)
-      #if image.size != mask.size:
-      #assert image.size == mask.size
-      #img = self.preprocess(image, self.scale)
-      #mask = self.preprocess(mask, self.scale)
-      #bg = self.preprocess(bg, self.scale)
-      image =  self.transform(image=pil_image)
-      
-      #bg =  self.transform(image=bg)
-      return {
-              'image': image['image'], 
-              'class': idx['class'],
-            }
+    #bg =  self.transform(image=bg)
+    return {
+            'image': image['image'], 
+            'class': class_dict[idx[1]],
+          }

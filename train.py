@@ -285,12 +285,7 @@ class Main:
             self.device = model_obj.get_device()
 
     def get_loaders(self):
-        obj = DepthDataLoader(self.conf, 
-                              self.data_dir + '/Flying Birds', 
-                              self.data_dir + '/Large QuadCopters',  
-                              self.data_dir + '/Small QuadCopters',
-                              self.data_dir + '/Winged Drones',
-                              .30)
+        obj = DepthDataLoader(self.conf, self.data_dir, .30)
         #self.train_loader = obj.get_train_loader()
         #self.test_loader = obj.get_test_loader()
         self.dataloaders = {}
