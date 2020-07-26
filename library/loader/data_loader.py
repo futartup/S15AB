@@ -21,10 +21,10 @@ data_dict = {
 }
 
 class_dict = {
-  0: 0.1,
-  1: 0.2,
-  2: 0.3,
-  3: 0.4,
+  0: torch.Tensor([1,0,0,0]),
+  1: torch.Tensor([0,1,0,0]),
+  2: torch.Tensor([0,0,1,0]),
+  3: torch.Tensor([0,0,0,1]),
 }
 
 class DepthDataLoader:
@@ -161,5 +161,5 @@ class DepthDataSet(Dataset):
     #bg =  self.transform(image=bg)
     return {
             'image': image['image'], 
-            'class': class_dict[idx[1]],
+            'class': idx[1],
           }
