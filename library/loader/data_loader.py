@@ -133,6 +133,7 @@ class DepthDataSet(Dataset):
 
   def __getitem__(self, i):
     idx = self.ids[i]
+    
     # image_file = glob(self.image_dir + '/'+ idx )
     # mask_file = glob(self.mask_dir + '/'+ idx )
     # print(idx)
@@ -143,9 +144,8 @@ class DepthDataSet(Dataset):
     # assert len(image_file) > 1, "No image found"
     # avoid svg images
     pil_image = idx[0]
-    print(pil_image.info)
-    if pil_image.mode in ['RGBA', 'RGB']:
-      pil_image = pil_image.convert('RGB')
+    #if pil_image.mode in ['RGBA', 'RGB']:
+    #pil_image = pil_image.convert('RGB')
   
 
     #mask = Image.open(self.mask_dir + '/'+ idx)

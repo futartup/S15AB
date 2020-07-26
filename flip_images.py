@@ -1,34 +1,35 @@
 from PIL import Image, ImageOps
-from imutils import paths
 import argparse
 import random
-import cv2
 import os, sys
 
+
 ap = argparse.ArgumentParser()
-ap.add_argument("-d", "--dataset", required=True,
-                help="path to input dataset")
-ap.add_argument("-rs", "--image_resize", required=False,
-                help="The size to which the image to be resized")
-ap.add_argument("-o", "--output_dir", required=False,
-                help="The output directory to save the files")
-ap.add_argument("-f", "--flip", required=False,
-                help="Flip the images")
+ap.add_argument("-d", "--dataset", required=True, help="path to input dataset")
+
 args = vars(ap.parse_args())
+   
+for filename in os.listdir(args['dataset']):
+    for file in os.listdir(os.getcwd() + '/data/Session 2 Dataset/' + filename):    
+        file = "{}/data/Session 2 Dataset/{}/{}".format(os.getcwd(), filename, file)
+        try:
+            img = Image.open(file) # open the image file
+            print(img.mode)
+            if img.mode in ['RGBA', 'L', 'P']:
+                #img = img.convert('RGB')
+                print('PNG file:', img.mode)
+                #path = img.filename.split('.')[0]
+                path_ext = img.filename.split('.')
+            
+                #filename = img.filename.split('/')[-1].split('.')[0]
+                img.load()  # needed for split()
+                background = Image.new('RGB', img.size, color=0)
+                background.paste(img)  # 3 is the alpha channel
+                background.save(path_ext[0]+'.jpg')
+                print(background.mode)
+                os.remove(file)
 
-print("[INFO] processing the images...")
-image_paths = list(paths.list_images(args["dataset"]))
-
-for path_image in image_paths:
-    image = Image.open(path_image)
-    file_name = path_image.split('/')[-1]
-    if "image_resize" in args and args["image_resize"] is not None:
-        resize_size = int(args["image_resize"])
-        image = image.resize((resize_size, resize_size))
-    if "flip" in args and args["flip"] is not None:
-        rotate = random.randint(0, 360)
-        image = image.rotate(rotate)
-    if "output_dir" in args and args["output_dir"] is not None:
-        image.save(args["output_dir"] + '/' + file_name)
-    else:
-        image.save(os.getcwd() + '/foreground_images/' + file_name)
+            #img.verify() # verify that it is, in fact an image
+        except (IOError, SyntaxError, AttributeError) as e:
+            print('Bad file:', e) # print out the names of corrupt files
+            #os.remove(file)
