@@ -2,12 +2,11 @@
     "seed": 1,
     "lr": 0.001,
     "data": "custom",
-    "num_workers": 1,
+    "num_workers": 4,
     "shuffle": true,
-    "epochs": 2,
+    "epochs": 20,
     "multiclass": true,
-    "batch_size": 10,
-    "num_workers": 2,
+    "batch_size": 100,
     "lr_step_size": 25,
     "lr_gamma": 0.001,
     "loss": { "l1": ["CrossEntropyLoss"]},
@@ -16,12 +15,11 @@
         "range_test": {"end_lr":100, "step_mode": "exp"}
     },
     "optimizer": {
-        "type": "Adam",
-        "weight_decay": 1e-4
+        "type": "SGD",
+        "momentum": 0.9
     },
     "scheduler": {
-        "type": "ReduceLROnPlateau",
-        "patience": 2
+        "type": "OneCycleLR"
     },
     "lr_finder_use": false,
     "transformations": {
@@ -40,7 +38,8 @@
                 "num_holes":1,
                 "max_h_size": 80, 
                 "max_w_size": 80,
-                "always_apply": true
+                "always_apply": true,
+                "p": 1,
             },
             {
                 "name": "Blur",

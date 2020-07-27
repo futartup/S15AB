@@ -97,7 +97,6 @@ class Main:
                 else:
                     self.model.eval()
                 
-                total = 0
                 running_loss = 0
                 running_corrects = 0
 
@@ -119,6 +118,7 @@ class Main:
                         # Send the images to model, and get the output
                         #images = torch.cat([fg_bg, bg], dim=1).to(device=self.device, dtype=torch.float)
                         output = self.model(image)
+                        print(output, target)
                         
                         loss = self.criterion(output, target) # the loss
                         #depth_loss = self.criterion_depth(depth_pred, depth.unsqueeze(1)) # the depth loss
@@ -310,7 +310,7 @@ class Main:
         if 'OneCycleLR' == self.conf['scheduler']['type']:
             params['epochs'] = self.conf['epochs']
             params['optimizer'] = self.optimizer
-            params['steps_per_epoch'] = len(self.train_loader)
+            params['steps_per_epoch'] = len(self.dataloaders['train'])
             params['max_lr'] = self.max_lr
         elif 'ReduceLROnPlateau' == self.conf['scheduler']['type']:
             params['optimizer'] = self.optimizer
